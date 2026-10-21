@@ -733,7 +733,7 @@ function placeholder(label) {
 
 function media(p) {
   const label = p.model || p.id.toUpperCase();
-  const src = p.img || `img/${p.id}.webp`;
+  const src = p.img || (window.EMBEDDED_IMAGES || {})[p.id] || `img/${p.id}.webp`;
   return `<img src="${src}" alt="Regula ${label}" loading="lazy" onerror="this.replaceWith(document.createRange().createContextualFragment(this.dataset.ph))" data-ph='${placeholder(label)}'>`;
 }
 
