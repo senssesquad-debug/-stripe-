@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Regula Baltija</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --ink: #12102a;
@@ -21,7 +21,10 @@
   --line: #e6e1f2;
   --radius: 18px;
   --ease: cubic-bezier(.2, .7, .2, 1);
+  --font-display: "Space Grotesk", Inter, sans-serif;
 }
+/* Space Grotesk has no Cyrillic, so Russian headings use Inter throughout */
+:root:lang(ru) { --font-display: Inter, system-ui, sans-serif; }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -33,9 +36,10 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
-h1, h2, h3, h4 { font-family: "Space Grotesk", Inter, sans-serif; line-height: 1.08; letter-spacing: -.02em; }
+h1, h2, h3, h4 { font-family: var(--font-display); line-height: 1.08; letter-spacing: -.02em; }
 a { color: inherit; text-decoration: none; }
 img { display: block; max-width: 100%; }
+main { overflow-x: clip; }
 button { font: inherit; }
 
 .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
@@ -71,7 +75,7 @@ button { font: inherit; }
 .header.is-solid { background: rgba(18, 16, 42, .86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-color: rgba(255, 255, 255, .07); }
 .header.is-hidden { transform: translateY(-100%); }
 .nav { display: flex; align-items: center; gap: 24px; height: 72px; }
-.logo { display: flex; align-items: center; gap: 10px; color: #fff; font-family: "Space Grotesk", Inter, sans-serif; font-weight: 700; font-size: 20px; }
+.logo { display: flex; align-items: center; gap: 10px; color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 20px; }
 .logo__mark { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--violet-3), var(--violet-1)); display: grid; place-items: center; font-size: 20px; }
 .logo small { display: block; font-family: Inter; font-weight: 500; font-size: 10px; letter-spacing: .14em; color: var(--violet-4); text-transform: uppercase; margin-top: -2px; }
 .menu { display: flex; gap: 2px; margin-left: 12px; list-style: none; }
@@ -92,7 +96,7 @@ button { font: inherit; }
 .drawer.is-open { transform: none; }
 .drawer__top { display: flex; justify-content: space-between; align-items: center; height: 72px; padding: 0 20px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
 .drawer details { border-bottom: 1px solid rgba(255, 255, 255, .08); }
-.drawer summary { list-style: none; cursor: pointer; padding: 18px 20px; font: 600 17px "Space Grotesk", Inter, sans-serif; display: flex; justify-content: space-between; }
+.drawer summary { list-style: none; cursor: pointer; padding: 18px 20px; font: 600 17px var(--font-display); display: flex; justify-content: space-between; }
 .drawer summary::-webkit-details-marker { display: none; }
 .drawer summary::after { content: "+"; color: var(--violet-3); font-size: 22px; line-height: 1; }
 .drawer details[open] summary::after { content: "–"; }
@@ -121,12 +125,12 @@ button { font: inherit; }
 .ticker { background: var(--ink); color: #fff; border-top: 1px solid rgba(255, 255, 255, .06); border-bottom: 1px solid rgba(255, 255, 255, .06); overflow: hidden; }
 .ticker__track { display: flex; gap: 56px; padding: 20px 0; width: max-content; animation: marquee 40s linear infinite; }
 .ticker__item { display: flex; align-items: center; gap: 14px; white-space: nowrap; font-size: 15px; color: #cfc8ea; }
-.ticker__item b { font-family: "Space Grotesk", Inter, sans-serif; color: #fff; }
+.ticker__item b { font-family: var(--font-display); color: #fff; }
 .ticker__item::before { content: ""; width: 8px; height: 8px; transform: rotate(45deg); background: var(--violet-3); }
 @keyframes marquee { to { transform: translateX(-50%); } }
 
 .manifesto { background: var(--ink); color: #fff; padding: 140px 0; }
-.manifesto p { font: 600 clamp(28px, 4.2vw, 56px)/1.18 "Space Grotesk", Inter, sans-serif; letter-spacing: -.02em; max-width: 1050px; }
+.manifesto p { font: 600 clamp(28px, 4.2vw, 56px)/1.18 var(--font-display); letter-spacing: -.02em; max-width: 1050px; }
 .manifesto .word { opacity: .14; transition: opacity .25s; }
 .manifesto .word.is-lit { opacity: 1; }
 .manifesto .word.is-accent.is-lit { color: var(--violet-3); }
@@ -134,9 +138,10 @@ button { font: inherit; }
 .pin { position: relative; height: 400vh; background: var(--paper); }
 .pin__stage { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; overflow: hidden; }
 .pin__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; width: 100%; }
-.pin__counter { font: 700 15px "Space Grotesk", Inter, sans-serif; color: var(--violet-2); margin-bottom: 18px; }
-.pin__titles { position: relative; height: 220px; }
-.pin__title { position: absolute; inset: 0; opacity: 0; transform: translateY(30px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.pin__counter { font: 700 15px var(--font-display); color: var(--violet-2); margin-bottom: 18px; }
+/* titles share one grid cell, so the box is as tall as the longest translation */
+.pin__titles { display: grid; }
+.pin__title { grid-area: 1 / 1; opacity: 0; transform: translateY(30px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
 .pin__title.is-active { opacity: 1; transform: none; }
 .pin__title h3 { font-size: clamp(34px, 4.6vw, 60px); margin-bottom: 16px; }
 .pin__title p { color: var(--muted); font-size: 17px; max-width: 460px; }
@@ -149,7 +154,7 @@ button { font: inherit; }
 
 .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border-radius: 24px; overflow: hidden; border: 1px solid var(--line); }
 .stat { background: #fff; padding: 36px 28px; }
-.stat b { display: block; font: 700 clamp(38px, 4.4vw, 58px) "Space Grotesk", Inter, sans-serif; letter-spacing: -.03em; background: linear-gradient(135deg, var(--violet-2), var(--ink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.stat b { display: block; font: 700 clamp(38px, 4.4vw, 58px) var(--font-display); letter-spacing: -.03em; background: linear-gradient(135deg, var(--violet-2), var(--ink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .stat span { color: var(--muted); font-size: 14px; }
 
 .catalog { background: #fff; }
@@ -177,7 +182,7 @@ button { font: inherit; }
 .card:hover .card__media img { transform: scale(1.06); }
 .card__ph { position: absolute; inset: 0; display: grid; place-items: center; }
 .card__ph svg { position: absolute; inset: 0; width: 100%; height: 100%; }
-.card__ph span { position: relative; font: 700 34px "Space Grotesk", Inter, sans-serif; color: var(--violet-1); letter-spacing: -.02em; }
+.card__ph span { position: relative; font: 700 34px var(--font-display); color: var(--violet-1); letter-spacing: -.02em; }
 .card__badge { position: absolute; top: 12px; left: 12px; z-index: 2; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 5px 9px; border-radius: 99px; background: var(--ink); color: #fff; }
 .card__badge--new { background: #19c37d; }
 .card__body { padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
@@ -210,7 +215,7 @@ button { font: inherit; }
 .tag { font-size: 13px; padding: 7px 12px; border-radius: 99px; background: rgba(169, 133, 255, .15); color: var(--violet-4); }
 .links a { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--line); font-weight: 500; transition: color .2s, padding .2s; }
 .links a:hover { color: var(--violet-1); padding-left: 6px; }
-.links a span { color: var(--violet-2); }
+.links a span:last-child { color: var(--violet-2); }
 
 .press { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; }
 .post { border-radius: var(--radius); overflow: hidden; background: #fff; border: 1px solid var(--line); display: flex; flex-direction: column; transition: box-shadow .3s; }
@@ -232,7 +237,7 @@ button { font: inherit; }
 .careers .section-head p { color: #bdb6dc; }
 .perks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 56px; }
 .perk { background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .08); border-radius: var(--radius); padding: 24px; }
-.perk b { display: block; font: 600 18px "Space Grotesk", Inter, sans-serif; margin: 14px 0 6px; }
+.perk b { display: block; font: 600 18px var(--font-display); margin: 14px 0 6px; }
 .perk p { font-size: 14px; color: #bdb6dc; }
 .icon { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: rgba(169, 133, 255, .15); color: var(--violet-3); }
 .jobs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
@@ -253,7 +258,7 @@ button { font: inherit; }
 .upload input { display: none; }
 .steps { display: flex; gap: 10px; margin-top: 18px; font-size: 13px; color: var(--muted); }
 .steps span { flex: 1; background: var(--paper); border-radius: 10px; padding: 10px; text-align: center; }
-.steps b { display: block; color: var(--violet-1); font-family: "Space Grotesk", Inter, sans-serif; }
+.steps b { display: block; color: var(--violet-1); font-family: var(--font-display); }
 
 .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .tile { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; transition: transform .3s var(--ease), border-color .3s; }
@@ -276,7 +281,7 @@ button { font: inherit; }
 
 .footer { background: var(--ink); color: #bdb6dc; padding: 80px 0 32px; font-size: 14px; }
 .footer__grid { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 32px; margin-bottom: 48px; }
-.footer h5 { color: #fff; font: 600 14px "Space Grotesk", Inter, sans-serif; margin-bottom: 14px; }
+.footer h5 { color: #fff; font: 600 14px var(--font-display); margin-bottom: 14px; }
 .footer__grid a { display: block; padding: 5px 0; transition: color .2s; }
 .footer__grid a:hover { color: #fff; }
 .subscribe { display: flex; gap: 8px; margin-top: 18px; }
@@ -297,7 +302,6 @@ button { font: inherit; }
   .pin { height: 360vh; }
   .pin__grid { grid-template-columns: 1fr; gap: 28px; }
   .pin__visual { max-width: 300px; order: -1; }
-  .pin__titles { height: 230px; }
   .stats { grid-template-columns: 1fr 1fr; }
   .grid { grid-template-columns: 1fr 1fr; }
   .duo, .jobs, .contact__grid, .modal__grid { grid-template-columns: 1fr; }
@@ -339,40 +343,40 @@ button { font: inherit; }
 
 <header class="header" id="header">
   <div class="container nav">
-    <a href="#top" class="logo"><span class="logo__mark">R</span><span>Regula<small>Baltija · Latvia</small></span></a>
+    <a href="#top" class="logo"><span class="logo__mark">R</span><span>Regula<small data-i18n="logo.sub">Baltija · Latvia</small></span></a>
     <ul class="menu">
-      <li><a href="#catalog">Products</a>
+      <li><a href="#catalog" data-i18n="nav.products">Products</a>
         <div class="dropdown">
-          <a href="#catalog" data-jump="readers">Document Readers</a>
-          <a href="#catalog" data-jump="manual">Manual Control Devices</a>
-          <a href="#catalog" data-jump="vsc">Video Spectral Comparators</a>
-          <a href="#catalog" data-jump="micro">Microscopes &amp; Magnifiers</a>
-          <a href="#catalog" data-jump="mo">Magneto-Optical &amp; VIN</a>
-          <a href="#catalog" data-jump="acc">Accessories</a>
-          <a href="#catalog" data-jump="soft">Software &amp; Reference Data</a>
+          <a href="#catalog" data-jump="readers" data-i18n="menu.readers">Document Readers</a>
+          <a href="#catalog" data-jump="manual" data-i18n="menu.manual">Manual Control Devices</a>
+          <a href="#catalog" data-jump="vsc" data-i18n="menu.vsc">Video Spectral Comparators</a>
+          <a href="#catalog" data-jump="micro" data-i18n="menu.micro">Microscopes &amp; Magnifiers</a>
+          <a href="#catalog" data-jump="mo" data-i18n="menu.mo">Magneto-Optical &amp; VIN</a>
+          <a href="#catalog" data-jump="acc" data-i18n="menu.acc">Accessories</a>
+          <a href="#catalog" data-jump="soft" data-i18n="menu.soft">Software &amp; Reference Data</a>
         </div>
       </li>
-      <li><a href="#expertise">Expertise</a>
+      <li><a href="#expertise" data-i18n="nav.expertise">Expertise</a>
         <div class="dropdown">
-          <a href="#expertise">Information Reference Systems</a>
-          <a href="#expertise">Reference Books</a>
-          <a href="#expertise">Specialized Training</a>
-          <a href="#expertise">Glossary of Banknotes</a>
-          <a href="#expertise">Glossary of Documents</a>
-          <a href="#expertise">Support</a>
+          <a href="#expertise" data-i18n="exp.irs">Information Reference Systems</a>
+          <a href="#expertise" data-i18n="exp.books">Reference Books</a>
+          <a href="#expertise" data-i18n="exp.training">Specialized Training</a>
+          <a href="#expertise" data-i18n="exp.glossBank">Glossary of Banknotes</a>
+          <a href="#expertise" data-i18n="exp.glossDoc">Glossary of Documents</a>
+          <a href="#expertise" data-i18n="exp.support">Support</a>
         </div>
       </li>
-      <li><a href="#press">Pressroom</a>
-        <div class="dropdown"><a href="#press">News</a><a href="#press">Blog</a><a href="#press">Exhibitions</a><a href="#press">Videos</a></div>
+      <li><a href="#press" data-i18n="nav.press">Pressroom</a>
+        <div class="dropdown"><a href="#press" data-i18n="press.news">News</a><a href="#press" data-i18n="press.blog">Blog</a><a href="#press" data-i18n="press.exhibitions">Exhibitions</a><a href="#press" data-i18n="press.videos">Videos</a></div>
       </li>
-      <li><a href="#company">Company</a>
-        <div class="dropdown"><a href="#company">Certificates &amp; Awards</a><a href="#company">Media Partners</a><a href="#contact">Regula Offices</a></div>
+      <li><a href="#company" data-i18n="nav.company">Company</a>
+        <div class="dropdown"><a href="#company" data-i18n="co.certs">Certificates &amp; Awards</a><a href="#company" data-i18n="co.media">Media Partners</a><a href="#contact" data-i18n="co.offices">Regula Offices</a></div>
       </li>
-      <li><a href="#careers">Careers</a></li>
+      <li><a href="#careers" data-i18n="nav.careers">Careers</a></li>
     </ul>
     <div class="nav__right">
-      <div class="lang"><button class="is-active">EN</button><button>LV</button><button>RU</button></div>
-      <a href="#contact" class="btn btn--primary">Get in touch</a>
+      <div class="lang"><button data-lang="en" class="is-active">EN</button><button data-lang="lv">LV</button><button data-lang="ru">RU</button></div>
+      <a href="#contact" class="btn btn--primary" data-i18n="cta.touch">Get in touch</a>
       <button class="burger" aria-label="Menu" data-drawer="open">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
       </button>
@@ -382,23 +386,23 @@ button { font: inherit; }
 
 <nav class="drawer" id="drawer">
   <div class="drawer__top">
-    <a href="#top" class="logo"><span class="logo__mark">R</span><span>Regula<small>Baltija · Latvia</small></span></a>
+    <a href="#top" class="logo"><span class="logo__mark">R</span><span>Regula<small data-i18n="logo.sub">Baltija · Latvia</small></span></a>
     <button class="burger" style="display:block" aria-label="Close" data-drawer="close">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
     </button>
   </div>
-  <details><summary>Products</summary>
-    <a href="#catalog" data-jump="readers">Document Readers</a><a href="#catalog" data-jump="manual">Manual Control Devices</a><a href="#catalog" data-jump="vsc">Video Spectral Comparators</a><a href="#catalog" data-jump="micro">Microscopes &amp; Magnifiers</a><a href="#catalog" data-jump="mo">Magneto-Optical &amp; VIN</a><a href="#catalog" data-jump="acc">Accessories</a><a href="#catalog" data-jump="soft">Software &amp; Reference Data</a>
+  <details><summary data-i18n="nav.products">Products</summary>
+    <a href="#catalog" data-jump="readers" data-i18n="menu.readers">Document Readers</a><a href="#catalog" data-jump="manual" data-i18n="menu.manual">Manual Control Devices</a><a href="#catalog" data-jump="vsc" data-i18n="menu.vsc">Video Spectral Comparators</a><a href="#catalog" data-jump="micro" data-i18n="menu.micro">Microscopes &amp; Magnifiers</a><a href="#catalog" data-jump="mo" data-i18n="menu.mo">Magneto-Optical &amp; VIN</a><a href="#catalog" data-jump="acc" data-i18n="menu.acc">Accessories</a><a href="#catalog" data-jump="soft" data-i18n="menu.soft">Software &amp; Reference Data</a>
   </details>
-  <details><summary>Expertise</summary>
-    <a href="#expertise">Information Reference Systems</a><a href="#expertise">Reference Books</a><a href="#expertise">Specialized Training</a><a href="#expertise">Glossary of Banknotes</a><a href="#expertise">Glossary of Documents</a><a href="#expertise">Support</a>
+  <details><summary data-i18n="nav.expertise">Expertise</summary>
+    <a href="#expertise" data-i18n="exp.irs">Information Reference Systems</a><a href="#expertise" data-i18n="exp.books">Reference Books</a><a href="#expertise" data-i18n="exp.training">Specialized Training</a><a href="#expertise" data-i18n="exp.glossBank">Glossary of Banknotes</a><a href="#expertise" data-i18n="exp.glossDoc">Glossary of Documents</a><a href="#expertise" data-i18n="exp.support">Support</a>
   </details>
-  <details><summary>Pressroom</summary><a href="#press">News</a><a href="#press">Blog</a><a href="#press">Exhibitions</a><a href="#press">Videos</a></details>
-  <details><summary>Company</summary><a href="#company">Certificates &amp; Awards</a><a href="#company">Media Partners</a><a href="#contact">Regula Offices</a></details>
-  <details><summary>Careers</summary><a href="#careers">Open roles</a><a href="#careers">Send CV</a></details>
+  <details><summary data-i18n="nav.press">Pressroom</summary><a href="#press" data-i18n="press.news">News</a><a href="#press" data-i18n="press.blog">Blog</a><a href="#press" data-i18n="press.exhibitions">Exhibitions</a><a href="#press" data-i18n="press.videos">Videos</a></details>
+  <details><summary data-i18n="nav.company">Company</summary><a href="#company" data-i18n="co.certs">Certificates &amp; Awards</a><a href="#company" data-i18n="co.media">Media Partners</a><a href="#contact" data-i18n="co.offices">Regula Offices</a></details>
+  <details><summary data-i18n="nav.careers">Careers</summary><a href="#careers" data-i18n="drawer.roles">Open roles</a><a href="#careers" data-i18n="drawer.cv">Send CV</a></details>
   <div class="drawer__foot">
-    <div class="lang" style="align-self:flex-start"><button class="is-active">EN</button><button>LV</button><button>RU</button></div>
-    <a href="#contact" class="btn btn--primary" style="justify-content:center">Get in touch</a>
+    <div class="lang" style="align-self:flex-start"><button data-lang="en" class="is-active">EN</button><button data-lang="lv">LV</button><button data-lang="ru">RU</button></div>
+    <a href="#contact" class="btn btn--primary" style="justify-content:center" data-i18n="cta.touch">Get in touch</a>
   </div>
 </nav>
 
@@ -410,31 +414,31 @@ button { font: inherit; }
     <div class="hero__fade"></div>
     <div class="container">
       <div class="hero__content" id="heroContent">
-        <span class="chip"><i></i>Daugavpils, Latvia · Since 1992</span>
-        <h1><span class="line"><span>Authenticity,</span></span><span class="line"><span><em class="accent">verified.</em></span></span></h1>
-        <p class="hero__lead">More than 100 solutions for document and banknote authentication, engineered and built in Latvia and trusted by border services, banks and forensic labs in 170+ countries.</p>
+        <span class="chip"><i></i><span data-i18n="hero.chip">Daugavpils, Latvia · Since 1992</span></span>
+        <h1><span class="line"><span data-i18n="hero.line1">Authenticity,</span></span><span class="line"><span><em class="accent" data-i18n="hero.line2">verified.</em></span></span></h1>
+        <p class="hero__lead" data-i18n="hero.lead">More than 100 solutions for document and banknote authentication, engineered and built in Latvia and trusted by border services, banks and forensic labs in 170+ countries.</p>
         <div class="hero__cta">
-          <a href="#catalog" class="btn btn--primary">Explore the catalog</a>
-          <a href="#" class="btn btn--glass"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch the video</a>
+          <a href="#catalog" class="btn btn--primary" data-i18n="hero.catalog">Explore the catalog</a>
+          <a href="#" class="btn btn--glass"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span data-i18n="hero.video">Watch the video</span></a>
         </div>
       </div>
     </div>
-    <div class="scroll-hint">Scroll</div>
+    <div class="scroll-hint" data-i18n="hero.scroll">Scroll</div>
   </section>
 
   <div class="ticker">
     <div class="ticker__track" id="ticker">
-      <span class="ticker__item"><b>2026</b> Gartner® Magic Quadrant™ for Identity Verification</span>
-      <span class="ticker__item"><b>170+</b> countries</span>
-      <span class="ticker__item"><b>80+</b> borders use Regula readers</span>
-      <span class="ticker__item"><b>100%</b> in-house hardware, software and data</span>
-      <span class="ticker__item"><b>Fan-free</b> silent, dust-proof devices</span>
+      <span class="ticker__item" data-i18n="ticker.1"><b>2026</b> Gartner® Magic Quadrant™ for Identity Verification</span>
+      <span class="ticker__item" data-i18n="ticker.2"><b>170+</b> countries</span>
+      <span class="ticker__item" data-i18n="ticker.3"><b>80+</b> borders use Regula readers</span>
+      <span class="ticker__item" data-i18n="ticker.4"><b>100%</b> in-house hardware, software and data</span>
+      <span class="ticker__item" data-i18n="ticker.5"><b>Fan-free</b> silent, dust-proof devices</span>
     </div>
   </div>
 
   <section class="manifesto">
     <div class="container">
-      <p id="manifesto">Every passport, banknote and VIN tells a story. Our job is to make sure it is the true one. From a magnifier at a checkpoint to a dual-camera comparator in a forensic lab, everything is designed, assembled and tested here in Daugavpils.</p>
+      <p id="manifesto" data-i18n="manifesto">Every passport, banknote and VIN tells a story. Our job is to make sure it is the true one. From a magnifier at a checkpoint to a dual-camera comparator in a forensic lab, everything is designed, assembled and tested here in Daugavpils.</p>
     </div>
   </section>
 
@@ -442,13 +446,13 @@ button { font: inherit; }
     <div class="pin__stage">
       <div class="container pin__grid">
         <div>
-          <div class="kicker">What we do</div>
+          <div class="kicker" data-i18n="pin.kicker">What we do</div>
           <div class="pin__counter"><span id="pinIndex">01</span> / 04</div>
           <div class="pin__titles">
-            <div class="pin__title is-active"><h3>Devices</h3><p>Readers, comparators, microscopes and magneto-optical systems for document and banknote authenticity checks.</p></div>
-            <div class="pin__title"><h3>Software</h3><p>Our own software drives every device, automates routine checks and builds court-ready reports.</p></div>
-            <div class="pin__title"><h3>Reference data</h3><p>Information Reference Systems with specimens of documents and banknotes from around the world, updated weekly.</p></div>
-            <div class="pin__title"><h3>Training</h3><p>Specialized courses on document and banknote examination, taught by practicing experts.</p></div>
+            <div class="pin__title is-active"><h3 data-i18n="pin.1.title">Devices</h3><p data-i18n="pin.1.text">Readers, comparators, microscopes and magneto-optical systems for document and banknote authenticity checks.</p></div>
+            <div class="pin__title"><h3 data-i18n="pin.2.title">Software</h3><p data-i18n="pin.2.text">Our own software drives every device, automates routine checks and builds court-ready reports.</p></div>
+            <div class="pin__title"><h3 data-i18n="pin.3.title">Reference data</h3><p data-i18n="pin.3.text">Information Reference Systems with specimens of documents and banknotes from around the world, updated weekly.</p></div>
+            <div class="pin__title"><h3 data-i18n="pin.4.title">Training</h3><p data-i18n="pin.4.text">Specialized courses on document and banknote examination, taught by practicing experts.</p></div>
           </div>
           <div class="pin__bar"><i id="pinBar"></i></div>
         </div>
@@ -473,10 +477,10 @@ button { font: inherit; }
   <section class="section" style="padding-top:0">
     <div class="container">
       <div class="stats reveal">
-        <div class="stat"><b data-count="34">0</b><span>years of in-house development</span></div>
-        <div class="stat"><b data-count="170" data-suffix="+">0</b><span>countries reached</span></div>
-        <div class="stat"><b data-count="100" data-suffix="+">0</b><span>verification solutions</span></div>
-        <div class="stat"><b data-count="80" data-suffix="+">0</b><span>borders equipped</span></div>
+        <div class="stat"><b data-count="34">0</b><span data-i18n="stat.years">years of in-house development</span></div>
+        <div class="stat"><b data-count="170" data-suffix="+">0</b><span data-i18n="stat.countries">countries reached</span></div>
+        <div class="stat"><b data-count="100" data-suffix="+">0</b><span data-i18n="stat.solutions">verification solutions</span></div>
+        <div class="stat"><b data-count="80" data-suffix="+">0</b><span data-i18n="stat.borders">borders equipped</span></div>
       </div>
     </div>
   </section>
@@ -484,14 +488,14 @@ button { font: inherit; }
   <section class="section catalog" id="catalog">
     <div class="container">
       <div class="section-head reveal">
-        <div><div class="kicker">Catalog</div><h2 class="section-title">Every device,<br>one place</h2></div>
-        <p>From a pocket magnifier to a dual-camera comparator. Filter by category or search by model number.</p>
+        <div><div class="kicker" data-i18n="catalog.kicker">Catalog</div><h2 class="section-title" data-i18n="catalog.title">Every device,<br>one place</h2></div>
+        <p data-i18n="catalog.lead">From a pocket magnifier to a dual-camera comparator. Filter by category or search by model number.</p>
       </div>
       <div class="catalog__tools reveal">
         <div class="filters" id="filters"></div>
         <label class="search">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          <input id="search" type="search" placeholder="Search, e.g. 4308">
+          <input id="search" type="search" placeholder="Search, e.g. 4308" data-i18n-placeholder="catalog.search">
         </label>
       </div>
       <div class="catalog__banner" id="banner"><img id="bannerImg" alt=""><div><h3 id="bannerTitle"></h3><p id="bannerText"></p></div></div>
@@ -508,8 +512,8 @@ button { font: inherit; }
         <h3 id="modalName"></h3>
         <p id="modalText"></p>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
-          <a href="#contact" class="btn btn--primary" data-close>Request a quote</a>
-          <a href="#contact" class="btn btn--outline" data-close>Full specs</a>
+          <a href="#contact" class="btn btn--primary" data-close data-i18n="modal.quote">Request a quote</a>
+          <a href="#contact" class="btn btn--outline" data-close data-i18n="modal.specs">Full specs</a>
         </div>
       </div>
     </div>
@@ -518,21 +522,21 @@ button { font: inherit; }
   <section class="section" id="expertise">
     <div class="container duo">
       <div class="panel panel--dark reveal reveal--left">
-        <div class="kicker" style="color:var(--violet-3)">Specialized training</div>
-        <h3>Learn to spot what others miss</h3>
-        <p>Hands-on courses for border guards, police, bank staff and forensic experts, led by Regula specialists.</p>
-        <div class="tags"><span class="tag">Document examination</span><span class="tag">Banknote authentication</span><span class="tag">Device operation</span><span class="tag">On-site or remote</span></div>
-        <a href="#" class="btn btn--primary">See courses</a>
+        <div class="kicker" style="color:var(--violet-3)" data-i18n="exp.training">Specialized training</div>
+        <h3 data-i18n="training.title">Learn to spot what others miss</h3>
+        <p data-i18n="training.lead">Hands-on courses for border guards, police, bank staff and forensic experts, led by Regula specialists.</p>
+        <div class="tags"><span class="tag" data-i18n="training.tag1">Document examination</span><span class="tag" data-i18n="training.tag2">Banknote authentication</span><span class="tag" data-i18n="training.tag3">Device operation</span><span class="tag" data-i18n="training.tag4">On-site or remote</span></div>
+        <a href="#" class="btn btn--primary" data-i18n="training.cta">See courses</a>
       </div>
       <div class="panel panel--light reveal reveal--right">
-        <div class="kicker">Knowledge hub</div>
-        <h3>Reference data you can rely on</h3>
+        <div class="kicker" data-i18n="hub.kicker">Knowledge hub</div>
+        <h3 data-i18n="hub.title">Reference data you can rely on</h3>
         <div class="links">
-          <a href="#">Information Reference Systems <span>→</span></a>
-          <a href="#">Reference Books <span>→</span></a>
-          <a href="#">Glossary of Banknotes <span>→</span></a>
-          <a href="#">Glossary of Documents <span>→</span></a>
-          <a href="#">Support center <span>→</span></a>
+          <a href="#"><span data-i18n="exp.irs">Information Reference Systems</span> <span>→</span></a>
+          <a href="#"><span data-i18n="exp.books">Reference Books</span> <span>→</span></a>
+          <a href="#"><span data-i18n="exp.glossBank">Glossary of Banknotes</span> <span>→</span></a>
+          <a href="#"><span data-i18n="exp.glossDoc">Glossary of Documents</span> <span>→</span></a>
+          <a href="#"><span data-i18n="hub.support">Support center</span> <span>→</span></a>
         </div>
       </div>
     </div>
@@ -541,16 +545,16 @@ button { font: inherit; }
   <section class="section" id="press" style="padding-top:0">
     <div class="container">
       <div class="section-head reveal">
-        <div><div class="kicker">Pressroom</div><h2 class="section-title">Latest from Regula</h2></div>
-        <a href="#" class="btn btn--outline">All news</a>
+        <div><div class="kicker" data-i18n="nav.press">Pressroom</div><h2 class="section-title" data-i18n="press.title">Latest from Regula</h2></div>
+        <a href="#" class="btn btn--outline" data-i18n="press.all">All news</a>
       </div>
       <div class="press stagger">
-        <a href="#" class="post reveal" style="--i:0"><div class="post__thumb"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><rect width="160" height="90" fill="#28234f"/><circle cx="120" cy="20" r="50" fill="#7b4fe0" opacity=".6"/><circle cx="40" cy="80" r="40" fill="#a985ff" opacity=".4"/></svg></div><div class="post__body"><small>Press release</small><h4>Regula launches IDV Platform for enterprise identity lifecycle management</h4></div></a>
-        <a href="#" class="post reveal" style="--i:1"><div class="post__thumb"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><rect width="160" height="90" fill="#1b1838"/><path d="M0 70 Q40 20 80 50 T160 30 V90 H0Z" fill="#7b4fe0" opacity=".7"/></svg></div><div class="post__body"><small>Product</small><h4>The upgraded Regula 4308M comparator</h4></div></a>
-        <a href="#" class="post reveal" style="--i:2"><div class="post__thumb"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><rect width="160" height="90" fill="#5b2fc4"/><g stroke="#d9c8ff" stroke-opacity=".5" fill="none"><circle cx="80" cy="45" r="15"/><circle cx="80" cy="45" r="30"/><circle cx="80" cy="45" r="45"/></g></svg></div><div class="post__body"><small>Press release</small><h4>Verifying mobile driver's licenses at scale</h4></div></a>
+        <a href="#" class="post reveal" style="--i:0"><div class="post__thumb"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><rect width="160" height="90" fill="#28234f"/><circle cx="120" cy="20" r="50" fill="#7b4fe0" opacity=".6"/><circle cx="40" cy="80" r="40" fill="#a985ff" opacity=".4"/></svg></div><div class="post__body"><small data-i18n="post.release">Press release</small><h4 data-i18n="post.1">Regula launches IDV Platform for enterprise identity lifecycle management</h4></div></a>
+        <a href="#" class="post reveal" style="--i:1"><div class="post__thumb"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><rect width="160" height="90" fill="#1b1838"/><path d="M0 70 Q40 20 80 50 T160 30 V90 H0Z" fill="#7b4fe0" opacity=".7"/></svg></div><div class="post__body"><small data-i18n="post.product">Product</small><h4 data-i18n="post.2">The upgraded Regula 4308M comparator</h4></div></a>
+        <a href="#" class="post reveal" style="--i:2"><div class="post__thumb"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><rect width="160" height="90" fill="#5b2fc4"/><g stroke="#d9c8ff" stroke-opacity=".5" fill="none"><circle cx="80" cy="45" r="15"/><circle cx="80" cy="45" r="30"/><circle cx="80" cy="45" r="45"/></g></svg></div><div class="post__body"><small data-i18n="post.release">Press release</small><h4 data-i18n="post.3">Verifying mobile driver's licenses at scale</h4></div></a>
       </div>
       <div class="press-nav reveal">
-        <a href="#">News <span>→</span></a><a href="#">Blog <span>→</span></a><a href="#">Exhibitions <span>→</span></a><a href="#">Videos <span>→</span></a>
+        <a href="#"><span data-i18n="press.news">News</span> <span>→</span></a><a href="#"><span data-i18n="press.blog">Blog</span> <span>→</span></a><a href="#"><span data-i18n="press.exhibitions">Exhibitions</span> <span>→</span></a><a href="#"><span data-i18n="press.videos">Videos</span> <span>→</span></a>
       </div>
     </div>
   </section>
@@ -558,33 +562,33 @@ button { font: inherit; }
   <section class="section careers" id="careers">
     <div class="container">
       <div class="section-head reveal">
-        <div><div class="kicker">Careers in Daugavpils</div><h2 class="section-title">Build the tech that<br>keeps documents <em class="accent">honest</em></h2></div>
-        <p>Our devices are designed and assembled here, then shipped to 170+ countries. Join the team behind them.</p>
+        <div><div class="kicker" data-i18n="careers.kicker">Careers in Daugavpils</div><h2 class="section-title" data-i18n="careers.title">Build the tech that<br>keeps documents <em class="accent">honest</em></h2></div>
+        <p data-i18n="careers.lead">Our devices are designed and assembled here, then shipped to 170+ countries. Join the team behind them.</p>
       </div>
       <div class="perks stagger">
-        <div class="perk reveal" style="--i:0"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></div><b>Global impact</b><p>Your work ends up at borders, banks and labs worldwide.</p></div>
-        <div class="perk reveal" style="--i:1"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 20V4M5 11l7-7 7 7"/></svg></div><b>Grow with us</b><p>Training from experts and room to move across teams.</p></div>
-        <div class="perk reveal" style="--i:2"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12"/><path d="M9 21v-6h6v6"/></svg></div><b>Close to home</b><p>World-class engineering without leaving Latgale.</p></div>
-        <div class="perk reveal" style="--i:3"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M7 10v5c3 2 7 2 10 0v-5"/></svg></div><b>Students welcome</b><p>Internships and joint projects with Daugavpils University.</p></div>
+        <div class="perk reveal" style="--i:0"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></div><b data-i18n="perk.1.title">Global impact</b><p data-i18n="perk.1.text">Your work ends up at borders, banks and labs worldwide.</p></div>
+        <div class="perk reveal" style="--i:1"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 20V4M5 11l7-7 7 7"/></svg></div><b data-i18n="perk.2.title">Grow with us</b><p data-i18n="perk.2.text">Training from experts and room to move across teams.</p></div>
+        <div class="perk reveal" style="--i:2"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12"/><path d="M9 21v-6h6v6"/></svg></div><b data-i18n="perk.3.title">Close to home</b><p data-i18n="perk.3.text">World-class engineering without leaving Latgale.</p></div>
+        <div class="perk reveal" style="--i:3"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M7 10v5c3 2 7 2 10 0v-5"/></svg></div><b data-i18n="perk.4.title">Students welcome</b><p data-i18n="perk.4.text">Internships and joint projects with Daugavpils University.</p></div>
       </div>
       <div class="jobs">
         <div class="reveal reveal--left">
-          <h3>Where we usually hire</h3>
-          <p class="jobs__intro">No open role that fits right now? Send your CV anyway. We review every application when a position opens.</p>
-          <div class="role"><div>Production &amp; assembly<small>Daugavpils · on-site</small></div><span class="pill">Talent pool</span></div>
-          <div class="role"><div>Electronics &amp; optics engineering<small>Daugavpils · on-site</small></div><span class="pill">Talent pool</span></div>
-          <div class="role"><div>Software development<small>Daugavpils · hybrid</small></div><span class="pill">Talent pool</span></div>
-          <div class="role"><div>Student internships<small>Daugavpils · seasonal</small></div><span class="pill pill--open">Ask us</span></div>
+          <h3 data-i18n="jobs.title">Where we usually hire</h3>
+          <p class="jobs__intro" data-i18n="jobs.lead">No open role that fits right now? Send your CV anyway. We review every application when a position opens.</p>
+          <div class="role"><div data-i18n="role.production">Production &amp; assembly<small>Daugavpils · on-site</small></div><span class="pill" data-i18n="pill.pool">Talent pool</span></div>
+          <div class="role"><div data-i18n="role.engineering">Electronics &amp; optics engineering<small>Daugavpils · on-site</small></div><span class="pill" data-i18n="pill.pool">Talent pool</span></div>
+          <div class="role"><div data-i18n="role.software">Software development<small>Daugavpils · hybrid</small></div><span class="pill" data-i18n="pill.pool">Talent pool</span></div>
+          <div class="role"><div data-i18n="role.internship">Student internships<small>Daugavpils · seasonal</small></div><span class="pill pill--open" data-i18n="pill.ask">Ask us</span></div>
         </div>
         <form class="form reveal reveal--right" id="cvForm">
-          <h3>Send us your CV</h3>
-          <p>Takes about a minute. Available in English, Latvian and Russian.</p>
-          <div class="field"><label for="f-name">Full name</label><input id="f-name" required></div>
-          <div class="field"><label for="f-mail">Email</label><input id="f-mail" type="email" required></div>
-          <div class="field"><label for="f-area">Area of interest</label><select id="f-area"><option>Production &amp; assembly</option><option>Engineering</option><option>Software development</option><option>Internship</option><option>Other</option></select></div>
-          <div class="field"><label>CV</label><label class="upload"><input type="file" accept=".pdf,.doc,.docx" id="f-file"><span id="f-file-label">Drop your CV here or tap to upload<br><small>PDF or DOCX</small></span></label></div>
-          <button class="btn btn--primary" style="width:100%;justify-content:center;margin-top:6px">Send CV</button>
-          <div class="steps"><span><b>1</b>We review</span><span><b>2</b>We call you</span><span><b>3</b>Meet the team</span></div>
+          <h3 data-i18n="form.title">Send us your CV</h3>
+          <p data-i18n="form.lead">Takes about a minute. Available in English, Latvian and Russian.</p>
+          <div class="field"><label for="f-name" data-i18n="form.name">Full name</label><input id="f-name" required></div>
+          <div class="field"><label for="f-mail" data-i18n="form.email">Email</label><input id="f-mail" type="email" required></div>
+          <div class="field"><label for="f-area" data-i18n="form.area">Area of interest</label><select id="f-area"><option data-i18n="form.opt.production">Production &amp; assembly</option><option data-i18n="form.opt.engineering">Engineering</option><option data-i18n="form.opt.software">Software development</option><option data-i18n="form.opt.internship">Internship</option><option data-i18n="form.opt.other">Other</option></select></div>
+          <div class="field"><label>CV</label><label class="upload"><input type="file" accept=".pdf,.doc,.docx" id="f-file"><span id="f-file-label" data-i18n="form.upload">Drop your CV here or tap to upload<br><small>PDF or DOCX</small></span></label></div>
+          <button class="btn btn--primary" style="width:100%;justify-content:center;margin-top:6px" data-i18n="form.send">Send CV</button>
+          <div class="steps"><span data-i18n="form.step1"><b>1</b>We review</span><span data-i18n="form.step2"><b>2</b>We call you</span><span data-i18n="form.step3"><b>3</b>Meet the team</span></div>
         </form>
       </div>
     </div>
@@ -592,11 +596,11 @@ button { font: inherit; }
 
   <section class="section" id="company">
     <div class="container">
-      <div class="section-head reveal"><div><div class="kicker">Company</div><h2 class="section-title">Trusted, certified, connected</h2></div></div>
+      <div class="section-head reveal"><div><div class="kicker" data-i18n="nav.company">Company</div><h2 class="section-title" data-i18n="company.title">Trusted, certified, connected</h2></div></div>
       <div class="trio stagger">
-        <a href="#" class="tile reveal" style="--i:0"><div class="icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/></svg></div><h3>Certificates &amp; Awards</h3><p>Quality standards and industry recognition behind every device.</p></a>
-        <a href="#" class="tile reveal" style="--i:1"><div class="icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></svg></div><h3>Media Partners</h3><p>Publications and events we work with across the industry.</p></a>
-        <a href="#contact" class="tile reveal" style="--i:2"><div class="icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 21s-7-6.5-7-12a7 7 0 0114 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></div><h3>Regula Offices</h3><p>Latvia, USA, Germany, Poland, the Netherlands and Brazil.</p></a>
+        <a href="#" class="tile reveal" style="--i:0"><div class="icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/></svg></div><h3 data-i18n="co.certs">Certificates &amp; Awards</h3><p data-i18n="company.certs">Quality standards and industry recognition behind every device.</p></a>
+        <a href="#" class="tile reveal" style="--i:1"><div class="icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></svg></div><h3 data-i18n="co.media">Media Partners</h3><p data-i18n="company.media">Publications and events we work with across the industry.</p></a>
+        <a href="#contact" class="tile reveal" style="--i:2"><div class="icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 21s-7-6.5-7-12a7 7 0 0114 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></div><h3 data-i18n="co.offices">Regula Offices</h3><p data-i18n="company.offices">Latvia, USA, Germany, Poland, the Netherlands and Brazil.</p></a>
       </div>
     </div>
   </section>
@@ -604,13 +608,13 @@ button { font: inherit; }
   <section class="section contact" id="contact">
     <div class="container contact__grid">
       <div class="contact__card reveal reveal--left">
-        <div class="kicker" style="color:var(--violet-3)">Contacts</div>
-        <h3>Let's talk business</h3>
-        <div class="contact__row"><small>Company</small>Regula Baltija LLC</div>
-        <div class="contact__row"><small>Address</small>Višķu iela 34, Daugavpils, LV-5410, Latvia</div>
-        <div class="contact__row"><small>Phone</small><a href="tel:+37165431299">+371 65 43 12 99</a></div>
-        <div class="contact__row"><small>Email</small><a href="mailto:info.lv@regulaforensics.com">info.lv@regulaforensics.com</a></div>
-        <a href="mailto:info.lv@regulaforensics.com" class="btn btn--primary" style="margin-top:20px">Get in touch</a>
+        <div class="kicker" style="color:var(--violet-3)" data-i18n="contact.kicker">Contacts</div>
+        <h3 data-i18n="contact.title">Let's talk business</h3>
+        <div class="contact__row"><small data-i18n="contact.company">Company</small><span data-i18n="contact.companyName">Regula Baltija LLC</span></div>
+        <div class="contact__row"><small data-i18n="contact.address">Address</small><span data-i18n="contact.addressValue">Višķu iela 34, Daugavpils, LV-5410, Latvia</span></div>
+        <div class="contact__row"><small data-i18n="contact.phone">Phone</small><a href="tel:+37165431299">+371 65 43 12 99</a></div>
+        <div class="contact__row"><small data-i18n="form.email">Email</small><a href="mailto:info.lv@regulaforensics.com">info.lv@regulaforensics.com</a></div>
+        <a href="mailto:info.lv@regulaforensics.com" class="btn btn--primary" style="margin-top:20px" data-i18n="cta.touch">Get in touch</a>
       </div>
       <div class="map reveal reveal--right">
         <svg viewBox="0 0 400 340" preserveAspectRatio="xMidYMid slice">
@@ -621,7 +625,7 @@ button { font: inherit; }
           <circle cx="200" cy="160" r="12" fill="#a985ff"><animate attributeName="r" values="10;40;10" dur="2.4s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2.4s" repeatCount="indefinite"/></circle>
           <circle cx="200" cy="160" r="8" fill="#a985ff"/>
         </svg>
-        <div class="map__pin">Regula Baltija, Daugavpils</div>
+        <div class="map__pin" data-i18n="contact.pin">Regula Baltija, Daugavpils</div>
       </div>
     </div>
   </section>
@@ -632,9 +636,9 @@ button { font: inherit; }
   <div class="container">
     <div class="footer__grid">
       <div>
-        <a href="#top" class="logo"><span class="logo__mark">R</span><span>Regula<small>Baltija · Latvia</small></span></a>
-        <p style="margin-top:16px;max-width:300px">Document and banknote authentication, made in Daugavpils since 1992.</p>
-        <form class="subscribe" id="subForm"><input type="email" placeholder="Subscribe to newsletter" required><button class="btn btn--primary" style="padding:11px 16px">→</button></form>
+        <a href="#top" class="logo"><span class="logo__mark">R</span><span>Regula<small data-i18n="logo.sub">Baltija · Latvia</small></span></a>
+        <p style="margin-top:16px;max-width:300px" data-i18n="footer.tagline">Document and banknote authentication, made in Daugavpils since 1992.</p>
+        <form class="subscribe" id="subForm"><input type="email" placeholder="Subscribe to newsletter" data-i18n-placeholder="footer.subscribe" required><button class="btn btn--primary" style="padding:11px 16px">→</button></form>
         <div class="social">
           <a href="#" aria-label="RSS"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="19" r="2"/><path d="M3 10a11 11 0 0111 11h-3a8 8 0 00-8-8zm0-6a17 17 0 0117 17h-3A14 14 0 003 7z"/></svg></a>
           <a href="#" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8V6c0-1 .5-1.5 1.5-1.5H17V1h-3c-3 0-4 2-4 4.5V8H7v3.5h3V23h4V11.5h3l.5-3.5z"/></svg></a>
@@ -644,19 +648,20 @@ button { font: inherit; }
           <a href="#" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg></a>
         </div>
       </div>
-      <div><h5>Products</h5><a href="#catalog" data-jump="readers">Document readers</a><a href="#catalog" data-jump="manual">Manual control</a><a href="#catalog" data-jump="vsc">Comparators</a><a href="#catalog" data-jump="micro">Microscopes</a><a href="#catalog" data-jump="mo">Magneto-optical</a><a href="#catalog" data-jump="soft">Software</a></div>
-      <div><h5>Expertise</h5><a href="#expertise">Reference systems</a><a href="#expertise">Reference books</a><a href="#expertise">Training</a><a href="#expertise">Glossaries</a><a href="#expertise">Support</a></div>
-      <div><h5>Pressroom</h5><a href="#press">News</a><a href="#press">Blog</a><a href="#press">Exhibitions</a><a href="#press">Videos</a></div>
-      <div><h5>Company</h5><a href="#company">Certificates &amp; Awards</a><a href="#company">Media Partners</a><a href="#careers">Careers</a><a href="#contact">Offices</a></div>
+      <div><h5 data-i18n="nav.products">Products</h5><a href="#catalog" data-jump="readers" data-i18n="footer.readers">Document readers</a><a href="#catalog" data-jump="manual" data-i18n="footer.manual">Manual control</a><a href="#catalog" data-jump="vsc" data-i18n="footer.vsc">Comparators</a><a href="#catalog" data-jump="micro" data-i18n="footer.micro">Microscopes</a><a href="#catalog" data-jump="mo" data-i18n="footer.mo">Magneto-optical</a><a href="#catalog" data-jump="soft" data-i18n="footer.soft">Software</a></div>
+      <div><h5 data-i18n="nav.expertise">Expertise</h5><a href="#expertise" data-i18n="footer.irs">Reference systems</a><a href="#expertise" data-i18n="footer.books">Reference books</a><a href="#expertise" data-i18n="footer.training">Training</a><a href="#expertise" data-i18n="footer.glossaries">Glossaries</a><a href="#expertise" data-i18n="exp.support">Support</a></div>
+      <div><h5 data-i18n="nav.press">Pressroom</h5><a href="#press" data-i18n="press.news">News</a><a href="#press" data-i18n="press.blog">Blog</a><a href="#press" data-i18n="press.exhibitions">Exhibitions</a><a href="#press" data-i18n="press.videos">Videos</a></div>
+      <div><h5 data-i18n="nav.company">Company</h5><a href="#company" data-i18n="co.certs">Certificates &amp; Awards</a><a href="#company" data-i18n="co.media">Media Partners</a><a href="#careers" data-i18n="nav.careers">Careers</a><a href="#contact" data-i18n="footer.offices">Offices</a></div>
     </div>
     <div class="footer__bottom">
-      <span>© 1992–2026 Regula. All rights reserved.</span>
-      <nav><a href="#">Terms of use</a><a href="#">Privacy</a><a href="#">Cookie policy</a></nav>
+      <span data-i18n="footer.rights">© 1992–2026 Regula. All rights reserved.</span>
+      <nav><a href="#" data-i18n="footer.terms">Terms of use</a><a href="#" data-i18n="footer.privacy">Privacy</a><a href="#" data-i18n="footer.cookies">Cookie policy</a></nav>
     </div>
-    <p class="legal">Gartner® and Magic Quadrant™ are trademarks of Gartner, Inc. and/or its affiliates, used with permission. Gartner does not endorse any vendor, product or service depicted in its research publications. Concept design.</p>
+    <p class="legal" data-i18n="footer.legal">Gartner® and Magic Quadrant™ are trademarks of Gartner, Inc. and/or its affiliates, used with permission. Gartner does not endorse any vendor, product or service depicted in its research publications. Concept design.</p>
   </div>
 </footer>
 
+<script src="i18n.js"></script>
 <script>
 const CATEGORIES = {
   readers: { label: 'Document Readers', cover: 'https://static-content.regulaforensics.com/Visuals/0574-new-2.webp', text: 'Full-page, ID-1 and mobile readers for border control, police and business.' },
@@ -732,18 +737,34 @@ function media(p) {
   return `<img src="${src}" alt="Regula ${label}" loading="lazy" onerror="this.replaceWith(document.createRange().createContextualFragment(this.dataset.ph))" data-ph='${placeholder(label)}'>`;
 }
 
-const state = { cat: 'all', query: '' };
+const state = { cat: 'all', query: '', lang: 'en' };
+
+// English lives in the markup; capture it so we can switch back to it
+$$('[data-i18n]').forEach(el => { I18N.en[el.dataset.i18n] ??= el.innerHTML; });
+$$('[data-i18n-placeholder]').forEach(el => { I18N.en[el.dataset.i18nPlaceholder] ??= el.placeholder; });
+
+const t = key => I18N[state.lang][key] ?? I18N.en[key];
+
+function category(key) {
+  const [label, text] = CATEGORY_I18N[state.lang]?.[key] || [];
+  return { ...CATEGORIES[key], label: label || CATEGORIES[key].label, text: text || CATEGORIES[key].text };
+}
+
+function product(p) {
+  const [name, text] = PRODUCT_I18N[state.lang]?.[p.id] || [];
+  return { ...p, name: name || p.name, text: text || p.text };
+}
 
 function renderFilters() {
   const counts = PRODUCTS.reduce((acc, p) => (acc[p.cat] = (acc[p.cat] || 0) + 1, acc), {});
-  const items = [['all', 'All', PRODUCTS.length], ...Object.entries(CATEGORIES).map(([k, v]) => [k, v.label, counts[k]])];
+  const items = [['all', t('catalog.all'), PRODUCTS.length], ...Object.keys(CATEGORIES).map(k => [k, category(k).label, counts[k]])];
   $('#filters').innerHTML = items.map(([key, label, n]) =>
     `<button class="filter${state.cat === key ? ' is-active' : ''}" data-cat="${key}">${label}<sup>${n}</sup></button>`
   ).join('');
 }
 
 function renderBanner() {
-  const c = CATEGORIES[state.cat];
+  const c = CATEGORIES[state.cat] && category(state.cat);
   const banner = $('#banner');
   if (!c || !c.cover) { banner.classList.remove('is-shown'); return; }
   $('#bannerImg').src = c.cover;
@@ -755,20 +776,20 @@ function renderBanner() {
 
 function renderGrid() {
   const q = state.query.trim().toLowerCase();
-  const list = PRODUCTS.filter(p =>
+  const list = PRODUCTS.map(product).filter(p =>
     (state.cat === 'all' || p.cat === state.cat) &&
     (!q || `${p.id} ${p.model || ''} ${p.name} ${p.text}`.toLowerCase().includes(q))
   );
   $('#grid').innerHTML = list.length ? list.map((p, i) => `
     <button class="card is-entering" style="--i:${Math.min(i, 12)}" data-id="${p.id}">
-      ${p.badge ? `<span class="card__badge${p.badge === 'New' ? ' card__badge--new' : ''}">${p.badge}</span>` : ''}
+      ${p.badge ? `<span class="card__badge${p.badge === 'New' ? ' card__badge--new' : ''}">${t('badge.' + p.badge)}</span>` : ''}
       <div class="card__media">${media(p)}</div>
       <div class="card__body">
         <span class="card__model">${p.model || 'Regula ' + p.id.toUpperCase()}</span>
         <h4 class="card__name">${p.name}</h4>
         <p class="card__text">${p.text}</p>
       </div>
-    </button>`).join('') : '<p class="empty">Nothing found. Try another model number.</p>';
+    </button>`).join('') : `<p class="empty">${t('catalog.empty')}</p>`;
 }
 
 function renderCatalog() { renderFilters(); renderBanner(); renderGrid(); }
@@ -785,9 +806,9 @@ const modal = $('#modal');
 $('#grid').addEventListener('click', e => {
   const card = e.target.closest('.card');
   if (!card) return;
-  const p = PRODUCTS.find(x => x.id === card.dataset.id);
+  const p = product(PRODUCTS.find(x => x.id === card.dataset.id));
   $('#modalMedia').innerHTML = media(p);
-  $('#modalCat').textContent = `${CATEGORIES[p.cat].label} · ${p.model || 'Regula ' + p.id.toUpperCase()}`;
+  $('#modalCat').textContent = `${category(p.cat).label} · ${p.model || 'Regula ' + p.id.toUpperCase()}`;
   $('#modalName').textContent = p.name;
   $('#modalText').textContent = p.text;
   modal.showModal();
@@ -802,26 +823,58 @@ $$('[data-drawer]').forEach(b => b.addEventListener('click', () => setDrawer(b.d
 $$('#drawer a').forEach(a => a.addEventListener('click', () => setDrawer(false)));
 
 $$('.lang').forEach(group => group.addEventListener('click', e => {
-  if (e.target.tagName !== 'BUTTON') return;
-  $$('button', group).forEach(b => b.classList.toggle('is-active', b === e.target));
+  if (e.target.dataset.lang) setLang(e.target.dataset.lang);
 }));
 
 $('#f-file').addEventListener('change', e => {
   const f = e.target.files[0];
-  if (f) $('#f-file-label').textContent = f.name;
+  if (!f) return;
+  const label = $('#f-file-label');
+  delete label.dataset.i18n;
+  label.textContent = f.name;
 });
-$('#cvForm').addEventListener('submit', e => { e.preventDefault(); e.target.querySelector('button').textContent = 'Thank you, we’ll be in touch'; });
+$('#cvForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  btn.dataset.i18n = 'form.thanks';
+  btn.innerHTML = t('form.thanks');
+});
 $('#subForm').addEventListener('submit', e => { e.preventDefault(); e.target.querySelector('button').textContent = '✓'; });
 
 const ticker = $('#ticker');
 ticker.innerHTML += ticker.innerHTML;
 
 const manifesto = $('#manifesto');
-const accentWords = ['true', 'Daugavpils.'];
-manifesto.innerHTML = manifesto.textContent.trim().split(/\s+/).map(w =>
-  `<span class="word${accentWords.includes(w) ? ' is-accent' : ''}">${w}</span>`
-).join(' ');
-const words = $$('.word', manifesto);
+let words = [];
+function renderManifesto() {
+  const accentWords = t('manifesto.accent');
+  manifesto.innerHTML = t('manifesto').trim().split(/\s+/).map(w =>
+    `<span class="word${accentWords.includes(w) ? ' is-accent' : ''}">${w}</span>`
+  ).join(' ');
+  words = $$('.word', manifesto);
+}
+
+function setLang(lang) {
+  if (!I18N[lang]) lang = 'en';
+  state.lang = lang;
+  document.documentElement.lang = lang;
+  document.title = t('meta.title');
+  $$('[data-i18n]').forEach(el => { el.innerHTML = t(el.dataset.i18n); });
+  $$('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+  $$('.lang button').forEach(b => b.classList.toggle('is-active', b.dataset.lang === lang));
+  renderManifesto();
+  renderCatalog();
+  onScroll();
+  try { localStorage.setItem('lang', lang); } catch {}
+}
+
+function initialLang() {
+  const fromUrl = new URLSearchParams(location.search).get('lang');
+  if (I18N[fromUrl]) return fromUrl;
+  try { const saved = localStorage.getItem('lang'); if (I18N[saved]) return saved; } catch {}
+  const browser = (navigator.language || '').slice(0, 2);
+  return I18N[browser] ? browser : 'en';
+}
 
 const revealObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => entry.target.classList.toggle('is-visible', entry.isIntersecting));
@@ -948,8 +1001,7 @@ addEventListener('scroll', () => requestAnimationFrame(onScroll), { passive: tru
   requestAnimationFrame(draw);
 })();
 
-renderCatalog();
-onScroll();
+setLang(initialLang());
 </script>
 </body>
 </html>
