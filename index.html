@@ -193,7 +193,7 @@ button { font: inherit; }
 @keyframes card-in { from { opacity: 0; transform: translateY(24px) scale(.97); } }
 .empty { grid-column: 1 / -1; padding: 48px; text-align: center; color: var(--muted); }
 
-.modal { border: 0; padding: 0; border-radius: 24px; width: min(860px, calc(100% - 32px)); max-height: calc(100% - 32px); background: #fff; color: var(--ink); box-shadow: 0 40px 80px rgba(18, 16, 42, .4); }
+.modal { border: 0; padding: 0; margin: auto; border-radius: 24px; width: min(860px, calc(100% - 32px)); max-height: calc(100% - 32px); background: #fff; color: var(--ink); box-shadow: 0 40px 80px rgba(18, 16, 42, .4); }
 .modal::backdrop { background: rgba(18, 16, 42, .6); backdrop-filter: blur(4px); }
 .modal[open] { animation: pop .35s var(--ease); }
 @keyframes pop { from { opacity: 0; transform: translateY(20px) scale(.97); } }
