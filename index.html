@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Regula Baltija</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #12102a;
+  --ink-2: #1b1838;
+  --ink-3: #28234f;
+  --violet-1: #5b2fc4;
+  --violet-2: #7b4fe0;
+  --violet-3: #a985ff;
+  --violet-4: #d9c8ff;
+  --violet-5: #f3eeff;
+  --paper: #f7f5fb;
+  --muted: #6b6785;
+  --line: #e6e1f2;
+  --radius: 18px;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: Inter, system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+h1, h2, h3, h4 { font-family: "Space Grotesk", Inter, sans-serif; line-height: 1.08; letter-spacing: -.02em; }
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+button { font: inherit; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+.accent {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--violet-3), #efe6ff 50%, var(--violet-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.kicker { font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--violet-2); margin-bottom: 12px; }
+.section { padding: 112px 0; }
+.section-title { font-size: clamp(32px, 4.4vw, 52px); }
+.section-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 44px; flex-wrap: wrap; }
+.section-head p { color: var(--muted); max-width: 440px; }
+
+.btn { display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer; font-weight: 600; font-size: 14px; padding: 13px 22px; border-radius: 12px; transition: transform .2s, box-shadow .2s, background .2s; }
+.btn--primary { background: linear-gradient(135deg, var(--violet-2), var(--violet-1)); color: #fff; box-shadow: 0 8px 24px rgba(91, 47, 196, .35); }
+.btn--primary:hover { transform: translateY(-1px); box-shadow: 0 12px 30px rgba(91, 47, 196, .45); }
+.btn--glass { background: rgba(255, 255, 255, .08); color: #fff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .2); }
+.btn--glass:hover { background: rgba(255, 255, 255, .14); }
+.btn--outline { background: #fff; color: var(--violet-1); box-shadow: inset 0 0 0 1px var(--line); }
+
+.reveal { opacity: 0; transform: translateY(40px) scale(.98); filter: blur(6px); transition: opacity .9s var(--ease), transform .9s var(--ease), filter .9s var(--ease); }
+.reveal.is-visible { opacity: 1; transform: none; filter: none; }
+.reveal--left { transform: translateX(-48px); }
+.reveal--right { transform: translateX(48px); }
+.stagger > * { transition-delay: calc(var(--i, 0) * 80ms); }
+
+.progress { position: fixed; top: 0; left: 0; height: 2px; width: 100%; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, var(--violet-3), var(--violet-1)); z-index: 100; }
+
+.header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; transition: background .3s, border-color .3s, transform .4s var(--ease); border-bottom: 1px solid transparent; }
+.header.is-solid { background: rgba(18, 16, 42, .86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-color: rgba(255, 255, 255, .07); }
+.header.is-hidden { transform: translateY(-100%); }
+.nav { display: flex; align-items: center; gap: 24px; height: 72px; }
+.logo { display: flex; align-items: center; gap: 10px; color: #fff; font-family: "Space Grotesk", Inter, sans-serif; font-weight: 700; font-size: 20px; }
+.logo__mark { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--violet-3), var(--violet-1)); display: grid; place-items: center; font-size: 20px; }
+.logo small { display: block; font-family: Inter; font-weight: 500; font-size: 10px; letter-spacing: .14em; color: var(--violet-4); text-transform: uppercase; margin-top: -2px; }
+.menu { display: flex; gap: 2px; margin-left: 12px; list-style: none; }
+.menu > li { position: relative; }
+.menu > li > a { display: block; color: #d8d3ee; font-size: 14px; font-weight: 500; padding: 10px 12px; border-radius: 10px; transition: background .2s, color .2s; }
+.menu > li > a:hover { background: rgba(255, 255, 255, .07); color: #fff; }
+.dropdown { position: absolute; top: 100%; left: 0; min-width: 270px; background: #fff; border-radius: 14px; padding: 8px; box-shadow: 0 20px 50px rgba(18, 16, 42, .25); opacity: 0; visibility: hidden; transform: translateY(6px); transition: .2s; }
+.menu > li:hover .dropdown { opacity: 1; visibility: visible; transform: none; }
+.dropdown a { display: block; padding: 9px 12px; border-radius: 9px; font-size: 14px; }
+.dropdown a:hover { background: var(--violet-5); color: var(--violet-1); }
+.nav__right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.lang { display: flex; background: rgba(255, 255, 255, .07); border-radius: 10px; padding: 3px; }
+.lang button { border: 0; background: none; color: #bdb6dc; font-weight: 600; font-size: 12px; padding: 6px 9px; border-radius: 8px; cursor: pointer; }
+.lang button.is-active { background: #fff; color: var(--ink); }
+.burger { display: none; background: none; border: 0; color: #fff; cursor: pointer; padding: 8px; }
+
+.drawer { position: fixed; inset: 0; z-index: 60; background: var(--ink); color: #fff; overflow: auto; transform: translateX(100%); transition: transform .35s var(--ease); }
+.drawer.is-open { transform: none; }
+.drawer__top { display: flex; justify-content: space-between; align-items: center; height: 72px; padding: 0 20px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.drawer details { border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.drawer summary { list-style: none; cursor: pointer; padding: 18px 20px; font: 600 17px "Space Grotesk", Inter, sans-serif; display: flex; justify-content: space-between; }
+.drawer summary::-webkit-details-marker { display: none; }
+.drawer summary::after { content: "+"; color: var(--violet-3); font-size: 22px; line-height: 1; }
+.drawer details[open] summary::after { content: "–"; }
+.drawer details a { display: block; padding: 11px 20px 11px 32px; color: #cfc8ea; font-size: 15px; }
+.drawer__foot { padding: 24px 20px; display: flex; flex-direction: column; gap: 16px; }
+
+.hero { position: relative; min-height: 100svh; background: var(--ink); color: #fff; overflow: hidden; display: flex; align-items: center; }
+.hero__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero__glow { position: absolute; width: 900px; height: 900px; right: -300px; top: -200px; background: radial-gradient(circle, rgba(123, 79, 224, .4), transparent 60%); pointer-events: none; }
+.hero__fade { position: absolute; left: 0; right: 0; bottom: 0; height: 200px; background: linear-gradient(transparent, var(--ink)); pointer-events: none; }
+.hero__content { position: relative; padding: 140px 0 120px; max-width: 760px; will-change: transform, opacity; }
+.chip { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--violet-4); background: rgba(169, 133, 255, .12); border: 1px solid rgba(169, 133, 255, .25); padding: 7px 12px; border-radius: 99px; }
+.chip i { width: 6px; height: 6px; border-radius: 50%; background: #7ef0b0; box-shadow: 0 0 10px #7ef0b0; }
+.hero h1 { font-size: clamp(46px, 8vw, 104px); margin: 24px 0 24px; }
+.hero h1 .line { display: block; overflow: hidden; }
+.hero h1 .line span { display: inline-block; transform: translateY(110%); animation: rise 1.1s var(--ease) forwards; }
+.hero h1 .line:nth-child(2) span { animation-delay: .12s; }
+@keyframes rise { to { transform: none; } }
+.hero__lead { font-size: 18px; color: #c9c2e6; max-width: 560px; opacity: 0; animation: fade 1s .5s forwards; }
+.hero__cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; opacity: 0; animation: fade 1s .7s forwards; }
+@keyframes fade { to { opacity: 1; } }
+.scroll-hint { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: #8d86b3; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.scroll-hint::after { content: ""; width: 1px; height: 40px; background: linear-gradient(var(--violet-3), transparent); animation: drip 2s infinite; }
+@keyframes drip { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+.ticker { background: var(--ink); color: #fff; border-top: 1px solid rgba(255, 255, 255, .06); border-bottom: 1px solid rgba(255, 255, 255, .06); overflow: hidden; }
+.ticker__track { display: flex; gap: 56px; padding: 20px 0; width: max-content; animation: marquee 40s linear infinite; }
+.ticker__item { display: flex; align-items: center; gap: 14px; white-space: nowrap; font-size: 15px; color: #cfc8ea; }
+.ticker__item b { font-family: "Space Grotesk", Inter, sans-serif; color: #fff; }
+.ticker__item::before { content: ""; width: 8px; height: 8px; transform: rotate(45deg); background: var(--violet-3); }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+.manifesto { background: var(--ink); color: #fff; padding: 140px 0; }
+.manifesto p { font: 600 clamp(28px, 4.2vw, 56px)/1.18 "Space Grotesk", Inter, sans-serif; letter-spacing: -.02em; max-width: 1050px; }
+.manifesto .word { opacity: .14; transition: opacity .25s; }
+.manifesto .word.is-lit { opacity: 1; }
+.manifesto .word.is-accent.is-lit { color: var(--violet-3); }
+
+.pin { position: relative; height: 400vh; background: var(--paper); }
+.pin__stage { position: sticky; top: 0; height: 100vh; display: flex; align-items: center; overflow: hidden; }
+.pin__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; width: 100%; }
+.pin__counter { font: 700 15px "Space Grotesk", Inter, sans-serif; color: var(--violet-2); margin-bottom: 18px; }
+.pin__titles { position: relative; height: 220px; }
+.pin__title { position: absolute; inset: 0; opacity: 0; transform: translateY(30px); transition: opacity .6s var(--ease), transform .6s var(--ease); }
+.pin__title.is-active { opacity: 1; transform: none; }
+.pin__title h3 { font-size: clamp(34px, 4.6vw, 60px); margin-bottom: 16px; }
+.pin__title p { color: var(--muted); font-size: 17px; max-width: 460px; }
+.pin__bar { height: 3px; background: var(--line); border-radius: 3px; margin-top: 28px; max-width: 460px; overflow: hidden; }
+.pin__bar i { display: block; height: 100%; width: 100%; background: linear-gradient(90deg, var(--violet-3), var(--violet-1)); transform-origin: 0 50%; transform: scaleX(0); }
+.pin__visual { position: relative; aspect-ratio: 1; max-width: 520px; justify-self: center; width: 100%; }
+.pin__shape { position: absolute; inset: 0; border-radius: 32px; opacity: 0; transform: scale(.9) rotate(-4deg); transition: opacity .7s var(--ease), transform .7s var(--ease); overflow: hidden; }
+.pin__shape.is-active { opacity: 1; transform: none; }
+.pin__shape svg { width: 100%; height: 100%; }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border-radius: 24px; overflow: hidden; border: 1px solid var(--line); }
+.stat { background: #fff; padding: 36px 28px; }
+.stat b { display: block; font: 700 clamp(38px, 4.4vw, 58px) "Space Grotesk", Inter, sans-serif; letter-spacing: -.03em; background: linear-gradient(135deg, var(--violet-2), var(--ink)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.stat span { color: var(--muted); font-size: 14px; }
+
+.catalog { background: #fff; }
+.catalog__tools { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 28px; }
+.filters { display: flex; gap: 8px; flex-wrap: wrap; flex: 1; }
+.filter { border: 1px solid var(--line); background: #fff; font-weight: 500; font-size: 14px; padding: 9px 16px; border-radius: 99px; cursor: pointer; color: var(--muted); transition: .2s; }
+.filter:hover { border-color: var(--violet-3); color: var(--violet-1); }
+.filter.is-active { background: var(--ink); border-color: var(--ink); color: #fff; }
+.filter sup { font-size: 10px; margin-left: 3px; opacity: .6; }
+.search { position: relative; }
+.search input { font: 14px Inter; padding: 11px 14px 11px 38px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); outline: none; width: 220px; }
+.search input:focus { border-color: var(--violet-2); background: #fff; }
+.search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+.catalog__banner { display: none; position: relative; border-radius: 22px; overflow: hidden; margin-bottom: 20px; background: var(--ink); min-height: 180px; }
+.catalog__banner.is-shown { display: block; }
+.catalog__banner img { width: 100%; height: 220px; object-fit: cover; opacity: .55; }
+.catalog__banner div { position: absolute; left: 28px; bottom: 24px; color: #fff; }
+.catalog__banner h3 { font-size: 28px; }
+.catalog__banner p { color: #d4ccf0; font-size: 14px; max-width: 520px; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.card { position: relative; display: flex; flex-direction: column; border-radius: var(--radius); background: var(--paper); border: 1px solid var(--line); overflow: hidden; cursor: pointer; text-align: left; transition: transform .35s var(--ease), box-shadow .35s, border-color .35s, opacity .4s; }
+.card:hover { transform: translateY(-6px); box-shadow: 0 22px 44px rgba(91, 47, 196, .14); border-color: var(--violet-4); }
+.card__media { position: relative; aspect-ratio: 4 / 3; background: linear-gradient(145deg, #fff, var(--violet-5)); display: grid; place-items: center; overflow: hidden; }
+.card__media img { width: 82%; height: 82%; object-fit: contain; transition: transform .5s var(--ease); }
+.card:hover .card__media img { transform: scale(1.06); }
+.card__ph { position: absolute; inset: 0; display: grid; place-items: center; }
+.card__ph svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.card__ph span { position: relative; font: 700 34px "Space Grotesk", Inter, sans-serif; color: var(--violet-1); letter-spacing: -.02em; }
+.card__badge { position: absolute; top: 12px; left: 12px; z-index: 2; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 5px 9px; border-radius: 99px; background: var(--ink); color: #fff; }
+.card__badge--new { background: #19c37d; }
+.card__body { padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.card__model { font: 600 12px Inter; letter-spacing: .1em; color: var(--violet-2); text-transform: uppercase; }
+.card__name { font-size: 17px; }
+.card__text { font-size: 13.5px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card.is-entering { animation: card-in .55s var(--ease) both; animation-delay: calc(var(--i, 0) * 40ms); }
+@keyframes card-in { from { opacity: 0; transform: translateY(24px) scale(.97); } }
+.empty { grid-column: 1 / -1; padding: 48px; text-align: center; color: var(--muted); }
+
+.modal { border: 0; padding: 0; border-radius: 24px; width: min(860px, calc(100% - 32px)); max-height: calc(100% - 32px); background: #fff; color: var(--ink); box-shadow: 0 40px 80px rgba(18, 16, 42, .4); }
+.modal::backdrop { background: rgba(18, 16, 42, .6); backdrop-filter: blur(4px); }
+.modal[open] { animation: pop .35s var(--ease); }
+@keyframes pop { from { opacity: 0; transform: translateY(20px) scale(.97); } }
+.modal__grid { display: grid; grid-template-columns: 1fr 1fr; }
+.modal__media { background: linear-gradient(145deg, #fff, var(--violet-5)); min-height: 320px; position: relative; display: grid; place-items: center; }
+.modal__media img { width: 80%; max-height: 300px; object-fit: contain; }
+.modal__body { padding: 36px; display: flex; flex-direction: column; gap: 14px; }
+.modal__body h3 { font-size: 30px; }
+.modal__body p { color: var(--muted); }
+.modal__close { position: absolute; top: 14px; right: 14px; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--paper); cursor: pointer; z-index: 3; font-size: 18px; }
+
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.panel { border-radius: 24px; padding: 44px; position: relative; overflow: hidden; }
+.panel--dark { background: var(--ink); color: #fff; }
+.panel--light { background: #fff; border: 1px solid var(--line); }
+.panel h3 { font-size: 32px; margin: 6px 0 14px; }
+.panel > p { opacity: .78; margin-bottom: 24px; }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.tag { font-size: 13px; padding: 7px 12px; border-radius: 99px; background: rgba(169, 133, 255, .15); color: var(--violet-4); }
+.links a { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--line); font-weight: 500; transition: color .2s, padding .2s; }
+.links a:hover { color: var(--violet-1); padding-left: 6px; }
+.links a span { color: var(--violet-2); }
+
+.press { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; }
+.post { border-radius: var(--radius); overflow: hidden; background: #fff; border: 1px solid var(--line); display: flex; flex-direction: column; transition: box-shadow .3s; }
+.post:hover { box-shadow: 0 18px 40px rgba(18, 16, 42, .08); }
+.post__thumb { aspect-ratio: 16 / 9; position: relative; overflow: hidden; background: var(--ink-3); }
+.post__thumb svg { width: 100%; height: 100%; transition: transform .6s var(--ease); }
+.post:hover .post__thumb svg { transform: scale(1.08); }
+.post__body { padding: 22px; }
+.post__body small { color: var(--violet-2); font-weight: 600; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; }
+.post__body h4 { font-size: 18px; margin-top: 8px; }
+.press-nav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
+.press-nav a { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 18px; font-weight: 600; display: flex; justify-content: space-between; transition: .2s; }
+.press-nav a:hover { border-color: var(--violet-3); color: var(--violet-1); }
+
+.careers { background: var(--ink); color: #fff; position: relative; overflow: hidden; }
+.careers::before { content: ""; position: absolute; left: -200px; bottom: -200px; width: 640px; height: 640px; background: radial-gradient(circle, rgba(123, 79, 224, .35), transparent 60%); }
+.careers .container { position: relative; }
+.careers .kicker { color: var(--violet-3); }
+.careers .section-head p { color: #bdb6dc; }
+.perks { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 56px; }
+.perk { background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .08); border-radius: var(--radius); padding: 24px; }
+.perk b { display: block; font: 600 18px "Space Grotesk", Inter, sans-serif; margin: 14px 0 6px; }
+.perk p { font-size: 14px; color: #bdb6dc; }
+.icon { width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; background: rgba(169, 133, 255, .15); color: var(--violet-3); }
+.jobs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+.jobs h3 { font-size: 24px; margin-bottom: 6px; }
+.jobs__intro { color: #bdb6dc; font-size: 14.5px; margin-bottom: 20px; }
+.role { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; border-radius: 14px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .07); margin-bottom: 10px; transition: background .2s; }
+.role:hover { background: rgba(255, 255, 255, .08); }
+.role small { display: block; color: #a59fc6; font-size: 13px; }
+.pill { font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: 99px; background: rgba(255, 255, 255, .08); color: #cfc8ea; white-space: nowrap; }
+.pill--open { background: rgba(126, 240, 176, .15); color: #7ef0b0; }
+.form { background: #fff; color: var(--ink); border-radius: 24px; padding: 32px; }
+.form > p { color: var(--muted); font-size: 14.5px; margin-bottom: 20px; }
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.field input, .field select { width: 100%; font: 15px Inter; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); outline: none; }
+.field input:focus, .field select:focus { border-color: var(--violet-2); background: #fff; }
+.upload { display: block; border: 1.5px dashed var(--violet-4); border-radius: 12px; padding: 18px; text-align: center; font-size: 14px; color: var(--muted); background: var(--violet-5); cursor: pointer; }
+.upload input { display: none; }
+.steps { display: flex; gap: 10px; margin-top: 18px; font-size: 13px; color: var(--muted); }
+.steps span { flex: 1; background: var(--paper); border-radius: 10px; padding: 10px; text-align: center; }
+.steps b { display: block; color: var(--violet-1); font-family: "Space Grotesk", Inter, sans-serif; }
+
+.trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.tile { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; transition: transform .3s var(--ease), border-color .3s; }
+.tile:hover { transform: translateY(-4px); border-color: var(--violet-4); }
+.tile .icon { background: var(--violet-5); color: var(--violet-1); }
+.tile h3 { font-size: 20px; margin: 16px 0 8px; }
+.tile p { color: var(--muted); font-size: 14.5px; }
+
+.contact { background: #fff; }
+.contact__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.contact__card { background: var(--ink); color: #fff; border-radius: 24px; padding: 44px; }
+.contact__card h3 { font-size: 30px; margin-bottom: 24px; }
+.contact__row { padding: 14px 0; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.contact__row:last-of-type { border: 0; }
+.contact__row small { display: block; color: #a59fc6; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
+.map { border-radius: 24px; background: var(--ink-2); position: relative; overflow: hidden; min-height: 340px; }
+.map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map__pin { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -100%); background: #fff; border-radius: 14px; padding: 12px 16px; box-shadow: 0 18px 40px rgba(0, 0, 0, .3); font-size: 14px; font-weight: 600; white-space: nowrap; }
+.map__pin::after { content: ""; position: absolute; left: 50%; bottom: -7px; width: 14px; height: 14px; background: #fff; transform: translateX(-50%) rotate(45deg); }
+
+.footer { background: var(--ink); color: #bdb6dc; padding: 80px 0 32px; font-size: 14px; }
+.footer__grid { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 32px; margin-bottom: 48px; }
+.footer h5 { color: #fff; font: 600 14px "Space Grotesk", Inter, sans-serif; margin-bottom: 14px; }
+.footer__grid a { display: block; padding: 5px 0; transition: color .2s; }
+.footer__grid a:hover { color: #fff; }
+.subscribe { display: flex; gap: 8px; margin-top: 18px; }
+.subscribe input { flex: 1; min-width: 0; font: 14px Inter; padding: 11px 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .12); background: rgba(255, 255, 255, .05); color: #fff; outline: none; }
+.social { display: flex; gap: 8px; margin-top: 20px; }
+.social a { width: 38px; height: 38px; border-radius: 10px; background: rgba(255, 255, 255, .06); display: grid; place-items: center; color: #d8d3ee; transition: background .2s; }
+.social a:hover { background: var(--violet-1); color: #fff; }
+.footer__bottom { border-top: 1px solid rgba(255, 255, 255, .08); padding-top: 24px; display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 13px; }
+.footer__bottom nav { display: flex; gap: 20px; flex-wrap: wrap; }
+.legal { font-size: 11.5px; color: #7d77a0; margin-top: 18px; max-width: 900px; }
+
+@media (max-width: 1080px) {
+  .menu, .nav__right .lang, .nav__right .btn { display: none; }
+  .burger { display: block; }
+  .grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+  .pin { height: 360vh; }
+  .pin__grid { grid-template-columns: 1fr; gap: 28px; }
+  .pin__visual { max-width: 300px; order: -1; }
+  .pin__titles { height: 230px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .grid { grid-template-columns: 1fr 1fr; }
+  .duo, .jobs, .contact__grid, .modal__grid { grid-template-columns: 1fr; }
+  .perks { grid-template-columns: 1fr 1fr; }
+  .trio { grid-template-columns: 1fr; }
+  .press { grid-template-columns: 1fr 1fr; }
+  .press .post:first-child { grid-column: 1 / -1; }
+  .press-nav { grid-template-columns: 1fr 1fr; }
+  .footer__grid { grid-template-columns: 1fr 1fr; }
+  .footer__grid > div:first-child { grid-column: 1 / -1; }
+  .modal__media { min-height: 220px; }
+}
+@media (max-width: 600px) {
+  .container { padding: 0 16px; }
+  .section { padding: 72px 0; }
+  .manifesto { padding: 96px 0; }
+  .perks, .press { grid-template-columns: 1fr; }
+  .grid { gap: 10px; }
+  .card__body { padding: 14px; }
+  .card__name { font-size: 15px; }
+  .card__text { display: none; }
+  .card__ph span { font-size: 24px; }
+  .panel, .contact__card, .modal__body { padding: 28px; }
+  .form { padding: 24px; }
+  .hero__lead { font-size: 16px; }
+  .hero__cta .btn { flex: 1; justify-content: center; }
+  .search, .search input { width: 100%; }
+  .stat { padding: 26px 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  .reveal { opacity: 1; transform: none; filter: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress"></div>
+
+<header class="header" id="header">
+  <div class="container nav">
+    <a href="#top" class="logo"><span class="logo__mark">R</span><span>Regula<small>Baltija · Latvia</small></span></a>
+    <ul class="menu">
+      <li><a href="#catalog">Products</a>
+        <div class="dropdown">
+          <a href="#catalog" data-jump="readers">Document Readers</a>
+          <a href="#catalog" data-jump="manual">Manual Control Devices</a>
+          <a href="#catalog" data-jump="vsc">Video Spectral Comparators</a>
+          <a href="#catalog" data-jump="micro">Microscopes &amp; Magnifiers</a>
+          <a href="#catalog" data-jump="mo">Magneto-Optical &amp; VIN</a>
+          <a href="#catalog" data-jump="acc">Accessories</a>
+          <a href="#catalog" data-jump="soft">Software &amp; Reference Data</a>
+        </div>
+      </li>
+      <li><a href="#expertise">Expertise</a>
+        <div class="dropdown">
+          <a href="#expertise">Information Reference Systems</a>
+          <a href="#expertise">Reference Books</a>
+          <a href="#expertise">Specialized Training</a>
+          <a href="#expertise">Glossary of Banknotes</a>
+          <a href="#expertise">Glossary of Documents</a>
+          <a href="#expertise">Support</a>
+        </div>
+      </li>
+      <li><a href="#press">Pressroom</a>
+        <div class="dropdown"><a href="#press">News</a><a href="#press">Blog</a><a href="#press">Exhibitions</a><a href="#press">Videos</a></div>
+      </li>
+      <li><a href="#company">Company</a>
+        <div class="dropdown"><a href="#company">Certificates &amp; Awards</a><a href="#company">Media Partners</a><a href="#contact">Regula Offices</a></div>
+      </li>
+      <li><a href="#careers">Careers</a></li>
+    </ul>
+    <div class="nav__right">
+      <div class="lang"><button class="is-active">EN</button><button>LV</button><button>RU</button></div>
+      <a href="#contact" class="btn btn--primary">Get in touch</a>
+      <button class="burger" aria-label="Menu" data-drawer="open">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="drawer" id="drawer">
+  <div class="drawer__top">
+    <a href="#top" class="logo"><span class="logo__mark">R</span><span>Regula<small>Baltija · Latvia</small></span></a>
+    <button class="burger" style="display:block" aria-label="Close" data-drawer="close">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <details><summary>Products</summary>
+    <a href="#catalog" data-jump="readers">Document Readers</a><a href="#catalog" data-jump="manual">Manual Control Devices</a><a href="#catalog" data-jump="vsc">Video Spectral Comparators</a><a href="#catalog" data-jump="micro">Microscopes &amp; Magnifiers</a><a href="#catalog" data-jump="mo">Magneto-Optical &amp; VIN</a><a href="#catalog" data-jump="acc">Accessories</a><a href="#catalog" data-jump="soft">Software &amp; Reference Data</a>
+  </details>
+  <details><summary>Expertise</summary>
+    <a href="#expertise">Information Reference Systems</a><a href="#expertise">Reference Books</a><a href="#expertise">Specialized Training</a><a href="#expertise">Glossary of Banknotes</a><a href="#expertise">Glossary of Documents</a><a href="#expertise">Support</a>
+  </details>
+  <details><summary>Pressroom</summary><a href="#press">News</a><a href="#press">Blog</a><a href="#press">Exhibitions</a><a href="#press">Videos</a></details>
+  <details><summary>Company</summary><a href="#company">Certificates &amp; Awards</a><a href="#company">Media Partners</a><a href="#contact">Regula Offices</a></details>
+  <details><summary>Careers</summary><a href="#careers">Open roles</a><a href="#careers">Send CV</a></details>
+  <div class="drawer__foot">
+    <div class="lang" style="align-self:flex-start"><button class="is-active">EN</button><button>LV</button><button>RU</button></div>
+    <a href="#contact" class="btn btn--primary" style="justify-content:center">Get in touch</a>
+  </div>
+</nav>
+
+<main id="top">
+
+  <section class="hero" id="hero">
+    <canvas class="hero__canvas" id="field"></canvas>
+    <div class="hero__glow"></div>
+    <div class="hero__fade"></div>
+    <div class="container">
+      <div class="hero__content" id="heroContent">
+        <span class="chip"><i></i>Daugavpils, Latvia · Since 1992</span>
+        <h1><span class="line"><span>Authenticity,</span></span><span class="line"><span><em class="accent">verified.</em></span></span></h1>
+        <p class="hero__lead">More than 100 solutions for document and banknote authentication, engineered and built in Latvia and trusted by border services, banks and forensic labs in 170+ countries.</p>
+        <div class="hero__cta">
+          <a href="#catalog" class="btn btn--primary">Explore the catalog</a>
+          <a href="#" class="btn btn--glass"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Watch the video</a>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint">Scroll</div>
+  </section>
+
+  <div class="ticker">
+    <div class="ticker__track" id="ticker">
+      <span class="ticker__item"><b>2026</b> Gartner® Magic Quadrant™ for Identity Verification</span>
+      <span class="ticker__item"><b>170+</b> countries</span>
+      <span class="ticker__item"><b>80+</b> borders use Regula readers</span>
+      <span class="ticker__item"><b>100%</b> in-house hardware, software and data</span>
+      <span class="ticker__item"><b>Fan-free</b> silent, dust-proof devices</span>
+    </div>
+  </div>
+
+  <section class="manifesto">
+    <div class="container">
+      <p id="manifesto">Every passport, banknote and VIN tells a story. Our job is to make sure it is the true one. From a magnifier at a checkpoint to a dual-camera comparator in a forensic lab, everything is designed, assembled and tested here in Daugavpils.</p>
+    </div>
+  </section>
+
+  <section class="pin" id="pin">
+    <div class="pin__stage">
+      <div class="container pin__grid">
+        <div>
+          <div class="kicker">What we do</div>
+          <div class="pin__counter"><span id="pinIndex">01</span> / 04</div>
+          <div class="pin__titles">
+            <div class="pin__title is-active"><h3>Devices</h3><p>Readers, comparators, microscopes and magneto-optical systems for document and banknote authenticity checks.</p></div>
+            <div class="pin__title"><h3>Software</h3><p>Our own software drives every device, automates routine checks and builds court-ready reports.</p></div>
+            <div class="pin__title"><h3>Reference data</h3><p>Information Reference Systems with specimens of documents and banknotes from around the world, updated weekly.</p></div>
+            <div class="pin__title"><h3>Training</h3><p>Specialized courses on document and banknote examination, taught by practicing experts.</p></div>
+          </div>
+          <div class="pin__bar"><i id="pinBar"></i></div>
+        </div>
+        <div class="pin__visual">
+          <div class="pin__shape is-active">
+            <svg viewBox="0 0 400 400"><defs><linearGradient id="s1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7b4fe0"/><stop offset="1" stop-color="#12102a"/></linearGradient></defs><rect width="400" height="400" fill="url(#s1)"/><g fill="none" stroke="#d9c8ff" stroke-opacity=".5"><rect x="90" y="120" width="220" height="150" rx="14"/><rect x="110" y="140" width="180" height="110" rx="6" stroke-opacity=".25"/><path d="M150 300h100M200 270v30"/></g><rect x="110" y="190" width="180" height="2" fill="#a985ff"><animate attributeName="y" values="140;248;140" dur="3s" repeatCount="indefinite"/></rect></svg>
+          </div>
+          <div class="pin__shape">
+            <svg viewBox="0 0 400 400"><defs><linearGradient id="s2" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b2fc4"/><stop offset="1" stop-color="#1b1838"/></linearGradient></defs><rect width="400" height="400" fill="url(#s2)"/><g font-family="monospace" font-size="13" fill="#d9c8ff" fill-opacity=".55"><text x="70" y="130">P&lt;LVABERZINS&lt;&lt;JANIS&lt;&lt;&lt;&lt;&lt;</text><text x="70" y="155">LV1234567&lt;8LVA9001015M&lt;&lt;</text></g><g stroke="#a985ff" stroke-width="2" fill="none"><path d="M70 210h120"><animate attributeName="d" values="M70 210h20;M70 210h260;M70 210h20" dur="4s" repeatCount="indefinite"/></path></g><circle cx="300" cy="280" r="30" fill="none" stroke="#7ef0b0" stroke-width="2"/><path d="M286 280l10 10 18-20" stroke="#7ef0b0" stroke-width="3" fill="none"/></svg>
+          </div>
+          <div class="pin__shape">
+            <svg viewBox="0 0 400 400"><rect width="400" height="400" fill="#12102a"/><g fill="#a985ff"><circle cx="200" cy="200" r="4"/></g><g fill="none" stroke="#a985ff"><circle cx="200" cy="200" r="50" stroke-opacity=".6"/><circle cx="200" cy="200" r="100" stroke-opacity=".35"/><circle cx="200" cy="200" r="150" stroke-opacity=".18"/></g><g fill="#d9c8ff"><circle cx="250" cy="200" r="5"><animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200" dur="8s" repeatCount="indefinite"/></circle><circle cx="200" cy="100" r="5"><animateTransform attributeName="transform" type="rotate" from="0 200 200" to="-360 200 200" dur="14s" repeatCount="indefinite"/></circle><circle cx="350" cy="200" r="5"><animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200" dur="22s" repeatCount="indefinite"/></circle></g></svg>
+          </div>
+          <div class="pin__shape">
+            <svg viewBox="0 0 400 400"><defs><linearGradient id="s4" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#12102a"/><stop offset="1" stop-color="#7b4fe0"/></linearGradient></defs><rect width="400" height="400" fill="url(#s4)"/><g fill="#d9c8ff"><rect x="80" y="260" width="40" height="60" rx="6" fill-opacity=".35"/><rect x="140" y="220" width="40" height="100" rx="6" fill-opacity=".5"/><rect x="200" y="170" width="40" height="150" rx="6" fill-opacity=".7"/><rect x="260" y="110" width="40" height="210" rx="6"/></g><path d="M100 240L160 200 220 150 280 90" stroke="#fff" stroke-width="2" fill="none" stroke-dasharray="6 6"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="stats reveal">
+        <div class="stat"><b data-count="34">0</b><span>years of in-house development</span></div>
+        <div class="stat"><b data-count="170" data-suffix="+">0</b><span>countries reached</span></div>
+        <div class="stat"><b data-count="100" data-suffix="+">0</b><span>verification solutions</span></div>
+        <div class="stat"><b data-count="80" data-suffix="+">0</b><span>borders equipped</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section catalog" id="catalog">
+    <div class="container">
+      <div class="section-head reveal">
+        <div><div class="kicker">Catalog</div><h2 class="section-title">Every device,<br>one place</h2></div>
+        <p>From a pocket magnifier to a dual-camera comparator. Filter by category or search by model number.</p>
+      </div>
+      <div class="catalog__tools reveal">
+        <div class="filters" id="filters"></div>
+        <label class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <input id="search" type="search" placeholder="Search, e.g. 4308">
+        </label>
+      </div>
+      <div class="catalog__banner" id="banner"><img id="bannerImg" alt=""><div><h3 id="bannerTitle"></h3><p id="bannerText"></p></div></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <dialog class="modal" id="modal">
+    <button class="modal__close" aria-label="Close" data-close>×</button>
+    <div class="modal__grid">
+      <div class="modal__media" id="modalMedia"></div>
+      <div class="modal__body">
+        <div class="card__model" id="modalCat"></div>
+        <h3 id="modalName"></h3>
+        <p id="modalText"></p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">
+          <a href="#contact" class="btn btn--primary" data-close>Request a quote</a>
+          <a href="#contact" class="btn btn--outline" data-close>Full specs</a>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <section class="section" id="expertise">
+    <div class="container duo">
+      <div class="panel panel--dark reveal reveal--left">
+        <div class="kicker" style="color:var(--violet-3)">Specialized training</div>
+        <h3>Learn to spot what others miss</h3>
+        <p>Hands-on courses for border guards, police, bank staff and forensic experts, led by Regula specialists.</p>
+        <div class="tags"><span class="tag">Document examination</span><span class="tag">Banknote authentication</span><span class="tag">Device operation</span><span class="tag">On-site or remote</span></div>
+        <a href="#" class="btn btn--primary">See courses</a>
+      </div>
+      <div class="panel panel--light reveal reveal--right">
+        <div class="kicker">Knowledge hub</div>
+        <h3>Reference data you can rely on</h3>
+        <div class="links">
+          <a href="#">Information Reference Systems <span>→</span></a>
+          <a href="#">Reference Books <span>→</span></a>
+          <a href="#">Glossary of Banknotes <span>→</span></a>
+          <a href="#">Glossary of Documents <span>→</span></a>
+          <a href="#">Support center <span>→</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="press" style="padding-top:0">
+    <div class="container">
+      <div class="section-head reveal">
+        <div><div class="kicker">Pressroom</div><h2 class="section-title">Latest from Regula</h2></div>
+        <a href="#" class="btn btn--outline">All news</a>
+      </div>
+      <div class="press stagger">
+        <a href="#" class="post reveal" style="--i:0"><div class="post__thumb"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><rect width="160" height="90" fill="#28234f"/><circle cx="120" cy="20" r="50" fill="#7b4fe0" opacity=".6"/><circle cx="40" cy="80" r="40" fill="#a985ff" opacity=".4"/></svg></div><div class="post__body"><small>Press release</small><h4>Regula launches IDV Platform for enterprise identity lifecycle management</h4></div></a>
+        <a href="#" class="post reveal" style="--i:1"><div class="post__thumb"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><rect width="160" height="90" fill="#1b1838"/><path d="M0 70 Q40 20 80 50 T160 30 V90 H0Z" fill="#7b4fe0" opacity=".7"/></svg></div><div class="post__body"><small>Product</small><h4>The upgraded Regula 4308M comparator</h4></div></a>
+        <a href="#" class="post reveal" style="--i:2"><div class="post__thumb"><svg viewBox="0 0 160 90" preserveAspectRatio="xMidYMid slice"><rect width="160" height="90" fill="#5b2fc4"/><g stroke="#d9c8ff" stroke-opacity=".5" fill="none"><circle cx="80" cy="45" r="15"/><circle cx="80" cy="45" r="30"/><circle cx="80" cy="45" r="45"/></g></svg></div><div class="post__body"><small>Press release</small><h4>Verifying mobile driver's licenses at scale</h4></div></a>
+      </div>
+      <div class="press-nav reveal">
+        <a href="#">News <span>→</span></a><a href="#">Blog <span>→</span></a><a href="#">Exhibitions <span>→</span></a><a href="#">Videos <span>→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section careers" id="careers">
+    <div class="container">
+      <div class="section-head reveal">
+        <div><div class="kicker">Careers in Daugavpils</div><h2 class="section-title">Build the tech that<br>keeps documents <em class="accent">honest</em></h2></div>
+        <p>Our devices are designed and assembled here, then shipped to 170+ countries. Join the team behind them.</p>
+      </div>
+      <div class="perks stagger">
+        <div class="perk reveal" style="--i:0"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></div><b>Global impact</b><p>Your work ends up at borders, banks and labs worldwide.</p></div>
+        <div class="perk reveal" style="--i:1"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 20V4M5 11l7-7 7 7"/></svg></div><b>Grow with us</b><p>Training from experts and room to move across teams.</p></div>
+        <div class="perk reveal" style="--i:2"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 21V9l8-6 8 6v12"/><path d="M9 21v-6h6v6"/></svg></div><b>Close to home</b><p>World-class engineering without leaving Latgale.</p></div>
+        <div class="perk reveal" style="--i:3"><div class="icon"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M7 10v5c3 2 7 2 10 0v-5"/></svg></div><b>Students welcome</b><p>Internships and joint projects with Daugavpils University.</p></div>
+      </div>
+      <div class="jobs">
+        <div class="reveal reveal--left">
+          <h3>Where we usually hire</h3>
+          <p class="jobs__intro">No open role that fits right now? Send your CV anyway. We review every application when a position opens.</p>
+          <div class="role"><div>Production &amp; assembly<small>Daugavpils · on-site</small></div><span class="pill">Talent pool</span></div>
+          <div class="role"><div>Electronics &amp; optics engineering<small>Daugavpils · on-site</small></div><span class="pill">Talent pool</span></div>
+          <div class="role"><div>Software development<small>Daugavpils · hybrid</small></div><span class="pill">Talent pool</span></div>
+          <div class="role"><div>Student internships<small>Daugavpils · seasonal</small></div><span class="pill pill--open">Ask us</span></div>
+        </div>
+        <form class="form reveal reveal--right" id="cvForm">
+          <h3>Send us your CV</h3>
+          <p>Takes about a minute. Available in English, Latvian and Russian.</p>
+          <div class="field"><label for="f-name">Full name</label><input id="f-name" required></div>
+          <div class="field"><label for="f-mail">Email</label><input id="f-mail" type="email" required></div>
+          <div class="field"><label for="f-area">Area of interest</label><select id="f-area"><option>Production &amp; assembly</option><option>Engineering</option><option>Software development</option><option>Internship</option><option>Other</option></select></div>
+          <div class="field"><label>CV</label><label class="upload"><input type="file" accept=".pdf,.doc,.docx" id="f-file"><span id="f-file-label">Drop your CV here or tap to upload<br><small>PDF or DOCX</small></span></label></div>
+          <button class="btn btn--primary" style="width:100%;justify-content:center;margin-top:6px">Send CV</button>
+          <div class="steps"><span><b>1</b>We review</span><span><b>2</b>We call you</span><span><b>3</b>Meet the team</span></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="company">
+    <div class="container">
+      <div class="section-head reveal"><div><div class="kicker">Company</div><h2 class="section-title">Trusted, certified, connected</h2></div></div>
+      <div class="trio stagger">
+        <a href="#" class="tile reveal" style="--i:0"><div class="icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/></svg></div><h3>Certificates &amp; Awards</h3><p>Quality standards and industry recognition behind every device.</p></a>
+        <a href="#" class="tile reveal" style="--i:1"><div class="icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></svg></div><h3>Media Partners</h3><p>Publications and events we work with across the industry.</p></a>
+        <a href="#contact" class="tile reveal" style="--i:2"><div class="icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 21s-7-6.5-7-12a7 7 0 0114 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg></div><h3>Regula Offices</h3><p>Latvia, USA, Germany, Poland, the Netherlands and Brazil.</p></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section contact" id="contact">
+    <div class="container contact__grid">
+      <div class="contact__card reveal reveal--left">
+        <div class="kicker" style="color:var(--violet-3)">Contacts</div>
+        <h3>Let's talk business</h3>
+        <div class="contact__row"><small>Company</small>Regula Baltija LLC</div>
+        <div class="contact__row"><small>Address</small>Višķu iela 34, Daugavpils, LV-5410, Latvia</div>
+        <div class="contact__row"><small>Phone</small><a href="tel:+37165431299">+371 65 43 12 99</a></div>
+        <div class="contact__row"><small>Email</small><a href="mailto:info.lv@regulaforensics.com">info.lv@regulaforensics.com</a></div>
+        <a href="mailto:info.lv@regulaforensics.com" class="btn btn--primary" style="margin-top:20px">Get in touch</a>
+      </div>
+      <div class="map reveal reveal--right">
+        <svg viewBox="0 0 400 340" preserveAspectRatio="xMidYMid slice">
+          <rect width="400" height="340" fill="#1b1838"/>
+          <path d="M-20 230 C80 190 150 260 230 210 S360 160 420 190" stroke="#3b3470" stroke-width="24" fill="none"/>
+          <g stroke="#28234f" stroke-width="2"><path d="M0 60H400M0 130H400M0 280H400M60 0V340M150 0V340M260 0V340M340 0V340"/></g>
+          <g stroke="#3a3468" stroke-width="5"><path d="M0 100L400 150M120 0L180 340"/></g>
+          <circle cx="200" cy="160" r="12" fill="#a985ff"><animate attributeName="r" values="10;40;10" dur="2.4s" repeatCount="indefinite"/><animate attributeName="opacity" values=".6;0;.6" dur="2.4s" repeatCount="indefinite"/></circle>
+          <circle cx="200" cy="160" r="8" fill="#a985ff"/>
+        </svg>
+        <div class="map__pin">Regula Baltija, Daugavpils</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__grid">
+      <div>
+        <a href="#top" class="logo"><span class="logo__mark">R</span><span>Regula<small>Baltija · Latvia</small></span></a>
+        <p style="margin-top:16px;max-width:300px">Document and banknote authentication, made in Daugavpils since 1992.</p>
+        <form class="subscribe" id="subForm"><input type="email" placeholder="Subscribe to newsletter" required><button class="btn btn--primary" style="padding:11px 16px">→</button></form>
+        <div class="social">
+          <a href="#" aria-label="RSS"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="19" r="2"/><path d="M3 10a11 11 0 0111 11h-3a8 8 0 00-8-8zm0-6a17 17 0 0117 17h-3A14 14 0 003 7z"/></svg></a>
+          <a href="#" aria-label="Facebook"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 8V6c0-1 .5-1.5 1.5-1.5H17V1h-3c-3 0-4 2-4 4.5V8H7v3.5h3V23h4V11.5h3l.5-3.5z"/></svg></a>
+          <a href="#" aria-label="LinkedIn"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 3a2 2 0 110 4 2 2 0 010-4zM2 9h4v12H2zm7 0h4v2c.6-1 2-2.3 4-2.3 4 0 5 2.6 5 6V21h-4v-5.5c0-1.5 0-3.3-2-3.3s-2.3 1.6-2.3 3.2V21H9z"/></svg></a>
+          <a href="#" aria-label="X"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.8 2H21l-7 8 8.3 12H16l-5-7-5.8 7H2l7.5-8.8L1.5 2H8l4.5 6.4zm-1.1 18h1.8L7.4 4H5.5z"/></svg></a>
+          <a href="#" aria-label="YouTube"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M23 7.5a3 3 0 00-2-2C19 5 12 5 12 5s-7 0-9 .5a3 3 0 00-2 2C.5 9.4.5 12 .5 12s0 2.6.5 4.5a3 3 0 002 2c2 .5 9 .5 9 .5s7 0 9-.5a3 3 0 002-2c.5-1.9.5-4.5.5-4.5s0-2.6-.5-4.5zM9.7 15.5v-7l6 3.5z"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg></a>
+        </div>
+      </div>
+      <div><h5>Products</h5><a href="#catalog" data-jump="readers">Document readers</a><a href="#catalog" data-jump="manual">Manual control</a><a href="#catalog" data-jump="vsc">Comparators</a><a href="#catalog" data-jump="micro">Microscopes</a><a href="#catalog" data-jump="mo">Magneto-optical</a><a href="#catalog" data-jump="soft">Software</a></div>
+      <div><h5>Expertise</h5><a href="#expertise">Reference systems</a><a href="#expertise">Reference books</a><a href="#expertise">Training</a><a href="#expertise">Glossaries</a><a href="#expertise">Support</a></div>
+      <div><h5>Pressroom</h5><a href="#press">News</a><a href="#press">Blog</a><a href="#press">Exhibitions</a><a href="#press">Videos</a></div>
+      <div><h5>Company</h5><a href="#company">Certificates &amp; Awards</a><a href="#company">Media Partners</a><a href="#careers">Careers</a><a href="#contact">Offices</a></div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 1992–2026 Regula. All rights reserved.</span>
+      <nav><a href="#">Terms of use</a><a href="#">Privacy</a><a href="#">Cookie policy</a></nav>
+    </div>
+    <p class="legal">Gartner® and Magic Quadrant™ are trademarks of Gartner, Inc. and/or its affiliates, used with permission. Gartner does not endorse any vendor, product or service depicted in its research publications. Concept design.</p>
+  </div>
+</footer>
+
+<script>
+const CATEGORIES = {
+  readers: { label: 'Document Readers', cover: 'https://static-content.regulaforensics.com/Visuals/0574-new-2.webp', text: 'Full-page, ID-1 and mobile readers for border control, police and business.' },
+  manual: { label: 'Manual Control', cover: 'https://static-content.regulaforensics.com/Hardware-products/Categories/Manual3.webp', text: 'Front-line devices for fast manual authenticity checks.' },
+  vsc: { label: 'Comparators', cover: 'https://static-content.regulaforensics.com/Visuals/comparators-visual.webp', text: 'Video spectral comparators for forensic labs and second-line control.' },
+  micro: { label: 'Microscopes & Magnifiers', cover: '', text: 'Premium optics for examinations that need to be seen with your own eyes.' },
+  mo: { label: 'Magneto-Optical & VIN', cover: '', text: 'Non-destructive magnetic imaging for documents, banknotes, VINs and firearms.' },
+  acc: { label: 'Accessories', cover: '', text: 'Add-ons that extend comparators and examination workstations.' },
+  soft: { label: 'Software & Data', cover: '', text: 'The software and reference data behind every Regula device.' }
+};
+
+const PRODUCTS = [
+  { id: '70x4m', cat: 'readers', name: 'Full-page passport reader', badge: 'Bestseller', text: 'Fast, hassle-free reading and verification of identity documents with automated data entry at the front line.' },
+  { id: '70x9', cat: 'readers', name: 'Reader with built-in computer', text: 'Independent full-page verification workstation for stationary use where desk space is limited.' },
+  { id: '7223e', cat: 'readers', name: 'Embedded ID card reader', badge: 'New', text: 'Compact ID-1 reader for kiosks and gates that scans both sides in a single pass.' },
+  { id: '70x8m', cat: 'readers', name: 'Embedded full-page reader', text: 'Built into e-gates, border kiosks and check-in counters for self-service registration.' },
+  { id: '1120m', cat: 'readers', name: 'Mobile document authenticator', text: 'Document and identity authentication powered by a smartphone.' },
+  { id: '7320', cat: 'readers', name: 'Mobile document reader', text: 'Authenticity check, fingerprint capture and face matching in one compact mobile unit.' },
+  { id: '8333m', cat: 'readers', name: 'Portable workstation', text: 'Tablet PC with document reader, optional fingerprint scanner and RFID reader for non-stop field checks.' },
+  { id: '7308', cat: 'readers', name: 'Wi-Fi full-page reader', text: 'Portable reader with built-in computer and shoulder strap, streaming to a display over Wi-Fi.' },
+  { id: '70x7', cat: 'readers', name: 'Data entry automation reader', text: 'Compact reader for banks, hotels, hospitals and telecoms that captures ID data automatically.' },
+  { id: '72x3', cat: 'readers', name: 'ID-1 duplex reader', text: 'Two-sided scanning and authenticity checks for ID cards, driver’s licenses and other card-format documents.' },
+
+  { id: '4166', cat: 'manual', name: 'Morphing detector', badge: 'New', text: 'Reveals surface artifacts that expose morphed photos in documents.' },
+  { id: '4125', cat: 'manual', name: 'ForensicScope', badge: 'New', text: 'On-the-go checker for expert authentication of IDs and banknotes in the field.' },
+  { id: '4205d', cat: 'manual', name: 'Front-line border control device', text: 'Brings lab-grade counterfeit detection to the front line of border control.' },
+  { id: '4325', cat: 'manual', name: 'Express authenticity verifier', text: 'Time-saving device with multiple light sources, a thermostage and optional extensions.' },
+  { id: '10xx', cat: 'manual', name: 'Compact document examiner', badge: 'New', text: 'Multi-spectral examination device for reliable everyday expert work.' },
+
+  { id: '4308m', cat: 'vsc', name: 'Dual-video spectral comparator', badge: 'Flagship', text: 'Two optical systems, motorized stage, hyperspectral imaging and 3D visualization for the most complex examinations.' },
+  { id: '4307', cat: 'vsc', name: 'Customizable comparator', text: 'Multi-purpose comparator with an embedded spectrometer and 32 configuration options.' },
+  { id: '4306m', cat: 'vsc', name: 'Video spectral comparator', badge: 'New', text: 'Cost-efficient comparator with coaxial lighting, anti-Stokes illumination and a removable stage.' },
+  { id: '4305dmh', cat: 'vsc', name: 'Portable comparator', text: 'Space-saving comparator with front-panel controls that works without a PC.' },
+  { id: '4308', cat: 'vsc', name: 'Dual-video comparator (previous gen)', badge: 'Limited', text: 'Versatile dual-camera comparator for labs and border checkpoints.' },
+  { id: '88xx', cat: 'vsc', name: 'Photospectral scanner', text: 'Captures documents under different light sources at very high resolution for databases and remote examination.' },
+  { id: '2303', cat: 'vsc', name: 'OVD analyzer', text: 'Captures holograms in different lighting modes and analyzes their authenticity automatically.' },
+
+  { id: '5001mk', cat: 'micro', name: 'Spectral luminescent microscope', text: 'Visible, IR and UV light with imaging filters and up to 98x optical magnification.' },
+  { id: '5003', cat: 'micro', name: 'Trinocular stereo microscope', text: 'Stereo imaging with adjustable magnification up to 420x and on-device controls.' },
+  { id: '5006', cat: 'micro', name: 'Spectrometer-microscope', text: 'A spectrometer and an electronic microscope combined in one device.' },
+  { id: '100x', cat: 'micro', name: 'Compact magnifiers', text: 'Pocket magnifiers from 10x to 23x for quick authenticity checks.' },
+  { id: '1008', cat: 'micro', name: 'Dactyloscopic magnifier', text: 'For fingerprints and small objects, with LED lighting and diopter adjustment.' },
+  { id: '4177-5', cat: 'micro', name: 'Spectral luminescent magnifier', text: 'Mobile device for checks that don’t need high magnification or special illuminators.' },
+
+  { id: '4197', cat: 'mo', name: 'Magneto-optical visualizer', text: 'Real-time visualization of magnetic security features and hidden magnetic marks.' },
+  { id: '7701m', cat: 'mo', name: 'Magneto-optical scanner', text: 'Non-destructive examination of large documents with magnetic properties.' },
+  { id: '7708', cat: 'mo', name: 'MOHyster hysteresigraph', text: 'Measures magnetic hysteresis of security features and classifies their materials.' },
+  { id: '7505m', cat: 'mo', name: 'VIN verifier', text: 'Detects VIN falsification on metal surfaces in minutes, without removing paint.' },
+  { id: '7515m', cat: 'mo', name: 'Eddy-current magnetograph', text: 'Restores destroyed VINs and examines markings on aluminum and non-ferromagnetic surfaces.' },
+  { id: '7517', cat: 'mo', name: 'Firearms examination workstation', text: 'Detects falsified firearm and ammunition numbers and restores the originals.' },
+
+  { id: '4168', cat: 'acc', name: 'Thermostage', text: 'Heats samples to reveal thermochromic ink security features.' },
+  { id: '4165', cat: 'acc', name: 'Tilting stage', text: 'Changes the viewing angle to examine OVI and other angle-dependent features.' },
+  { id: '4169', cat: 'acc', name: 'Polarizer', text: 'Rotating optical filter for features that are visible only in polarized light.' },
+  { id: '4162', cat: 'acc', name: 'Professional 3D visualizer', text: 'Builds a 3D model of a document’s surface relief with white and IR LEDs.' },
+
+  { id: 'rfs', cat: 'soft', name: 'Regula Forensic Studio', model: 'RFS', text: 'Software that runs Regula comparators, processes images and builds forensic reports.' },
+  { id: 'irs', cat: 'soft', name: 'Information Reference System', model: 'IRS', text: 'Specimens of documents and banknotes from around the world, updated weekly.' },
+  { id: 'sdk', cat: 'soft', name: 'Document Reader SDK', model: 'SDK', text: 'The engine behind every Regula reader, also available as a standalone SDK.' }
+];
+
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function placeholder(label) {
+  return `<div class="card__ph"><svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid slice"><circle cx="160" cy="20" r="70" fill="#d9c8ff" opacity=".45"/><circle cx="30" cy="140" r="50" fill="#a985ff" opacity=".2"/></svg><span>${label}</span></div>`;
+}
+
+function media(p) {
+  const label = p.model || p.id.toUpperCase();
+  const src = p.img || `img/${p.id}.webp`;
+  return `<img src="${src}" alt="Regula ${label}" loading="lazy" onerror="this.replaceWith(document.createRange().createContextualFragment(this.dataset.ph))" data-ph='${placeholder(label)}'>`;
+}
+
+const state = { cat: 'all', query: '' };
+
+function renderFilters() {
+  const counts = PRODUCTS.reduce((acc, p) => (acc[p.cat] = (acc[p.cat] || 0) + 1, acc), {});
+  const items = [['all', 'All', PRODUCTS.length], ...Object.entries(CATEGORIES).map(([k, v]) => [k, v.label, counts[k]])];
+  $('#filters').innerHTML = items.map(([key, label, n]) =>
+    `<button class="filter${state.cat === key ? ' is-active' : ''}" data-cat="${key}">${label}<sup>${n}</sup></button>`
+  ).join('');
+}
+
+function renderBanner() {
+  const c = CATEGORIES[state.cat];
+  const banner = $('#banner');
+  if (!c || !c.cover) { banner.classList.remove('is-shown'); return; }
+  $('#bannerImg').src = c.cover;
+  $('#bannerImg').onerror = () => banner.classList.remove('is-shown');
+  $('#bannerTitle').textContent = c.label;
+  $('#bannerText').textContent = c.text;
+  banner.classList.add('is-shown');
+}
+
+function renderGrid() {
+  const q = state.query.trim().toLowerCase();
+  const list = PRODUCTS.filter(p =>
+    (state.cat === 'all' || p.cat === state.cat) &&
+    (!q || `${p.id} ${p.model || ''} ${p.name} ${p.text}`.toLowerCase().includes(q))
+  );
+  $('#grid').innerHTML = list.length ? list.map((p, i) => `
+    <button class="card is-entering" style="--i:${Math.min(i, 12)}" data-id="${p.id}">
+      ${p.badge ? `<span class="card__badge${p.badge === 'New' ? ' card__badge--new' : ''}">${p.badge}</span>` : ''}
+      <div class="card__media">${media(p)}</div>
+      <div class="card__body">
+        <span class="card__model">${p.model || 'Regula ' + p.id.toUpperCase()}</span>
+        <h4 class="card__name">${p.name}</h4>
+        <p class="card__text">${p.text}</p>
+      </div>
+    </button>`).join('') : '<p class="empty">Nothing found. Try another model number.</p>';
+}
+
+function renderCatalog() { renderFilters(); renderBanner(); renderGrid(); }
+
+$('#filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter');
+  if (!btn) return;
+  state.cat = btn.dataset.cat;
+  renderCatalog();
+});
+$('#search').addEventListener('input', e => { state.query = e.target.value; renderGrid(); });
+
+const modal = $('#modal');
+$('#grid').addEventListener('click', e => {
+  const card = e.target.closest('.card');
+  if (!card) return;
+  const p = PRODUCTS.find(x => x.id === card.dataset.id);
+  $('#modalMedia').innerHTML = media(p);
+  $('#modalCat').textContent = `${CATEGORIES[p.cat].label} · ${p.model || 'Regula ' + p.id.toUpperCase()}`;
+  $('#modalName').textContent = p.name;
+  $('#modalText').textContent = p.text;
+  modal.showModal();
+});
+modal.addEventListener('click', e => { if (e.target === modal || e.target.closest('[data-close]')) modal.close(); });
+
+$$('[data-jump]').forEach(a => a.addEventListener('click', () => { state.cat = a.dataset.jump; renderCatalog(); }));
+
+const drawer = $('#drawer');
+function setDrawer(open) { drawer.classList.toggle('is-open', open); document.body.style.overflow = open ? 'hidden' : ''; }
+$$('[data-drawer]').forEach(b => b.addEventListener('click', () => setDrawer(b.dataset.drawer === 'open')));
+$$('#drawer a').forEach(a => a.addEventListener('click', () => setDrawer(false)));
+
+$$('.lang').forEach(group => group.addEventListener('click', e => {
+  if (e.target.tagName !== 'BUTTON') return;
+  $$('button', group).forEach(b => b.classList.toggle('is-active', b === e.target));
+}));
+
+$('#f-file').addEventListener('change', e => {
+  const f = e.target.files[0];
+  if (f) $('#f-file-label').textContent = f.name;
+});
+$('#cvForm').addEventListener('submit', e => { e.preventDefault(); e.target.querySelector('button').textContent = 'Thank you, we’ll be in touch'; });
+$('#subForm').addEventListener('submit', e => { e.preventDefault(); e.target.querySelector('button').textContent = '✓'; });
+
+const ticker = $('#ticker');
+ticker.innerHTML += ticker.innerHTML;
+
+const manifesto = $('#manifesto');
+const accentWords = ['true', 'Daugavpils.'];
+manifesto.innerHTML = manifesto.textContent.trim().split(/\s+/).map(w =>
+  `<span class="word${accentWords.includes(w) ? ' is-accent' : ''}">${w}</span>`
+).join(' ');
+const words = $$('.word', manifesto);
+
+const revealObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => entry.target.classList.toggle('is-visible', entry.isIntersecting));
+}, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+$$('.reveal').forEach(el => revealObserver.observe(el));
+
+const countObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    const target = +el.dataset.count;
+    const suffix = el.dataset.suffix || '';
+    const start = performance.now();
+    const tick = now => {
+      const t = Math.min((now - start) / 1600, 1);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - t, 3))) + suffix;
+      if (t < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+    countObserver.unobserve(el);
+  });
+}, { threshold: 0.6 });
+$$('[data-count]').forEach(el => countObserver.observe(el));
+
+const header = $('#header');
+const heroContent = $('#heroContent');
+const pin = $('#pin');
+const pinTitles = $$('.pin__title');
+const pinShapes = $$('.pin__shape');
+const progressBar = $('#progress');
+let lastY = 0;
+
+function onScroll() {
+  const y = scrollY;
+  const vh = innerHeight;
+
+  progressBar.style.transform = `scaleX(${y / (document.documentElement.scrollHeight - vh)})`;
+
+  header.classList.toggle('is-solid', y > 40);
+  header.classList.toggle('is-hidden', y > lastY && y > vh && !drawer.classList.contains('is-open'));
+  lastY = y;
+
+  if (!reduceMotion && y < vh * 1.2) {
+    const t = y / vh;
+    heroContent.style.transform = `translateY(${t * 120}px) scale(${1 - t * 0.08})`;
+    heroContent.style.opacity = 1 - t * 1.4;
+  }
+
+  const m = manifesto.getBoundingClientRect();
+  const mp = Math.min(Math.max((vh * 0.85 - m.top) / (m.height + vh * 0.35), 0), 1);
+  const lit = Math.floor(mp * words.length);
+  words.forEach((w, i) => w.classList.toggle('is-lit', i < lit));
+
+  const r = pin.getBoundingClientRect();
+  const pp = Math.min(Math.max(-r.top / (r.height - vh), 0), 0.9999);
+  const idx = Math.floor(pp * pinTitles.length);
+  pinTitles.forEach((el, i) => el.classList.toggle('is-active', i === idx));
+  pinShapes.forEach((el, i) => el.classList.toggle('is-active', i === idx));
+  $('#pinIndex').textContent = String(idx + 1).padStart(2, '0');
+  $('#pinBar').style.transform = `scaleX(${pp})`;
+}
+addEventListener('scroll', () => requestAnimationFrame(onScroll), { passive: true });
+
+(function field() {
+  const canvas = $('#field');
+  const ctx = canvas.getContext('2d');
+  let w, h, dpr, cols, rows, gap;
+  const mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
+
+  function resize() {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    w = canvas.clientWidth; h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    gap = w < 700 ? 26 : 34;
+    cols = Math.ceil(w / gap) + 4;
+    rows = Math.ceil(h / gap) + 4;
+  }
+
+  function draw(time) {
+    const t = time * 0.00035;
+    mouse.x += (mouse.tx - mouse.x) * 0.05;
+    mouse.y += (mouse.ty - mouse.y) * 0.05;
+    const scroll = Math.min(scrollY / h, 1);
+    ctx.clearRect(0, 0, w, h);
+
+    for (let j = 0; j < rows; j++) {
+      for (let i = 0; i < cols; i++) {
+        const nx = i / cols, ny = j / rows;
+        const wave =
+          Math.sin(nx * 6 + t * 2) * 0.5 +
+          Math.cos(ny * 5 - t * 1.6) * 0.5 +
+          Math.sin((nx + ny) * 4 + t) * 0.6;
+        const dx = nx - mouse.x, dy = ny - mouse.y;
+        const pull = Math.exp(-(dx * dx + dy * dy) * 18);
+        const z = wave + pull * 1.6;
+
+        const x = (i - 2) * gap + Math.sin(t + j * 0.3) * 6;
+        const y = (j - 2) * gap + z * 16 - scroll * 80 * ny;
+        const r = Math.max(0.4, 1.1 + z * 0.9);
+        const a = Math.min(0.85, Math.max(0.05, 0.18 + z * 0.22 + pull * 0.5)) * (1 - scroll * 0.6);
+
+        ctx.beginPath();
+        ctx.fillStyle = z > 0.9 ? `rgba(217,200,255,${a})` : `rgba(169,133,255,${a})`;
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    const sweep = ((time * 0.00012) % 1.4) - 0.2;
+    const sy = sweep * h;
+    const grad = ctx.createLinearGradient(0, sy - 60, 0, sy + 2);
+    grad.addColorStop(0, 'rgba(169,133,255,0)');
+    grad.addColorStop(1, 'rgba(169,133,255,.12)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, sy - 60, w, 62);
+
+    if (!reduceMotion) requestAnimationFrame(draw);
+  }
+
+  addEventListener('resize', resize);
+  addEventListener('pointermove', e => { mouse.tx = e.clientX / w; mouse.ty = e.clientY / h; }, { passive: true });
+  resize();
+  requestAnimationFrame(draw);
+})();
+
+renderCatalog();
+onScroll();
+</script>
+</body>
+</html>
