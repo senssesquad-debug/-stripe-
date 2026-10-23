@@ -108,6 +108,10 @@ public class LostIllusioner extends Illusioner {
             if (source.getEntity() instanceof ServerPlayer killer) {
                 StoryEvents.onLostMobDefeated(killer, this);
             }
+            if (expeditionLeader) {
+                // The expedition's research notes are the clue players hunt for; always dropped once.
+                spawnAtLocation(level, new net.minecraft.world.item.ItemStack(com.lostfeatures.registry.ModItems.ENCRYPTED_NOTES.get()));
+            }
             EventMemory.get(level).record(EventMemory.Type.ILLAGER_EXPEDITION, blockPosition(), "illusioner_defeated");
             AncientSignals.post(level, blockPosition(), AncientSignals.Kind.ENCOUNTER_END);
         }

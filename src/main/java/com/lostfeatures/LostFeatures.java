@@ -38,6 +38,7 @@ public final class LostFeatures {
         ModItems.register(modEventBus);
         ModBlockEntities.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
+        com.lostfeatures.world.structure.ModStructures.register(modEventBus);
 
         modEventBus.addListener(ModEntities::registerAttributes);
         modEventBus.addListener(ModBlockEntities::registerCapabilities);

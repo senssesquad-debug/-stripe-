@@ -172,6 +172,13 @@ public class RedDragon extends Monster {
         initBossEvent();
     }
 
+    /** Starts this dragon in flight (used when an encounter places it high above its territory). */
+    public void beginAirborne() {
+        setFlying(true);
+        setMode(Mode.FLY);
+        takeoffCooldown = 200;
+    }
+
     public void setHomePos(BlockPos pos) {
         this.homePos = pos.immutable();
     }
