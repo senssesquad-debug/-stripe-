@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="${mod_license}"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="Lost Features team"
+description='''
+Restores selected removed, unused and abandoned Minecraft concepts (rubies, the Red Dragon,
+the Giant, the Illusioner, Brick Pyramids, Far Lands-inspired terrain and more) alongside an
+original living ecosystem, ancient redstone technology and an optional story campaign.
+All story content is original mod lore, not official Minecraft canon.
+'''
+
+[[dependencies.${mod_id}]]
+modId="neoforge"
+type="required"
+versionRange="[${neo_version},)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.${mod_id}]]
+modId="minecraft"
+type="required"
+versionRange="${minecraft_version_range}"
+ordering="NONE"
+side="BOTH"

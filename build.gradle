@@ -1,0 +1,113 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.144'
+    id 'idea'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+// Minecraft 26.2 requires Java 25.
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+sourceSets.main.resources {
+    // JSON produced by the data generators (runClientData / runServerData).
+    srcDir 'src/generated/resources'
+}
+
+sourceSets {
+    gameTest {
+        compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+        runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+    }
+}
+configurations {
+    gameTestImplementation.extendsFrom implementation
+    gameTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
+neoForge {
+    version = project.neo_version
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        gameTestServer {
+            type = "gameTestServer"
+            sourceSet = sourceSets.gameTest
+            gameDirectory = file('build/gametest')
+        }
+        clientData {
+            clientData()
+            programArguments.addAll '--mod', project.mod_id,
+                    '--all',
+                    '--uncached',
+                    '--output', file('src/generated/resources').absolutePath,
+                    '--existing', file('src/main/resources').absolutePath
+        }
+        serverData {
+            serverData()
+            programArguments.addAll '--mod', project.mod_id,
+                    '--all',
+                    '--uncached',
+                    '--output', file('src/generated/resources').absolutePath,
+                    '--existing', file('src/main/resources').absolutePath
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+            sourceSet(sourceSets.gameTest)
+        }
+    }
+}
+
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def replaceProperties = [
+        minecraft_version      : minecraft_version,
+        minecraft_version_range: minecraft_version_range,
+        neo_version            : neo_version,
+        mod_id                 : mod_id,
+        mod_name               : mod_name,
+        mod_license            : mod_license,
+        mod_version            : mod_version
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into layout.buildDirectory.dir('generated/sources/modMetadata')
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+// Packages the full source project next to the JAR.
+tasks.register('sourceArchive', Zip) {
+    archiveFileName = "${mod_id}-${mod_version}-project-src.zip"
+    destinationDirectory = layout.buildDirectory.dir('libs')
+    from(projectDir) {
+        include 'src/**', 'docs/**', 'tools/**', 'gradle/**', 'build.gradle', 'settings.gradle',
+                'gradle.properties', 'gradlew', 'gradlew.bat', 'README.md', 'LICENSE*'
+    }
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
