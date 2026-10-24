@@ -55,30 +55,17 @@ public final class LostFeaturesCommands {
                 }))
                 .then(Commands.literal("start").then(Commands.argument("type", StringArgumentType.word())
                         .suggests((c, b) -> SharedSuggestionProvider.suggest(Arrays.stream(EventType.values()).map(EventType::getSerializedName), b))
-                        .executes(ctx -> {
-                            ServerPlayer player = ctx.getSource().getPlayerOrException();
-                            String name = StringArgumentType.getString(ctx, "type");
-                            EventType type = Arrays.stream(EventType.values()).filter(t -> t.getSerializedName().equals(name)).findFirst().orElse(null);
-                            if (type == null) {
-                                ctx.getSource().sendFailure(Component.literal("Unknown event type " + name));
-                                return 0;
-                            }
-                            ActiveEvent e = EncounterDirector.get(player.level()).tryStart(player.level(), player, type, true);
-                            if (e == null) {
-                                ctx.getSource().sendFailure(Component.literal("Could not start " + name + " here (needs a valid loaded location; see docs/TESTING.md)"));
-                                return 0;
-                            }
-                            LostFeatures.LOGGER.info("Admin {} started event {} #{}", player.getGameProfile().name(), name, e.id());
-                            ctx.getSource().sendSuccess(() -> Component.literal("Started " + name + " #" + e.id() + " at " + e.center().toShortString()), true);
-                            return 1;
-                        })))
+                        .executes(ctx -> startEvent(ctx.getSource(), StringArgumentType.getString(ctx, "type"),
+                                net.minecraft.core.BlockPos.containing(ctx.getSource().getPosition())))
+                        .then(Commands.argument("pos", net.minecraft.commands.arguments.coordinates.BlockPosArgument.blockPos())
+                                .executes(ctx -> startEvent(ctx.getSource(), StringArgumentType.getString(ctx, "type"),
+                                        net.minecraft.commands.arguments.coordinates.BlockPosArgument.getLoadedBlockPos(ctx, "pos"))))))
                 .then(Commands.literal("stop").then(Commands.argument("id", IntegerArgumentType.integer(1)).executes(ctx -> {
                     ServerLevel level = ctx.getSource().getLevel();
                     boolean ok = EncounterDirector.get(level).stop(IntegerArgumentType.getInteger(ctx, "id"), level.getGameTime());
                     ctx.getSource().sendSuccess(() -> Component.literal(ok ? "Event stopping" : "No such active event"), true);
                     return ok ? 1 : 0;
                 }))));
-
         root.then(Commands.literal("encounter")
                 .then(Commands.literal("giant").executes(ctx -> {
                     ServerPlayer p = ctx.getSource().getPlayerOrException();
@@ -122,5 +109,23 @@ public final class LostFeaturesCommands {
                                 })))));
 
         event.getDispatcher().register(root);
+    }
+
+    private static int startEvent(CommandSourceStack source, String name, net.minecraft.core.BlockPos pos) {
+        EventType type = Arrays.stream(EventType.values()).filter(t -> t.getSerializedName().equals(name)).findFirst().orElse(null);
+        if (type == null) {
+            source.sendFailure(Component.literal("Unknown event type " + name));
+            return 0;
+        }
+        ServerLevel level = source.getLevel();
+        EncounterDirector director = EncounterDirector.get(level);
+        ActiveEvent e = director.tryStart(level, pos, type, true);
+        if (e == null) {
+            source.sendFailure(Component.literal("Could not start " + name + " here: " + director.lastRefusal()));
+            return 0;
+        }
+        LostFeatures.LOGGER.info("Admin {} started event {} #{} at {}", source.getTextName(), name, e.id(), e.center().toShortString());
+        source.sendSuccess(() -> Component.literal("Started " + name + " #" + e.id() + " at " + e.center().toShortString()), true);
+        return 1;
     }
 }

@@ -18,6 +18,8 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -103,20 +105,40 @@ public class RunicLogicDeviceBlock extends Block implements EntityBlock {
         }
     }
 
+    /**
+     * Input changes are evaluated one tick after the neighbour update. Time-based transitions (pulse end,
+     * sequence timeout) are handled by the block entity ticker instead of long scheduled ticks, because
+     * vanilla keeps only one pending scheduled tick per position and a long one would delay input handling.
+     */
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (level.getBlockEntity(pos) instanceof RunicLogicBlockEntity be) {
-            boolean output = be.evaluate(level, state, readInputs(level, pos, state));
-            if (output != state.getValue(POWERED)) {
-                BlockState next = state.setValue(POWERED, output);
-                level.setBlock(pos, next, Block.UPDATE_ALL);
-                updateFront(level, pos, next);
-            }
-            int wake = be.nextWakeDelay(level);
-            if (wake > 0) {
-                level.scheduleTick(pos, this, wake);
-            }
+            applyOutput(level, pos, state, be.evaluate(level, state, readInputs(level, pos, state)));
         }
+    }
+
+    static void applyOutput(Level level, BlockPos pos, BlockState state, boolean output) {
+        if (output != state.getValue(POWERED)) {
+            BlockState next = state.setValue(POWERED, output);
+            level.setBlock(pos, next, Block.UPDATE_ALL);
+            ((RunicLogicDeviceBlock) state.getBlock()).updateFront(level, pos, next);
+        }
+    }
+
+    public static void setOutput(Level level, BlockPos pos, boolean output) {
+        BlockState state = level.getBlockState(pos);
+        if (state.getBlock() instanceof RunicLogicDeviceBlock) {
+            applyOutput(level, pos, state, output);
+        }
+    }
+
+    @Override
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return level.isClientSide() ? null : (l, p, s, be) -> {
+            if (be instanceof RunicLogicBlockEntity runic) {
+                runic.serverTick();
+            }
+        };
     }
 
     /** Bit 0: left, bit 1: back, bit 2: right (relative to the output arrow). */

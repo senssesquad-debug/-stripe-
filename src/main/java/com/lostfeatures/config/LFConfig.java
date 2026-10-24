@@ -111,7 +111,7 @@ public final class LFConfig {
         DRAGON_NATURAL_SPAWNING = b.comment("Allow the encounter director to place rare Red Dragon encounters.")
                 .define("naturalSpawning", true);
         DRAGON_SPAWN_CHANCE = b.comment("Chance per eligible player per director check (default check: every 1200 ticks).",
-                        "0.004 means roughly one encounter attempt per ~4 in-game days of continuous play, before other conditions.")
+                        "0.004 = 1 in 250 checks, i.e. about one attempt per ~12 in-game days of play per player, before biome/cooldown/population conditions.")
                 .defineInRange("spawnChance", 0.004, 0.0, 1.0);
         DRAGON_SPAWN_COOLDOWN_TICKS = b.comment("Minimum ticks between natural dragon encounters in one dimension.")
                 .defineInRange("spawnCooldownTicks", 72000, 0, Integer.MAX_VALUE);
@@ -119,9 +119,9 @@ public final class LFConfig {
                 .defineInRange("maxNearby", 1, 0, 16);
         DRAGON_MIN_DISTANCE_FROM_WORLD_SPAWN = b.comment("Natural dragon encounters never start closer than this to the world spawn.")
                 .defineInRange("minDistanceFromWorldSpawn", 512, 0, 100000);
-        DRAGON_NEAR_PLAYER_BUILDS = b.comment("If false, natural encounters are skipped near beds, bells and lit furnaces (player bases).")
+        DRAGON_NEAR_PLAYER_BUILDS = b.comment("If false, natural encounters never start within 48 blocks of a bed (player bases and villages).")
                 .define("allowNearPlayerBuilds", false);
-        DRAGON_ENVIRONMENTAL_DAMAGE = b.comment("Fire breath may scorch grass/leaves into burnt variants (never player-placed blocks such as planks).")
+        DRAGON_ENVIRONMENTAL_DAMAGE = b.comment("Fire breath may scorch grass blocks (they regrow) and burn away short grass, ferns and dead bushes (tag lostfeatures:dragon_scorchable). Respects mobGriefing.")
                 .define("environmentalDamage", true);
         DRAGON_MAX_SCORCH_BLOCKS = b.comment("Hard cap of blocks a single breath can scorch.")
                 .defineInRange("maxScorchBlocksPerBreath", 6, 0, 64);

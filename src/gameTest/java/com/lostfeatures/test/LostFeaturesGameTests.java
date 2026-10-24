@@ -101,6 +101,9 @@ public final class LostFeaturesGameTests {
         TESTS.put("event_memory_bounded", new Spec(LostFeaturesGameTests::eventMemoryBounded, 20));
         TESTS.put("ancient_disturbance_lifecycle", new Spec(LostFeaturesGameTests::ancientDisturbanceLifecycle, 900));
         TESTS.put("far_lands_density_bounded", new Spec(LostFeaturesGameTests::farLandsDensityBounded, 20));
+        TESTS.put("structures_build_signature_blocks", new Spec(LostFeaturesGameTests::structuresBuild, 40));
+        TESTS.put("red_dragon_breath_is_telegraphed", new Spec(LostFeaturesGameTests::dragonBreathTelegraphed, 200));
+        TESTS.put("giant_slam_after_windup", new Spec(LostFeaturesGameTests::giantSlamAfterWindup, 260));
     }
 
     private LostFeaturesGameTests() {
@@ -385,6 +388,90 @@ public final class LostFeaturesGameTests {
         h.assertTrue(event != null, "forced disturbance starts at a loaded location");
         h.succeedWhen(() -> h.assertTrue(event.stage() == EventStage.DONE || !director.events().contains(event),
                 "event reaches DONE and is cleaned up (stage " + event.stage() + ")"));
+    }
+
+    /** The dragon must show the charging state (jaw/smoke/roar) before any fire damage is dealt. */
+    static void dragonBreathTelegraphed(GameTestHelper h) {
+        RedDragon dragon = h.spawn(ModEntities.RED_DRAGON.get(), new BlockPos(1, 1, 4));
+        var target = h.spawn(EntityTypes.IRON_GOLEM, new BlockPos(7, 1, 4));
+        target.setNoAi(true);
+        float start = target.getHealth();
+        boolean[] sawCharge = {false};
+        boolean[] damagedBeforeCharge = {false};
+        h.onEachTick(() -> {
+            if (dragon.isAlive() && target.isAlive()) {
+                dragon.setTarget(target);
+            }
+            if (dragon.getBreathState() == 1) {
+                sawCharge[0] = true;
+            }
+            // Bites may land at any time; fire must never land before the breath telegraph.
+            if (!sawCharge[0] && target.getRemainingFireTicks() > 0) {
+                damagedBeforeCharge[0] = true;
+            }
+        });
+        h.succeedWhen(() -> {
+            h.assertFalse(damagedBeforeCharge[0], "no fire before the telegraph");
+            h.assertTrue(sawCharge[0], "breath charge (telegraph) observed");
+            h.assertTrue(!target.isAlive() || target.getHealth() < start, "target took damage");
+        });
+    }
+
+    /** The Giant raises its arms (synched windup) before the slam lands. */
+    static void giantSlamAfterWindup(GameTestHelper h) {
+        LostGiant giant = h.spawn(ModEntities.GIANT.get(), new BlockPos(1, 1, 1));
+        var golem = h.spawn(EntityTypes.IRON_GOLEM, new BlockPos(5, 1, 5));
+        golem.setNoAi(true);
+        float start = golem.getHealth();
+        boolean[] sawWindup = {false};
+        h.onEachTick(() -> {
+            if (giant.isAlive() && golem.isAlive()) {
+                giant.setTarget(golem);
+            }
+            if (giant.getWindup() > 0) {
+                sawWindup[0] = true;
+            }
+        });
+        h.succeedWhen(() -> {
+            h.assertTrue(sawWindup[0], "windup observed");
+            h.assertTrue(golem.getHealth() < start, "golem damaged by the slam/attacks");
+        });
+    }
+
+    /** Builds every structure kind well away from the test template and checks its signature blocks. */
+    static void structuresBuild(GameTestHelper h) {
+        var level = h.getLevel();
+        BlockPos base = h.absolutePos(C).offset(0, 30, 200);
+        int i = 0;
+        for (var kind : com.lostfeatures.world.structure.StructureKind.values()) {
+            BlockPos origin = base.offset(i++ * 64, 0, 0);
+            var piece = new com.lostfeatures.world.structure.AncientPiece(kind, origin, 1234L + i);
+            var box = piece.getBoundingBox();
+            piece.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(), box,
+                    net.minecraft.world.level.ChunkPos.containing(origin), origin);
+            net.minecraft.world.level.block.Block signature = switch (kind) {
+                case BRICK_PYRAMID -> Blocks.BRICKS;
+                case STARTING_HOUSE -> Blocks.OAK_PLANKS;
+                case OBSIDIAN_WALL -> Blocks.OBSIDIAN;
+                case GLASS_PILLAR -> Blocks.GLASS;
+                case MONOLITH -> Blocks.STONE;
+                case ANCIENT_RUINS -> ModBlocks.RUNIC_LOGIC_DEVICE.get();
+                case DRAGON_LAIR -> ModBlocks.ANCIENT_ALTAR.get();
+            };
+            boolean found = false;
+            boolean chest = false;
+            for (BlockPos p : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
+                var state = level.getBlockState(p);
+                found |= state.is(signature);
+                chest |= state.is(Blocks.CHEST) || state.is(ModBlocks.LOCKED_CHEST.get());
+            }
+            h.assertTrue(found, kind.getSerializedName() + " contains its signature block");
+            if (kind != com.lostfeatures.world.structure.StructureKind.OBSIDIAN_WALL) {
+                h.assertTrue(chest, kind.getSerializedName() + " contains loot");
+            }
+        }
+        level.getEntitiesOfClass(RedDragon.class, new AABB(base).inflate(600, 80, 100)).forEach(net.minecraft.world.entity.Entity::discard);
+        h.succeed();
     }
 
     static void farLandsDensityBounded(GameTestHelper h) {

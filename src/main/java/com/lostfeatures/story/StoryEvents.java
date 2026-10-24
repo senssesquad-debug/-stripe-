@@ -37,7 +37,7 @@ public final class StoryEvents {
             return false;
         }
         grantReward(player, milestone);
-        if (LFConfig.STORY_ANNOUNCEMENTS.getAsBoolean()) {
+        if (LFConfig.STORY_ANNOUNCEMENTS.getAsBoolean() && player.connection != null) {
             player.sendSystemMessage(Component.translatable("message.lostfeatures.journal_updated",
                     Component.translatable(milestone.titleKey()).withStyle(ChatFormatting.GOLD)).withStyle(ChatFormatting.YELLOW));
             player.level().playSound(null, player.blockPosition(), ModSounds.EVENT_STORY_DISCOVERY.get(), SoundSource.PLAYERS, 0.6F, 1.0F);

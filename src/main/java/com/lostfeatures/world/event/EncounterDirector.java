@@ -89,6 +89,8 @@ public class EncounterDirector extends SavedData {
     private long lastEventTime = -1_000_000L;
     private long lastDragonTime = -1_000_000L;
     private final Map<String, Long> lastByType = new HashMap<>();
+    /** Why the last start attempt was refused (for admin commands and debug logs; not persisted). */
+    private String lastRefusal = "";
 
     public EncounterDirector() {
     }
@@ -108,6 +110,15 @@ public class EncounterDirector extends SavedData {
 
     public static EncounterDirector get(ServerLevel level) {
         return level.getDataStorage().computeIfAbsent(TYPE);
+    }
+
+    public String lastRefusal() {
+        return lastRefusal;
+    }
+
+    private <T> T refuse(String reason) {
+        lastRefusal = reason;
+        return null;
     }
 
     public List<ActiveEvent> events() {
@@ -156,9 +167,14 @@ public class EncounterDirector extends SavedData {
         return n;
     }
 
-    /** Attempts to start an event near {@code player}. {@code forced} (admin command) skips chance and cooldowns, never safety checks. */
     public @Nullable ActiveEvent tryStart(ServerLevel level, ServerPlayer player, EventType type, boolean forced) {
+        return tryStart(level, player.blockPosition(), type, forced);
+    }
+
+    /** Attempts to start an event near {@code anchor}. {@code forced} (admin command) skips chance and cooldowns, never safety checks. */
+    public @Nullable ActiveEvent tryStart(ServerLevel level, BlockPos anchor, EventType type, boolean forced) {
         long now = level.getGameTime();
+        lastRefusal = "conditions not met";
         if (!forced) {
             long last = lastByType.getOrDefault(type.getSerializedName(), -1_000_000L);
             if (now - last < TYPE_COOLDOWN) {
@@ -166,10 +182,10 @@ public class EncounterDirector extends SavedData {
             }
         }
         ActiveEvent started = switch (type) {
-            case DRAGON_HUNTING_GROUNDS -> startHuntingGrounds(level, player, forced, now);
-            case VILLAGE_UNDER_THREAT -> startVillageThreat(level, player, forced, now);
-            case ILLAGER_EXPEDITION -> startExpedition(level, player, forced, now);
-            case ANCIENT_DISTURBANCE -> startDisturbance(level, player, forced, now);
+            case DRAGON_HUNTING_GROUNDS -> startHuntingGrounds(level, anchor, forced, now);
+            case VILLAGE_UNDER_THREAT -> startVillageThreat(level, anchor, forced, now);
+            case ILLAGER_EXPEDITION -> startExpedition(level, anchor, forced, now);
+            case ANCIENT_DISTURBANCE -> startDisturbance(level, anchor, forced, now);
         };
         if (started != null) {
             events.add(started);
@@ -255,7 +271,7 @@ public class EncounterDirector extends SavedData {
 
     /** A surface position {@code min..max} blocks from {@code from} in an entity-ticking chunk, or null. */
     static @Nullable BlockPos surfaceSpot(ServerLevel level, BlockPos from, int min, int max, RandomSource random, EntityType<?> type) {
-        for (int attempt = 0; attempt < 12; attempt++) {
+        for (int attempt = 0; attempt < 24; attempt++) {
             double angle = random.nextDouble() * Math.PI * 2;
             int dist = min + random.nextInt(Math.max(1, max - min));
             int x = from.getX() + Mth.floor(Math.cos(angle) * dist);
@@ -314,23 +330,23 @@ public class EncounterDirector extends SavedData {
 
     // =========================================================================== 9.1 Dragon Hunting Grounds
 
-    private @Nullable ActiveEvent startHuntingGrounds(ServerLevel level, ServerPlayer player, boolean forced, long now) {
+    private @Nullable ActiveEvent startHuntingGrounds(ServerLevel level, BlockPos anchor, boolean forced, long now) {
         if (!LFConfig.DRAGON_NATURAL_SPAWNING.getAsBoolean() || level.dimension() != Level.OVERWORLD) {
-            return null;
+            return refuse("dragon spawning disabled or not the Overworld");
         }
         RandomSource random = level.getRandom();
         if (!forced) {
             if (now - lastDragonTime < LFConfig.DRAGON_SPAWN_COOLDOWN_TICKS.getAsInt()) return null;
             if (random.nextDouble() >= LFConfig.DRAGON_SPAWN_CHANCE.get()) return null;
-            if (!inDragonBiome(level, player.blockPosition())) return null;
+            if (!inDragonBiome(level, anchor)) return null;
             BlockPos spawn = level.getRespawnData().pos();
             int minDist = LFConfig.DRAGON_MIN_DISTANCE_FROM_WORLD_SPAWN.getAsInt();
-            if (player.blockPosition().distSqr(spawn) < (double) minDist * minDist) return null;
+            if (anchor.distSqr(spawn) < (double) minDist * minDist) return null;
         }
-        int nearby = level.getEntitiesOfClass(RedDragon.class, player.getBoundingBox().inflate(256, 128, 256), RedDragon::isAlive).size();
-        if (nearby >= Math.max(1, LFConfig.DRAGON_MAX_NEARBY.getAsInt())) return null;
-        BlockPos center = surfaceSpot(level, player.blockPosition(), 48, 96, random, ModEntities.RED_DRAGON.get());
-        if (center == null) return null;
+        int nearby = level.getEntitiesOfClass(RedDragon.class, new AABB(anchor).inflate(256, 128, 256), RedDragon::isAlive).size();
+        if (nearby >= Math.max(1, LFConfig.DRAGON_MAX_NEARBY.getAsInt())) return refuse("population cap: " + nearby + " Red Dragon(s) within 256 blocks");
+        BlockPos center = surfaceSpot(level, anchor, 48, 96, random, ModEntities.RED_DRAGON.get());
+        if (center == null) return refuse("no free surface spot 48-96 blocks away in entity-ticking chunks");
         if (!LFConfig.DRAGON_NEAR_PLAYER_BUILDS.getAsBoolean() && !forced
                 && level.getPoiManager().findClosest(h -> h.is(PoiTypes.HOME), center, 48, PoiManager.Occupancy.ANY).isPresent()) {
             return null; // beds nearby: a player base or village
@@ -385,15 +401,17 @@ public class EncounterDirector extends SavedData {
 
     // =========================================================================== 9.2 Village Under Threat
 
-    private @Nullable ActiveEvent startVillageThreat(ServerLevel level, ServerPlayer player, boolean forced, long now) {
+    private @Nullable ActiveEvent startVillageThreat(ServerLevel level, BlockPos anchor, boolean forced, long now) {
         if (level.dimension() != Level.OVERWORLD) return null;
         RandomSource random = level.getRandom();
         if (!forced && (!level.isDarkOutside() || random.nextDouble() >= LFConfig.EVENT_VILLAGE_THREAT_CHANCE.get())) return null;
-        Optional<BlockPos> bell = level.getPoiManager().findClosest(h -> h.is(PoiTypes.MEETING), player.blockPosition(), 64, PoiManager.Occupancy.ANY);
-        if (bell.isEmpty()) return null;
-        BlockPos center = bell.get();
+        Optional<BlockPos> bell = level.getPoiManager().findClosest(h -> h.is(PoiTypes.MEETING), anchor, 64, PoiManager.Occupancy.ANY);
+        if (bell.isEmpty() && !forced) return null;
+        BlockPos center = bell.orElse(anchor);
         for (ActiveEvent other : events) {
-            if (other.type == EventType.VILLAGE_UNDER_THREAT && other.center.distSqr(center) < 128 * 128) return null;
+            if (other.type == EventType.VILLAGE_UNDER_THREAT && other.center.distSqr(center) < 128 * 128 && other.stage != EventStage.DONE) {
+                return refuse("another village threat is active within 128 blocks");
+            }
         }
         if (!forced && RegionalEcology.sample(level, center).villageNeedsRest()) return null;
 
@@ -469,21 +487,21 @@ public class EncounterDirector extends SavedData {
 
     // =========================================================================== 9.3 Illager Expedition
 
-    private @Nullable ActiveEvent startExpedition(ServerLevel level, ServerPlayer player, boolean forced, long now) {
+    private @Nullable ActiveEvent startExpedition(ServerLevel level, BlockPos anchor, boolean forced, long now) {
         RandomSource random = level.getRandom();
         if (!forced && random.nextDouble() >= LFConfig.EVENT_EXPEDITION_CHANCE.get()) return null;
-        Optional<EventMemory.Record> site = knownSite(level, player.blockPosition(), 160, forced ? 0 : 6000);
+        Optional<EventMemory.Record> site = knownSite(level, anchor, 160, forced ? 0 : 6000);
         BlockPos target;
         if (site.isPresent()) {
             target = site.get().pos();
         } else if (forced) {
-            target = player.blockPosition();
+            target = anchor;
         } else {
             return null;
         }
         if (!forced && EventMemory.get(level).count(target, 48, 72000, EventMemory.Type.ILLAGER_EXPEDITION) > 0) return null;
         BlockPos start = surfaceSpot(level, target, 24, 40, random, ModEntities.ILLUSIONER.get());
-        if (start == null) return null;
+        if (start == null) return refuse("no free surface spot 24-40 blocks from the site");
         LostIllusioner leader = spawn(level, ModEntities.ILLUSIONER.get(), start, EntitySpawnReason.PATROL);
         if (leader == null) return null;
         leader.setExpeditionLeader(true);
@@ -535,19 +553,19 @@ public class EncounterDirector extends SavedData {
 
     // =========================================================================== 9.4 Ancient Disturbance
 
-    private @Nullable ActiveEvent startDisturbance(ServerLevel level, ServerPlayer player, boolean forced, long now) {
+    private @Nullable ActiveEvent startDisturbance(ServerLevel level, BlockPos anchor, boolean forced, long now) {
         RandomSource random = level.getRandom();
         if (!forced && random.nextDouble() >= LFConfig.EVENT_DISTURBANCE_CHANCE.get()) return null;
-        Optional<EventMemory.Record> site = knownSite(level, player.blockPosition(), 96, forced ? 0 : 1200);
+        Optional<EventMemory.Record> site = knownSite(level, anchor, 96, forced ? 0 : 1200);
         BlockPos center;
         if (site.isPresent()) {
             center = site.get().pos();
         } else if (forced) {
-            center = player.blockPosition();
+            center = anchor;
         } else {
             return null;
         }
-        if (!level.isPositionEntityTicking(center)) return null;
+        if (!level.isPositionEntityTicking(center)) return refuse("site is not in an entity-ticking chunk");
         if (!forced && EventMemory.get(level).count(center, 32, 24000, EventMemory.Type.ANCIENT_DISTURBANCE) > 0) return null;
         ActiveEvent e = newEvent(EventType.ANCIENT_DISTURBANCE, center, now);
         EventMemory.get(level).record(EventMemory.Type.ANCIENT_DISTURBANCE, center, "tremor");

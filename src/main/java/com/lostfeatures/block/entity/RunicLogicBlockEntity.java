@@ -114,16 +114,25 @@ public class RunicLogicBlockEntity extends BlockEntity {
         }
     }
 
-    /** Ticks until the block must re-evaluate on its own (pulse end or sequence timeout), or 0. */
-    public int nextWakeDelay(ServerLevel level) {
-        long now = level.getGameTime();
-        if (pulseUntil > now) {
-            return (int) (pulseUntil - now);
+    /** Time-based transitions: ends output pulses and resets an abandoned sequence. */
+    public void serverTick() {
+        if (!(level instanceof ServerLevel server)) {
+            return;
         }
-        if (sequenceProgress > 0) {
-            return LFConfig.RUNIC_TIMING_WINDOW.getAsInt() + 1;
+        long now = server.getGameTime();
+        if (pulseUntil > 0 && now >= pulseUntil) {
+            pulseUntil = 0;
+            setChanged();
+            BlockState state = getBlockState();
+            if (state.getValue(RunicLogicDeviceBlock.PULSE) || state.getValue(RunicLogicDeviceBlock.MODE) == RunicMode.SEQUENCE) {
+                RunicLogicDeviceBlock.setOutput(server, worldPosition, false);
+            }
         }
-        return 0;
+        if (sequenceProgress > 0 && now - lastInputTime > LFConfig.RUNIC_TIMING_WINDOW.getAsInt()) {
+            sequenceProgress = 0;
+            setChanged();
+            server.playSound(null, worldPosition, ModSounds.RUNIC_RESET.get(), SoundSource.BLOCKS, 0.5F, 0.7F);
+        }
     }
 
     @Override
