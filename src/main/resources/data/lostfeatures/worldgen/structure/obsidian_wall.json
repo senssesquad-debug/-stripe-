@@ -1,0 +1,8 @@
+{
+  "type": "lostfeatures:ancient",
+  "kind": "obsidian_wall",
+  "biomes": "#lostfeatures:has_structure/obsidian_wall",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "none"
+}

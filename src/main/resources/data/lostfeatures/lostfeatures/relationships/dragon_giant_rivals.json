@@ -1,0 +1,7 @@
+{
+  "subject": "lostfeatures:red_dragon",
+  "target": "lostfeatures:giant",
+  "relation": "enemy",
+  "range": 24,
+  "priority": 4
+}

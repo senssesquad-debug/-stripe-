@@ -1,0 +1,8 @@
+{
+  "type": "lostfeatures:ancient",
+  "kind": "monolith",
+  "biomes": "#lostfeatures:has_structure/monolith",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "none"
+}

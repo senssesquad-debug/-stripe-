@@ -1,0 +1,8 @@
+{
+  "subject": "#lostfeatures:dragon_prey",
+  "target": "lostfeatures:red_dragon",
+  "relation": "fear",
+  "range": 20,
+  "priority": 1,
+  "speed": 1.4
+}

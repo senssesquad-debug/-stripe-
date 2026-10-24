@@ -1,0 +1,12 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "lostfeatures:config_enabled",
+      "key": "ruby_generation"
+    }
+  ],
+  "type": "neoforge:add_features",
+  "biomes": "#lostfeatures:has_ruby_ore_extra",
+  "features": "lostfeatures:ore_ruby_extra",
+  "step": "underground_ores"
+}

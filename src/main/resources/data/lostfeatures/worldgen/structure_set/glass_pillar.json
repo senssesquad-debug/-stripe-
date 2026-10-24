@@ -1,0 +1,20 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "lostfeatures:config_enabled",
+      "key": "structure_generation"
+    }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 1903011,
+    "separation": 14,
+    "spacing": 36
+  },
+  "structures": [
+    {
+      "structure": "lostfeatures:glass_pillar",
+      "weight": 1
+    }
+  ]
+}

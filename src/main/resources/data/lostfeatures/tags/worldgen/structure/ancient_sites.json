@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "lostfeatures:brick_pyramid",
+    "lostfeatures:starting_house",
+    "lostfeatures:obsidian_wall",
+    "lostfeatures:glass_pillar",
+    "lostfeatures:monolith",
+    "lostfeatures:ancient_ruins",
+    "lostfeatures:dragon_lair"
+  ]
+}

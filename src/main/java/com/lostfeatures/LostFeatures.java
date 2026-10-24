@@ -32,6 +32,7 @@ public final class LostFeatures {
         container.registerConfig(ModConfig.Type.COMMON, LFConfig.SPEC);
 
         ModSounds.register(modEventBus);
+        com.lostfeatures.registry.ModWorldgen.register(modEventBus);
         com.lostfeatures.registry.ModConditions.register(modEventBus);
         ModDataComponents.register(modEventBus);
         ModBlocks.register(modEventBus);

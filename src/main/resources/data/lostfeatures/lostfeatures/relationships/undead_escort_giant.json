@@ -1,0 +1,9 @@
+{
+  "subject": "#lostfeatures:giant_escort",
+  "target": "lostfeatures:giant",
+  "relation": "escort",
+  "range": 24,
+  "priority": 5,
+  "speed": 1.0,
+  "condition": "night"
+}

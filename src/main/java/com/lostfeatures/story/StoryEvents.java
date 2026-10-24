@@ -71,6 +71,9 @@ public final class StoryEvents {
     }
 
     public static void sync(ServerPlayer player, boolean open) {
+        if (player.connection == null) {
+            return; // not connected yet (or a test mock); the login hook syncs later
+        }
         StoryProgress progress = StoryProgress.get(player.level().getServer());
         PacketDistributor.sendToPlayer(player, new JournalPayload(List.copyOf(progress.milestones(player.getUUID())),
                 List.copyOf(progress.worldFlags()), open));

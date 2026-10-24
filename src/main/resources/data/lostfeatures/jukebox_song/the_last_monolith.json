@@ -1,0 +1,8 @@
+{
+  "comparator_output": 1,
+  "description": {
+    "translate": "jukebox_song.lostfeatures.the_last_monolith"
+  },
+  "length_in_seconds": 114.7,
+  "sound_event": "lostfeatures:music_disc.the_last_monolith"
+}

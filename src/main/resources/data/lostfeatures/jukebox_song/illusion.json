@@ -1,0 +1,8 @@
+{
+  "comparator_output": 4,
+  "description": {
+    "translate": "jukebox_song.lostfeatures.illusion"
+  },
+  "length_in_seconds": 93.0,
+  "sound_event": "lostfeatures:music_disc.illusion"
+}

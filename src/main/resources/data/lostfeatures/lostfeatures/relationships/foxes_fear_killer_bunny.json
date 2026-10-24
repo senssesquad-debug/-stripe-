@@ -1,0 +1,8 @@
+{
+  "subject": "minecraft:fox",
+  "target": "lostfeatures:killer_bunny",
+  "relation": "fear",
+  "range": 10,
+  "priority": 1,
+  "speed": 1.5
+}

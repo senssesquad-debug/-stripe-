@@ -1,0 +1,8 @@
+{
+  "subject": "minecraft:wolf",
+  "target": "#lostfeatures:village_threats",
+  "relation": "protect_owner",
+  "range": 12,
+  "priority": 2,
+  "condition": "tamed"
+}

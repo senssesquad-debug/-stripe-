@@ -1,0 +1,8 @@
+{
+  "subject": "#lostfeatures:dragon_prey",
+  "target": "lostfeatures:giant",
+  "relation": "fear",
+  "range": 14,
+  "priority": 1,
+  "speed": 1.3
+}

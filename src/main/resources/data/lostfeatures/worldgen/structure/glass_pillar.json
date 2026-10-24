@@ -1,0 +1,8 @@
+{
+  "type": "lostfeatures:ancient",
+  "kind": "glass_pillar",
+  "biomes": "#lostfeatures:has_structure/glass_pillar",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "none"
+}

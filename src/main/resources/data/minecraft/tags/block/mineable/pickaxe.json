@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "lostfeatures:ruby_ore",
+    "lostfeatures:deepslate_ruby_ore",
+    "lostfeatures:ruby_block",
+    "lostfeatures:ruby_bricks",
+    "lostfeatures:ancient_stone",
+    "lostfeatures:ancient_stone_bricks",
+    "lostfeatures:cracked_ancient_stone_bricks",
+    "lostfeatures:ancient_glyph_bricks",
+    "lostfeatures:ancient_bone_block",
+    "lostfeatures:illusory_wall",
+    "lostfeatures:ancient_event_sensor",
+    "lostfeatures:ancient_energy_reactor",
+    "lostfeatures:runic_logic_device",
+    "lostfeatures:ancient_secret_door",
+    "lostfeatures:dart_trap",
+    "lostfeatures:spike_trap",
+    "lostfeatures:ancient_altar"
+  ]
+}

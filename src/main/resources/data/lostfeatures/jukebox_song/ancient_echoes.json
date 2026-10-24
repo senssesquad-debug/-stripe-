@@ -1,0 +1,8 @@
+{
+  "comparator_output": 3,
+  "description": {
+    "translate": "jukebox_song.lostfeatures.ancient_echoes"
+  },
+  "length_in_seconds": 96.3,
+  "sound_event": "lostfeatures:music_disc.ancient_echoes"
+}

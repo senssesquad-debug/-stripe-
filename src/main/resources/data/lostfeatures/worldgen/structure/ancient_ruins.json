@@ -1,0 +1,8 @@
+{
+  "type": "lostfeatures:ancient",
+  "kind": "ancient_ruins",
+  "biomes": "#lostfeatures:has_structure/ancient_ruins",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "none"
+}

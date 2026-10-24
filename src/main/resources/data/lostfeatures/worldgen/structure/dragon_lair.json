@@ -1,0 +1,8 @@
+{
+  "type": "lostfeatures:ancient",
+  "kind": "dragon_lair",
+  "biomes": "#lostfeatures:has_structure/dragon_lair",
+  "spawn_overrides": {},
+  "step": "surface_structures",
+  "terrain_adaptation": "none"
+}

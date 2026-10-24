@@ -1,0 +1,8 @@
+{
+  "subject": "minecraft:witch",
+  "target": "lostfeatures:giant",
+  "relation": "support",
+  "range": 12,
+  "priority": 2,
+  "cooldown": 240
+}

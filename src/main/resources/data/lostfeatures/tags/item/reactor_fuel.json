@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "lostfeatures:ruby",
+    "lostfeatures:ruby_block",
+    "lostfeatures:illusion_dust",
+    "lostfeatures:strength_shard",
+    "lostfeatures:dragon_heart"
+  ]
+}

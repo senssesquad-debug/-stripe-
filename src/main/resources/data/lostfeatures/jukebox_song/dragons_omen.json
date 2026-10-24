@@ -1,0 +1,8 @@
+{
+  "comparator_output": 6,
+  "description": {
+    "translate": "jukebox_song.lostfeatures.dragons_omen"
+  },
+  "length_in_seconds": 93.0,
+  "sound_event": "lostfeatures:music_disc.dragons_omen"
+}

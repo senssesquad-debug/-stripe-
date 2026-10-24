@@ -1,0 +1,19 @@
+{
+  "type": "lostfeatures:far_lands",
+  "generator": {
+    "type": "minecraft:noise",
+    "settings": "lostfeatures:far_lands",
+    "biome_source": {
+      "type": "minecraft:checkerboard",
+      "scale": 4,
+      "biomes": [
+        "minecraft:plains",
+        "minecraft:forest",
+        "minecraft:taiga",
+        "minecraft:savanna",
+        "minecraft:desert",
+        "minecraft:snowy_plains"
+      ]
+    }
+  }
+}

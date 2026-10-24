@@ -1,0 +1,896 @@
+{
+  "block.ancient_altar.activate": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/ancient_altar/activate"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.ancient_altar.activate"
+  },
+  "block.ancient_door.close": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/ancient_door/close"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.ancient_door.close"
+  },
+  "block.ancient_door.open": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/ancient_door/open"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.ancient_door.open"
+  },
+  "block.dart_trap.fire": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/dart_trap/fire"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.dart_trap.fire"
+  },
+  "block.event_sensor.activate": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/event_sensor/activate"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.event_sensor.activate"
+  },
+  "block.locked_chest.unlock": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/locked_chest/unlock"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.locked_chest.unlock"
+  },
+  "block.mechanism.fail": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/mechanism/fail"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.mechanism.fail"
+  },
+  "block.reactor.activate": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/reactor/activate"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.reactor.activate"
+  },
+  "block.reactor.pulse": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/reactor/pulse"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.reactor.pulse"
+  },
+  "block.reactor.shutdown": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/reactor/shutdown"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.reactor.shutdown"
+  },
+  "block.ruby.break": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/ruby/break"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.ruby.break"
+  },
+  "block.ruby.fall": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/ruby/fall"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.ruby.fall"
+  },
+  "block.ruby.hit": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/ruby/hit"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.ruby.hit"
+  },
+  "block.ruby.place": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/ruby/place"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.ruby.place"
+  },
+  "block.ruby.step": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/ruby/step"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.ruby.step"
+  },
+  "block.runic_logic.input": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/runic_logic/input"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.runic_logic.input"
+  },
+  "block.runic_logic.output": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/runic_logic/output"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.runic_logic.output"
+  },
+  "block.runic_logic.reset": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/runic_logic/reset"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.runic_logic.reset"
+  },
+  "block.spike_trap.extend": {
+    "sounds": [
+      {
+        "name": "lostfeatures:block/spike_trap/extend"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.block.spike_trap.extend"
+  },
+  "entity.giant.ambient": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/giant/ambient"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.giant.ambient"
+  },
+  "entity.giant.death": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/giant/death"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.giant.death"
+  },
+  "entity.giant.hurt": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/giant/hurt"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.giant.hurt"
+  },
+  "entity.giant.slam": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/giant/slam"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.giant.slam"
+  },
+  "entity.giant.step": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/giant/step"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.giant.step"
+  },
+  "entity.giant.windup": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/giant/windup"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.giant.windup"
+  },
+  "entity.illusioner.ambient": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/illusioner/ambient"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.illusioner.ambient"
+  },
+  "entity.illusioner.cast": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/illusioner/cast"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.illusioner.cast"
+  },
+  "entity.illusioner.death": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/illusioner/death"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.illusioner.death"
+  },
+  "entity.illusioner.hurt": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/illusioner/hurt"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.illusioner.hurt"
+  },
+  "entity.illusioner.illusion": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/illusioner/illusion"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.illusioner.illusion"
+  },
+  "entity.illusioner.reposition": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/illusioner/reposition"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.illusioner.reposition"
+  },
+  "entity.illusioner.shoot": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/illusioner/shoot"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.illusioner.shoot"
+  },
+  "entity.killer_bunny.attack": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/killer_bunny/attack"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.killer_bunny.attack"
+  },
+  "entity.killer_bunny.death": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/killer_bunny/death"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.killer_bunny.death"
+  },
+  "entity.killer_bunny.hop": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/killer_bunny/hop"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.killer_bunny.hop"
+  },
+  "entity.killer_bunny.hurt": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/killer_bunny/hurt"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.killer_bunny.hurt"
+  },
+  "entity.killer_bunny.warning": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/killer_bunny/warning"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.killer_bunny.warning"
+  },
+  "entity.red_dragon.ambient": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/ambient"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.ambient"
+  },
+  "entity.red_dragon.breath_impact": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/breath_impact"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.breath_impact"
+  },
+  "entity.red_dragon.breath_loop": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/breath_loop"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.breath_loop"
+  },
+  "entity.red_dragon.breath_start": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/breath_start"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.breath_start"
+  },
+  "entity.red_dragon.death": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/death"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.death"
+  },
+  "entity.red_dragon.flap": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/flap"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.flap"
+  },
+  "entity.red_dragon.hurt": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/hurt"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.hurt"
+  },
+  "entity.red_dragon.land": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/land"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.land"
+  },
+  "entity.red_dragon.roar": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/roar"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.roar"
+  },
+  "entity.red_dragon.step": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/step"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.step"
+  },
+  "entity.red_dragon.takeoff": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/takeoff"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.takeoff"
+  },
+  "entity.red_dragon.warning": {
+    "sounds": [
+      {
+        "name": "lostfeatures:entity/red_dragon/warning"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.entity.red_dragon.warning"
+  },
+  "event.ancient_disturbance": {
+    "sounds": [
+      {
+        "name": "lostfeatures:event/ancient_disturbance"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.event.ancient_disturbance"
+  },
+  "event.boss_phase": {
+    "sounds": [
+      {
+        "name": "lostfeatures:event/boss_phase"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.event.boss_phase"
+  },
+  "event.boss_victory": {
+    "sounds": [
+      {
+        "name": "lostfeatures:event/boss_victory"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.event.boss_victory"
+  },
+  "event.dragon_encounter": {
+    "sounds": [
+      {
+        "name": "lostfeatures:event/dragon_encounter"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.event.dragon_encounter"
+  },
+  "event.illager_expedition": {
+    "sounds": [
+      {
+        "name": "lostfeatures:event/illager_expedition"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.event.illager_expedition"
+  },
+  "event.rare_discovery": {
+    "sounds": [
+      {
+        "name": "lostfeatures:event/rare_discovery"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.event.rare_discovery"
+  },
+  "event.story_discovery": {
+    "sounds": [
+      {
+        "name": "lostfeatures:event/story_discovery"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.event.story_discovery"
+  },
+  "event.village_alarm": {
+    "sounds": [
+      {
+        "name": "lostfeatures:event/village_alarm"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.event.village_alarm"
+  },
+  "item.copper_horn.bass.0": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/bass_0",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.bass.1": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/bass_1",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.bass.2": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/bass_2",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.bass.3": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/bass_3",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.bass.4": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/bass_4",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.bass.5": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/bass_5",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.bass.6": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/bass_6",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.bass.7": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/bass_7",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.bass.8": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/bass_8",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.bass.9": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/bass_9",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.harmony.0": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/harmony_0",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.harmony.1": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/harmony_1",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.harmony.2": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/harmony_2",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.harmony.3": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/harmony_3",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.harmony.4": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/harmony_4",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.harmony.5": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/harmony_5",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.harmony.6": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/harmony_6",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.harmony.7": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/harmony_7",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.harmony.8": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/harmony_8",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.harmony.9": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/harmony_9",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.melody.0": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/melody_0",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.melody.1": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/melody_1",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.melody.2": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/melody_2",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.melody.3": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/melody_3",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.melody.4": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/melody_4",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.melody.5": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/melody_5",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.melody.6": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/melody_6",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.melody.7": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/melody_7",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.melody.8": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/melody_8",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.copper_horn.melody.9": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/copper_horn/melody_9",
+        "attenuation_distance": 64
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.copper_horn"
+  },
+  "item.dragon_device.activate": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/dragon_device/activate"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.dragon_device.activate"
+  },
+  "item.journal.open": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/journal/open"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.journal.open"
+  },
+  "item.quiver.insert": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/quiver/insert"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.quiver.insert"
+  },
+  "item.quiver.remove": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/quiver/remove"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.quiver.remove"
+  },
+  "item.relic.use": {
+    "sounds": [
+      {
+        "name": "lostfeatures:item/relic/use"
+      }
+    ],
+    "subtitle": "subtitles.lostfeatures.item.relic.use"
+  },
+  "music.dragon": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/dragon",
+        "stream": true
+      }
+    ]
+  },
+  "music.dragon_boss": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/dragon_boss",
+        "stream": true
+      }
+    ]
+  },
+  "music.far_lands": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/far_lands",
+        "stream": true
+      }
+    ]
+  },
+  "music.giant": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/giant",
+        "stream": true
+      }
+    ]
+  },
+  "music.illusioner": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/illusioner",
+        "stream": true
+      }
+    ]
+  },
+  "music.mechanism": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/mechanism",
+        "stream": true
+      }
+    ]
+  },
+  "music.ruins": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/ruins",
+        "stream": true
+      }
+    ]
+  },
+  "music.story": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/story",
+        "stream": true
+      }
+    ]
+  },
+  "music.underground": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/underground",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.ancient_echoes": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/ruins",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.dragons_omen": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/dragon",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.far_beyond": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/far_lands",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.forgotten_civilization": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/story",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.illusion": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/illusioner",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.ruby_resonance": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/mechanism",
+        "stream": true
+      }
+    ]
+  },
+  "music_disc.the_last_monolith": {
+    "sounds": [
+      {
+        "name": "lostfeatures:music/underground",
+        "stream": true
+      }
+    ]
+  }
+}

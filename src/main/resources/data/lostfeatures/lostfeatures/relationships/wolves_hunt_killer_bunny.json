@@ -1,0 +1,8 @@
+{
+  "subject": "minecraft:wolf",
+  "target": "lostfeatures:killer_bunny",
+  "relation": "enemy",
+  "range": 16,
+  "priority": 3,
+  "condition": "untamed"
+}
