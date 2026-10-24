@@ -772,6 +772,20 @@ public class RedDragon extends Monster {
         super.die(source);
     }
 
+    /** The Ancestral Red Dragon uses its own loot table; natural dragons use the entity type default. */
+    public static final net.minecraft.resources.ResourceKey<net.minecraft.world.level.storage.loot.LootTable> ANCESTRAL_LOOT =
+            net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE,
+                    com.lostfeatures.LostFeatures.id("entities/ancestral_red_dragon"));
+
+    @Override
+    protected void dropFromLootTable(ServerLevel level, DamageSource source, boolean playerKilled) {
+        if (isAncestral()) {
+            dropFromLootTable(level, source, playerKilled, ANCESTRAL_LOOT);
+        } else {
+            super.dropFromLootTable(level, source, playerKilled);
+        }
+    }
+
     // ------------------------------------------------------------------ sounds
 
     @Override

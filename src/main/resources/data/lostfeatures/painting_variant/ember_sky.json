@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:ember_sky",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.ember_sky.author"
+  },
+  "height": 1,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.ember_sky.title"
+  },
+  "width": 1
+}

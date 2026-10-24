@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_dragon_fang": {
+      "conditions": {
+        "items": [
+          {
+            "items": "lostfeatures:dragon_fang"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "lostfeatures:fang_blade"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_dragon_fang"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "lostfeatures:fang_blade"
+    ]
+  }
+}

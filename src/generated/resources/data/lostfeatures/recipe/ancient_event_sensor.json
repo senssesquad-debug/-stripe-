@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "C": "lostfeatures:ancient_circuit",
+    "O": "minecraft:observer",
+    "R": "minecraft:redstone",
+    "S": "lostfeatures:ancient_stone_bricks"
+  },
+  "pattern": [
+    "SCS",
+    "ROR",
+    "SSS"
+  ],
+  "result": {
+    "id": "lostfeatures:ancient_event_sensor"
+  }
+}

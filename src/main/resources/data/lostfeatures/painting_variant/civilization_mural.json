@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:civilization_mural",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.civilization_mural.author"
+  },
+  "height": 3,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.civilization_mural.title"
+  },
+  "width": 4
+}

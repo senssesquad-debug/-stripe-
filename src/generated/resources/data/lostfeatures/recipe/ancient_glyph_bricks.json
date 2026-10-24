@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "lostfeatures:ancient_stone_bricks",
+    "minecraft:glow_ink_sac"
+  ],
+  "result": {
+    "id": "lostfeatures:ancient_glyph_bricks"
+  }
+}

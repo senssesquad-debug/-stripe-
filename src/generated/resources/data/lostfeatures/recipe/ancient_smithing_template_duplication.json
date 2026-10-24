@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "R": "lostfeatures:ruby",
+    "S": "lostfeatures:ancient_stone",
+    "T": "lostfeatures:ancient_smithing_template"
+  },
+  "pattern": [
+    "RTR",
+    "RSR",
+    "RRR"
+  ],
+  "result": {
+    "count": 2,
+    "id": "lostfeatures:ancient_smithing_template"
+  }
+}

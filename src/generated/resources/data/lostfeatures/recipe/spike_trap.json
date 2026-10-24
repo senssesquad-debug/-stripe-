@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "A": "lostfeatures:ancient_bone",
+    "I": "minecraft:iron_ingot",
+    "R": "minecraft:redstone",
+    "S": "lostfeatures:ancient_stone_bricks"
+  },
+  "pattern": [
+    " I ",
+    "IAI",
+    "SRS"
+  ],
+  "result": {
+    "count": 2,
+    "id": "lostfeatures:spike_trap"
+  }
+}

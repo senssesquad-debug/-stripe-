@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "C": "lostfeatures:ancient_circuit",
+    "S": "lostfeatures:ancient_stone",
+    "T": "minecraft:redstone_torch"
+  },
+  "pattern": [
+    "TCT",
+    "SSS"
+  ],
+  "result": {
+    "id": "lostfeatures:runic_logic_device"
+  }
+}

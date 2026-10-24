@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "extended=false": {
+      "model": "lostfeatures:block/spike_trap"
+    },
+    "extended=true": {
+      "model": "lostfeatures:block/spike_trap_extended"
+    }
+  }
+}

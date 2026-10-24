@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "F": "lostfeatures:dragon_fang",
+    "R": "lostfeatures:ruby",
+    "S": "minecraft:stick"
+  },
+  "pattern": [
+    "F",
+    "R",
+    "S"
+  ],
+  "result": {
+    "id": "lostfeatures:fang_blade"
+  }
+}

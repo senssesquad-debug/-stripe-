@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": "minecraft:compass",
+    "L": "lostfeatures:lens_fragment",
+    "O": "minecraft:obsidian",
+    "R": "lostfeatures:ruby"
+  },
+  "pattern": [
+    "ORO",
+    "RCR",
+    "OLO"
+  ],
+  "result": {
+    "id": "lostfeatures:edge_compass"
+  }
+}

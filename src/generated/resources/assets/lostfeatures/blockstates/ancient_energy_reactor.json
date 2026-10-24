@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "phase=active": {
+      "model": "lostfeatures:block/ancient_energy_reactor_active"
+    },
+    "phase=cooldown": {
+      "model": "lostfeatures:block/ancient_energy_reactor_cooldown"
+    },
+    "phase=idle": {
+      "model": "lostfeatures:block/ancient_energy_reactor"
+    }
+  }
+}

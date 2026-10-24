@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "B": "minecraft:bow",
+    "R": "minecraft:redstone",
+    "S": "lostfeatures:ancient_stone_bricks"
+  },
+  "pattern": [
+    "SSS",
+    "SBS",
+    "SRS"
+  ],
+  "result": {
+    "id": "lostfeatures:dart_trap"
+  }
+}

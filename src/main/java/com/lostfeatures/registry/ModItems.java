@@ -17,6 +17,11 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.component.Consumables;
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -52,6 +57,13 @@ public final class ModItems {
     public static final DeferredItem<Item> ANCIENT_KEY = lore("ancient_key", p -> p.rarity(Rarity.UNCOMMON).stacksTo(16));
     public static final DeferredItem<Item> DRACONIC_SIGIL = lore("draconic_sigil", p -> p.rarity(Rarity.EPIC).stacksTo(1).fireResistant());
     public static final DeferredItem<Item> ANCIENT_SMITHING_TEMPLATE = lore("ancient_smithing_template", p -> p.rarity(Rarity.UNCOMMON));
+
+    // --- Food (Killer Bunny drop; gives smoking/campfire recipes a mod-owned purpose)
+    public static final DeferredItem<Item> CURSED_RABBIT = ITEMS.registerItem("cursed_rabbit", p -> new LoreItem(p, "cursed_rabbit"),
+            p -> p.food(new FoodProperties.Builder().nutrition(3).saturationModifier(0.3F).build(),
+                    Consumables.defaultFood().onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0), 0.6F)).build()));
+    public static final DeferredItem<Item> COOKED_CURSED_RABBIT = ITEMS.registerItem("cooked_cursed_rabbit", Item::new,
+            p -> p.food(new FoodProperties.Builder().nutrition(7).saturationModifier(0.8F).build()));
 
     // --- Equipment and tools --------------------------------------------------------------
     public static final DeferredItem<QuiverItem> QUIVER = ITEMS.registerItem("quiver", QuiverItem::new, p -> p.stacksTo(1));

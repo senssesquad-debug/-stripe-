@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:far_lands",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.far_lands.author"
+  },
+  "height": 2,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.far_lands.title"
+  },
+  "width": 4
+}

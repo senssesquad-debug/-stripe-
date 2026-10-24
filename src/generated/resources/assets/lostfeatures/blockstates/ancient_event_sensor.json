@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "power=0": {
+      "model": "lostfeatures:block/ancient_event_sensor"
+    },
+    "power=1": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=10": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=11": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=12": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=13": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=14": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=15": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=2": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=3": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=4": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=5": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=6": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=7": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=8": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    },
+    "power=9": {
+      "model": "lostfeatures:block/ancient_event_sensor_on"
+    }
+  }
+}

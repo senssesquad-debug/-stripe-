@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:the_illusionist",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.the_illusionist.author"
+  },
+  "height": 2,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.the_illusionist.title"
+  },
+  "width": 2
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "D": "minecraft:redstone",
+    "R": "lostfeatures:ruby"
+  },
+  "pattern": [
+    "CDC",
+    "DRD",
+    "CDC"
+  ],
+  "result": {
+    "count": 2,
+    "id": "lostfeatures:ancient_circuit"
+  }
+}

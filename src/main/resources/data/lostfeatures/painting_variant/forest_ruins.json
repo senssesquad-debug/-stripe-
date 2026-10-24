@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:forest_ruins",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.forest_ruins.author"
+  },
+  "height": 2,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.forest_ruins.title"
+  },
+  "width": 2
+}

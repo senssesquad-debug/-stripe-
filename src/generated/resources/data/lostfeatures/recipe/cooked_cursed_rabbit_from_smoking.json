@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smoking",
+  "category": "food",
+  "experience": 0.35,
+  "ingredient": "lostfeatures:cursed_rabbit",
+  "result": {
+    "id": "lostfeatures:cooked_cursed_rabbit"
+  }
+}

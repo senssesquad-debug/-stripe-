@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:ruby_cave",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.ruby_cave.author"
+  },
+  "height": 1,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.ruby_cave.title"
+  },
+  "width": 2
+}

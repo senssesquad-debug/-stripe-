@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "lostfeatures:rose"
+  ],
+  "result": {
+    "id": "minecraft:red_dye"
+  }
+}

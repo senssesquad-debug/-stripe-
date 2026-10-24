@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:giants_shadow",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.giants_shadow.author"
+  },
+  "height": 2,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.giants_shadow.title"
+  },
+  "width": 2
+}

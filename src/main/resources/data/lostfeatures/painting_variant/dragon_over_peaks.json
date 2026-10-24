@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:dragon_over_peaks",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.dragon_over_peaks.author"
+  },
+  "height": 2,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.dragon_over_peaks.title"
+  },
+  "width": 4
+}

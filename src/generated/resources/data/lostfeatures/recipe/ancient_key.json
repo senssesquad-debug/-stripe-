@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "R": "lostfeatures:ruby"
+  },
+  "pattern": [
+    " R ",
+    " G ",
+    " G "
+  ],
+  "result": {
+    "id": "lostfeatures:ancient_key"
+  }
+}

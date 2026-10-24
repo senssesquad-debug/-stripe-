@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "lostfeatures:block/locked_chest",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "lostfeatures:block/locked_chest"
+    },
+    "facing=south": {
+      "model": "lostfeatures:block/locked_chest",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "lostfeatures:block/locked_chest",
+      "y": 270
+    }
+  }
+}

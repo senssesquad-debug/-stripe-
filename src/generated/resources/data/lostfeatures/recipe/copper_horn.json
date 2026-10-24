@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "minecraft:copper_ingot",
+    "H": "minecraft:goat_horn"
+  },
+  "pattern": [
+    "CHC",
+    " C "
+  ],
+  "result": {
+    "id": "lostfeatures:copper_horn"
+  }
+}

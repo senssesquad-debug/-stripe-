@@ -65,6 +65,8 @@ public final class ModCreativeTabs {
                 out.accept(ModItems.DECODED_NOTES.get());
                 out.accept(ModItems.VORPAL_FANG.get());
                 out.accept(ModItems.DRACONIC_SIGIL.get());
+                out.accept(ModItems.CURSED_RABBIT.get());
+                out.accept(ModItems.COOKED_CURSED_RABBIT.get());
                 // Equipment
                 out.accept(ModItems.ANCIENT_JOURNAL.get());
                 out.accept(ModItems.QUIVER.get());

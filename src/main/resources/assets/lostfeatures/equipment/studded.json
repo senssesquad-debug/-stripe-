@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "lostfeatures:studded"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "lostfeatures:studded"
+      }
+    ]
+  }
+}

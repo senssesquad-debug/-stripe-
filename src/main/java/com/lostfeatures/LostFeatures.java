@@ -32,6 +32,7 @@ public final class LostFeatures {
         container.registerConfig(ModConfig.Type.COMMON, LFConfig.SPEC);
 
         ModSounds.register(modEventBus);
+        com.lostfeatures.registry.ModConditions.register(modEventBus);
         ModDataComponents.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModEntities.register(modEventBus);
@@ -43,6 +44,8 @@ public final class LostFeatures {
         modEventBus.addListener(ModEntities::registerAttributes);
         modEventBus.addListener(ModBlockEntities::registerCapabilities);
         modEventBus.addListener(ModNetwork::register);
+        modEventBus.addListener(net.neoforged.neoforge.data.event.GatherDataEvent.Client.class, com.lostfeatures.data.ModDataGenerators::gatherClientData);
+        modEventBus.addListener(net.neoforged.neoforge.data.event.GatherDataEvent.Server.class, com.lostfeatures.data.ModDataGenerators::gatherServerData);
 
         LOGGER.info("Lost Features — Living World is loading");
     }

@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:monoliths",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.monoliths.author"
+  },
+  "height": 1,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.monoliths.title"
+  },
+  "width": 2
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/orientable_vertical",
+  "textures": {
+    "front": "lostfeatures:block/dart_trap_front",
+    "side": "lostfeatures:block/ancient_stone_bricks"
+  }
+}

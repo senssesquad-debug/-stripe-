@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:brick_pyramid",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.brick_pyramid.author"
+  },
+  "height": 2,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.brick_pyramid.title"
+  },
+  "width": 2
+}

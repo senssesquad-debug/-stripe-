@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_ancient_circuit": {
+      "conditions": {
+        "items": [
+          {
+            "items": "lostfeatures:ancient_circuit"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "lostfeatures:ancient_event_sensor"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_ancient_circuit"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "lostfeatures:ancient_event_sensor"
+    ]
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "lostfeatures:ancient_stone",
+  "result": {
+    "id": "lostfeatures:ancient_stone_bricks"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "lostfeatures:dragon_scale",
+  "base": "minecraft:iron_chestplate",
+  "result": {
+    "id": "lostfeatures:dragonscale_chestplate"
+  },
+  "template": "lostfeatures:ancient_smithing_template"
+}

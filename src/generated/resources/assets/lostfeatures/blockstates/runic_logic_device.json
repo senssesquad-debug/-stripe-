@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,powered=false": {
+      "model": "lostfeatures:block/runic_logic_device",
+      "y": 270
+    },
+    "facing=east,powered=true": {
+      "model": "lostfeatures:block/runic_logic_device_on",
+      "y": 270
+    },
+    "facing=north,powered=false": {
+      "model": "lostfeatures:block/runic_logic_device",
+      "y": 180
+    },
+    "facing=north,powered=true": {
+      "model": "lostfeatures:block/runic_logic_device_on",
+      "y": 180
+    },
+    "facing=south,powered=false": {
+      "model": "lostfeatures:block/runic_logic_device"
+    },
+    "facing=south,powered=true": {
+      "model": "lostfeatures:block/runic_logic_device_on"
+    },
+    "facing=west,powered=false": {
+      "model": "lostfeatures:block/runic_logic_device",
+      "y": 90
+    },
+    "facing=west,powered=true": {
+      "model": "lostfeatures:block/runic_logic_device_on",
+      "y": 90
+    }
+  }
+}

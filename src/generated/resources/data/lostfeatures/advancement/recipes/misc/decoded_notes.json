@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_encrypted_notes": {
+      "conditions": {
+        "items": [
+          {
+            "items": "lostfeatures:encrypted_notes"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "lostfeatures:decoded_notes"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_encrypted_notes"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "lostfeatures:decoded_notes"
+    ]
+  }
+}

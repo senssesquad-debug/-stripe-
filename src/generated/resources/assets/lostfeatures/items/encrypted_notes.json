@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "lostfeatures:item/encrypted_notes"
+  }
+}

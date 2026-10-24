@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": "lostfeatures:ruby_block",
+  "result": {
+    "count": 4,
+    "id": "lostfeatures:ruby_bricks"
+  }
+}

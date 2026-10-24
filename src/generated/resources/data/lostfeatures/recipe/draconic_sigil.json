@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "A": "lostfeatures:ancient_stone_bricks",
+    "D": "lostfeatures:illusion_dust",
+    "J": "lostfeatures:decoded_notes",
+    "R": "lostfeatures:ruby_block",
+    "S": "lostfeatures:strength_shard",
+    "W": "lostfeatures:wing_membrane"
+  },
+  "pattern": [
+    "DSD",
+    "WRW",
+    "AJA"
+  ],
+  "result": {
+    "id": "lostfeatures:draconic_sigil"
+  }
+}

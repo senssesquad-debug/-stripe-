@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "lostfeatures:cyan_rose"
+  ],
+  "result": {
+    "id": "minecraft:cyan_dye"
+  }
+}

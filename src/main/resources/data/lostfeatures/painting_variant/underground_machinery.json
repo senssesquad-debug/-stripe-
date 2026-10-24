@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:underground_machinery",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.underground_machinery.author"
+  },
+  "height": 2,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.underground_machinery.title"
+  },
+  "width": 3
+}

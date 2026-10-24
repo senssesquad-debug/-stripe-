@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:journal_clue",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.journal_clue.author"
+  },
+  "height": 1,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.journal_clue.title"
+  },
+  "width": 1
+}

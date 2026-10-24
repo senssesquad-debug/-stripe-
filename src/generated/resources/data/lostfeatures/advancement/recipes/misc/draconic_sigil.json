@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_decoded_notes": {
+      "conditions": {
+        "items": [
+          {
+            "items": "lostfeatures:decoded_notes"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "lostfeatures:draconic_sigil"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_decoded_notes"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "lostfeatures:draconic_sigil"
+    ]
+  }
+}

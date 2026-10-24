@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "lostfeatures:block/ancient_stone_bricks",
+    "side": "lostfeatures:block/ancient_energy_reactor_side",
+    "top": "lostfeatures:block/ancient_energy_reactor_top"
+  }
+}

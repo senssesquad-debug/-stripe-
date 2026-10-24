@@ -1,0 +1,13 @@
+{
+  "asset_id": "lostfeatures:ancient_reactor",
+  "author": {
+    "color": "gray",
+    "translate": "painting.lostfeatures.ancient_reactor.author"
+  },
+  "height": 2,
+  "title": {
+    "color": "yellow",
+    "translate": "painting.lostfeatures.ancient_reactor.title"
+  },
+  "width": 1
+}
