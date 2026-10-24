@@ -1,0 +1,36 @@
+{
+  "parent": "minecraft:nether/root",
+  "criteria": {
+    "cure": {
+      "conditions": {
+        "pigman": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "#rediscovered:pigman"
+            }
+          }
+        ]
+      },
+      "trigger": "rediscovered:cure_pigman"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "rediscovered:advancements.nether.cure_pigman.desc"
+    },
+    "icon": {
+      "id": "minecraft:golden_carrot"
+    },
+    "title": {
+      "translate": "rediscovered:advancements.nether.cure_pigman"
+    }
+  },
+  "requirements": [
+    [
+      "cure"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

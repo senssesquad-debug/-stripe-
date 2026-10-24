@@ -1,0 +1,36 @@
+{
+  "parent": "rediscovered:skylands/enter_pigman_village",
+  "criteria": {
+    "trade": {
+      "conditions": {
+        "villager": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "rediscovered:pigman"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:villager_trade"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "rediscovered:advancements.skylands.trade_with_pigman.desc"
+    },
+    "icon": {
+      "id": "rediscovered:ruby"
+    },
+    "title": {
+      "translate": "rediscovered:advancements.skylands.trade_with_pigman"
+    }
+  },
+  "requirements": [
+    [
+      "trade"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

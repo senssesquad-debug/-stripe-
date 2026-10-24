@@ -1,0 +1,36 @@
+{
+  "parent": "minecraft:adventure/root",
+  "criteria": {
+    "spike_death": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "minecraft:guardian"
+            }
+          }
+        ]
+      },
+      "trigger": "rediscovered:kill_with_spikes"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "rediscovered:advancements.adventure.spiky_spikes.desc"
+    },
+    "icon": {
+      "id": "rediscovered:spikes"
+    },
+    "title": {
+      "translate": "rediscovered:advancements.adventure.spiky_spikes"
+    }
+  },
+  "requirements": [
+    [
+      "spike_death"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -1,0 +1,36 @@
+{
+  "parent": "rediscovered:skylands/enter_brick_pyramid",
+  "criteria": {
+    "slay_dragon": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "rediscovered:red_dragon"
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:player_killed_entity"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "rediscovered:advancements.skylands.slay_red_dragon.desc"
+    },
+    "icon": {
+      "id": "rediscovered:red_dragon_egg"
+    },
+    "title": {
+      "translate": "rediscovered:advancements.skylands.slay_red_dragon"
+    }
+  },
+  "requirements": [
+    [
+      "slay_dragon"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

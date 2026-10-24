@@ -1,0 +1,55 @@
+{
+  "parent": "minecraft:adventure/sniper_duel",
+  "criteria": {
+    "snipe": {
+      "conditions": {
+        "entity": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "distance": {
+                "horizontal": {
+                  "min": 100.0
+                }
+              }
+            }
+          }
+        ],
+        "killing_blow": {
+          "direct_entity": {
+            "type": "rediscovered:purple_arrow"
+          },
+          "tags": [
+            {
+              "expected": true,
+              "id": "minecraft:is_projectile"
+            }
+          ]
+        }
+      },
+      "trigger": "minecraft:player_killed_entity"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "rediscovered:advancements.adventure.purple_arrow_snipe.desc"
+    },
+    "frame": "challenge",
+    "icon": {
+      "id": "rediscovered:purple_arrow"
+    },
+    "title": {
+      "translate": "rediscovered:advancements.adventure.purple_arrow_snipe"
+    }
+  },
+  "requirements": [
+    [
+      "snipe"
+    ]
+  ],
+  "rewards": {
+    "experience": 50
+  },
+  "sends_telemetry_event": true
+}

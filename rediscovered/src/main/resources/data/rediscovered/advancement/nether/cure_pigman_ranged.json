@@ -1,0 +1,37 @@
+{
+  "parent": "rediscovered:nether/cure_pigman",
+  "criteria": {
+    "cure": {
+      "conditions": {
+        "pigman": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "type": "rediscovered:ranged_pigman"
+            }
+          }
+        ]
+      },
+      "trigger": "rediscovered:cure_pigman"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "rediscovered:advancements.nether.cure_pigman_ranged.desc"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "minecraft:bow"
+    },
+    "title": {
+      "translate": "rediscovered:advancements.nether.cure_pigman_ranged"
+    }
+  },
+  "requirements": [
+    [
+      "cure"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

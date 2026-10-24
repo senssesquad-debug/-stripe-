@@ -1,0 +1,39 @@
+{
+  "parent": "minecraft:husbandry/tame_an_animal",
+  "criteria": {
+    "ride_zombie_horse": {
+      "conditions": {
+        "player": [
+          {
+            "condition": "minecraft:entity_properties",
+            "entity": "this",
+            "predicate": {
+              "vehicle": {
+                "type": "minecraft:zombie_horse"
+              }
+            }
+          }
+        ]
+      },
+      "trigger": "minecraft:started_riding"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "rediscovered:advancements.husbandry.ride_zombie_horse.desc"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "minecraft:saddle"
+    },
+    "title": {
+      "translate": "rediscovered:advancements.husbandry.ride_zombie_horse"
+    }
+  },
+  "requirements": [
+    [
+      "ride_zombie_horse"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
