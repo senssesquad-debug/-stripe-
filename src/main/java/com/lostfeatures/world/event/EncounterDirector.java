@@ -415,13 +415,14 @@ public class EncounterDirector extends SavedData {
         }
         if (!forced && RegionalEcology.sample(level, center).villageNeedsRest()) return null;
 
+        // A Giant needs a large clear spot; when none is found nearby the threat falls back to Killer Bunnies.
+        BlockPos giantAt = LFConfig.GIANT_NATURAL_SPAWNING.getAsBoolean() && random.nextFloat() < 0.7F
+                ? surfaceSpot(level, center, 36, 52, random, ModEntities.GIANT.get()) : null;
+        LostGiant g = giantAt == null ? null : spawn(level, ModEntities.GIANT.get(), giantAt, EntitySpawnReason.EVENT);
+        boolean giant = g != null;
         ActiveEvent e = newEvent(EventType.VILLAGE_UNDER_THREAT, center, now);
-        boolean giant = LFConfig.GIANT_NATURAL_SPAWNING.getAsBoolean() && random.nextFloat() < 0.7F;
         if (giant) {
-            BlockPos at = surfaceSpot(level, center, 36, 52, random, ModEntities.GIANT.get());
-            if (at == null) return null;
-            LostGiant g = spawn(level, ModEntities.GIANT.get(), at, EntitySpawnReason.EVENT);
-            if (g == null) return null;
+            BlockPos at = giantAt;
             g.lifecycle().markNatural();
             e.primary = g.getUUID();
             for (int i = 0; i < Math.min(2, LFConfig.GIANT_ESCORT_COUNT.getAsInt()); i++) {
@@ -442,7 +443,7 @@ public class EncounterDirector extends SavedData {
                     else e.addParticipant(b.getUUID());
                 }
             }
-            if (e.primary == null) return null;
+            if (e.primary == null) return refuse("no safe surface spot for the threat within 52 blocks");
         }
         announce(level, center, ModSounds.EVENT_VILLAGE_ALARM.get(), 4.0F);
         EventMemory.get(level).record(EventMemory.Type.VILLAGE_THREAT, center, giant ? "giant" : "killer_bunnies");

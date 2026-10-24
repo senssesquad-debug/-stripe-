@@ -218,6 +218,7 @@ def relationships():
                                          condition="untamed"),
         "tamed_wolves_protect_owner": dict(subject="minecraft:wolf", target=f"#{NS}:village_threats", relation="protect_owner", range=12,
                                            priority=2, condition="tamed"),
+        "killer_bunny_hunts_foxes": dict(subject=f"{NS}:killer_bunny", target="minecraft:fox", relation="enemy", range=16, priority=3),
         "foxes_fear_killer_bunny": dict(subject="minecraft:fox", target=f"{NS}:killer_bunny", relation="fear", range=10, priority=1, speed=1.5),
         "witches_support_giant": dict(subject="minecraft:witch", target=f"{NS}:giant", relation="support", range=12, priority=2, cooldown=240),
         "undead_escort_giant": dict(subject=f"#{NS}:giant_escort", target=f"{NS}:giant", relation="escort", range=24, priority=5, speed=1.0,

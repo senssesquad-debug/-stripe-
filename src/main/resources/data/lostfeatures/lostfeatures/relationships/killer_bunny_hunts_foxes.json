@@ -1,0 +1,7 @@
+{
+  "subject": "lostfeatures:killer_bunny",
+  "target": "minecraft:fox",
+  "relation": "enemy",
+  "range": 16,
+  "priority": 3
+}
