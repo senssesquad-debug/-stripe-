@@ -11,20 +11,19 @@ import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.item.TrackingItemStackRenderState;
 import net.minecraft.client.renderer.state.gui.BlitRenderState;
 import net.minecraft.client.renderer.state.gui.GuiItemRenderState;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 
 public class ItemPiPRenderer extends PictureInPictureRenderer<ItemPiPRenderState> {
-    public ItemPiPRenderer(BufferSource bufferSource) {
-        super(bufferSource);
+    public ItemPiPRenderer() {
     }
 
     @Override
@@ -32,7 +31,8 @@ public class ItemPiPRenderer extends PictureInPictureRenderer<ItemPiPRenderState
         return ItemPiPRenderState.class;
     }
 
-    protected void renderToTexture(ItemPiPRenderState renderState, PoseStack poseStack) {
+    @Override
+    protected void renderToTexture(ItemPiPRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
         poseStack.scale(1.0F, -1.0F, -1.0F);
         Minecraft mc = Minecraft.getInstance();
         GuiItemRenderState guiItemRenderState = renderState.guiItemRenderState();
@@ -45,22 +45,18 @@ public class ItemPiPRenderer extends PictureInPictureRenderer<ItemPiPRenderState
         TrackingItemStackRenderState itemStackRenderState = guiItemRenderState.itemStackRenderState();
         boolean flat = !itemStackRenderState.usesBlockLight();
         if (flat) {
-            mc.gameRenderer.getLighting().setupFor(Entry.ITEMS_FLAT);
+            mc.gameRenderer.lighting().setupFor(Entry.ITEMS_FLAT);
         } else {
-            mc.gameRenderer.getLighting().setupFor(Entry.ITEMS_3D);
+            mc.gameRenderer.lighting().setupFor(Entry.ITEMS_3D);
         }
 
-        FeatureRenderDispatcher featureRenderDispatcher = mc.gameRenderer.getFeatureRenderDispatcher();
-        SubmitNodeStorage submitNodeStorage = featureRenderDispatcher.getSubmitNodeStorage();
-        itemStackRenderState.submit(poseStack, submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0);
+        itemStackRenderState.submit(poseStack, submitNodeCollector, 15728880, OverlayTexture.NO_OVERLAY, 0);
         if (renderState.itemCount() > 1) {
-            this.renderCount(renderState, poseStack, submitNodeStorage);
+            this.renderCount(renderState, poseStack, submitNodeCollector);
         }
-
-        featureRenderDispatcher.renderAllFeatures();
     }
 
-    private void renderCount(ItemPiPRenderState renderState, PoseStack poseStack, SubmitNodeStorage submitNodeCollector) {
+    private void renderCount(ItemPiPRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
         Minecraft mc = Minecraft.getInstance();
         FormattedCharSequence formatted = Component.literal(Integer.toString(renderState.itemCount())).getVisualOrderText();
         poseStack.pushPose();
@@ -71,6 +67,7 @@ public class ItemPiPRenderer extends PictureInPictureRenderer<ItemPiPRenderState
         poseStack.popPose();
     }
 
+    @Override
     public void blitTexture(ItemPiPRenderState renderState, GuiRenderState guiRenderState) {
         int a = ARGB.as8BitChannel(renderState.alpha());
         guiRenderState.addBlitToCurrentLayer(
@@ -93,6 +90,7 @@ public class ItemPiPRenderer extends PictureInPictureRenderer<ItemPiPRenderState
         );
     }
 
+    @Override
     public boolean textureIsReadyToBlit(ItemPiPRenderState renderState) {
         return false;
     }

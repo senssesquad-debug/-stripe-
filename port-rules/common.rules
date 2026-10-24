@@ -1,0 +1,305 @@
+# Minecraft 26.1.2 -> 26.2: classes that moved.
+# Advancement triggers/predicates were split out of net.minecraft.advancements.criterion.
+class net/minecraft/advancements/CriteriaTriggers net/minecraft/advancements/triggers/CriteriaTriggers
+class net/minecraft/advancements/Criterion net/minecraft/advancements/triggers/Criterion
+class net/minecraft/advancements/CriterionTrigger net/minecraft/advancements/triggers/CriterionTrigger
+class net/minecraft/advancements/criterion/AnyBlockInteractionTrigger net/minecraft/advancements/triggers/AnyBlockInteractionTrigger
+class net/minecraft/advancements/criterion/AnyBlockInteractionTrigger$TriggerInstance net/minecraft/advancements/triggers/AnyBlockInteractionTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/BeeNestDestroyedTrigger net/minecraft/advancements/triggers/BeeNestDestroyedTrigger
+class net/minecraft/advancements/criterion/BeeNestDestroyedTrigger$TriggerInstance net/minecraft/advancements/triggers/BeeNestDestroyedTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/BlockPredicate net/minecraft/advancements/predicates/BlockPredicate
+class net/minecraft/advancements/criterion/BlockPredicate$Builder net/minecraft/advancements/predicates/BlockPredicate$Builder
+class net/minecraft/advancements/criterion/BredAnimalsTrigger net/minecraft/advancements/triggers/BredAnimalsTrigger
+class net/minecraft/advancements/criterion/BredAnimalsTrigger$TriggerInstance net/minecraft/advancements/triggers/BredAnimalsTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/BrewedPotionTrigger net/minecraft/advancements/triggers/BrewedPotionTrigger
+class net/minecraft/advancements/criterion/BrewedPotionTrigger$TriggerInstance net/minecraft/advancements/triggers/BrewedPotionTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/ChangeDimensionTrigger net/minecraft/advancements/triggers/ChangeDimensionTrigger
+class net/minecraft/advancements/criterion/ChangeDimensionTrigger$TriggerInstance net/minecraft/advancements/triggers/ChangeDimensionTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/ChanneledLightningTrigger net/minecraft/advancements/triggers/ChanneledLightningTrigger
+class net/minecraft/advancements/criterion/ChanneledLightningTrigger$TriggerInstance net/minecraft/advancements/triggers/ChanneledLightningTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/CollectionContentsPredicate net/minecraft/advancements/predicates/CollectionContentsPredicate
+class net/minecraft/advancements/criterion/CollectionContentsPredicate$Multiple net/minecraft/advancements/predicates/CollectionContentsPredicate$Multiple
+class net/minecraft/advancements/criterion/CollectionContentsPredicate$Single net/minecraft/advancements/predicates/CollectionContentsPredicate$Single
+class net/minecraft/advancements/criterion/CollectionContentsPredicate$Zero net/minecraft/advancements/predicates/CollectionContentsPredicate$Zero
+class net/minecraft/advancements/criterion/CollectionCountsPredicate net/minecraft/advancements/predicates/CollectionCountsPredicate
+class net/minecraft/advancements/criterion/CollectionCountsPredicate$Entry net/minecraft/advancements/predicates/CollectionCountsPredicate$Entry
+class net/minecraft/advancements/criterion/CollectionCountsPredicate$Multiple net/minecraft/advancements/predicates/CollectionCountsPredicate$Multiple
+class net/minecraft/advancements/criterion/CollectionCountsPredicate$Single net/minecraft/advancements/predicates/CollectionCountsPredicate$Single
+class net/minecraft/advancements/criterion/CollectionCountsPredicate$Zero net/minecraft/advancements/predicates/CollectionCountsPredicate$Zero
+class net/minecraft/advancements/criterion/CollectionPredicate net/minecraft/advancements/predicates/CollectionPredicate
+class net/minecraft/advancements/criterion/ConstructBeaconTrigger net/minecraft/advancements/triggers/ConstructBeaconTrigger
+class net/minecraft/advancements/criterion/ConstructBeaconTrigger$TriggerInstance net/minecraft/advancements/triggers/ConstructBeaconTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/ConsumeItemTrigger net/minecraft/advancements/triggers/ConsumeItemTrigger
+class net/minecraft/advancements/criterion/ConsumeItemTrigger$TriggerInstance net/minecraft/advancements/triggers/ConsumeItemTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/ContextAwarePredicate net/minecraft/advancements/predicates/ContextAwarePredicate
+class net/minecraft/advancements/criterion/CuredZombieVillagerTrigger net/minecraft/advancements/triggers/CuredZombieVillagerTrigger
+class net/minecraft/advancements/criterion/CuredZombieVillagerTrigger$TriggerInstance net/minecraft/advancements/triggers/CuredZombieVillagerTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/DamagePredicate net/minecraft/advancements/predicates/DamagePredicate
+class net/minecraft/advancements/criterion/DamagePredicate$Builder net/minecraft/advancements/predicates/DamagePredicate$Builder
+class net/minecraft/advancements/criterion/DamageSourcePredicate net/minecraft/advancements/predicates/DamageSourcePredicate
+class net/minecraft/advancements/criterion/DamageSourcePredicate$Builder net/minecraft/advancements/predicates/DamageSourcePredicate$Builder
+class net/minecraft/advancements/criterion/DataComponentMatchers net/minecraft/advancements/predicates/DataComponentMatchers
+class net/minecraft/advancements/criterion/DataComponentMatchers$Builder net/minecraft/advancements/predicates/DataComponentMatchers$Builder
+class net/minecraft/advancements/criterion/DefaultBlockInteractionTrigger net/minecraft/advancements/triggers/DefaultBlockInteractionTrigger
+class net/minecraft/advancements/criterion/DefaultBlockInteractionTrigger$TriggerInstance net/minecraft/advancements/triggers/DefaultBlockInteractionTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/DistancePredicate net/minecraft/advancements/predicates/DistancePredicate
+class net/minecraft/advancements/criterion/DistanceTrigger net/minecraft/advancements/triggers/DistanceTrigger
+class net/minecraft/advancements/criterion/DistanceTrigger$TriggerInstance net/minecraft/advancements/triggers/DistanceTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/EffectsChangedTrigger net/minecraft/advancements/triggers/EffectsChangedTrigger
+class net/minecraft/advancements/criterion/EffectsChangedTrigger$TriggerInstance net/minecraft/advancements/triggers/EffectsChangedTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/EnchantedItemTrigger net/minecraft/advancements/triggers/EnchantedItemTrigger
+class net/minecraft/advancements/criterion/EnchantedItemTrigger$TriggerInstance net/minecraft/advancements/triggers/EnchantedItemTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/EnchantmentPredicate net/minecraft/advancements/predicates/EnchantmentPredicate
+class net/minecraft/advancements/criterion/EnterBlockTrigger net/minecraft/advancements/triggers/EnterBlockTrigger
+class net/minecraft/advancements/criterion/EnterBlockTrigger$TriggerInstance net/minecraft/advancements/triggers/EnterBlockTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/EntityEquipmentPredicate net/minecraft/advancements/predicates/entity/EntityEquipmentPredicate
+class net/minecraft/advancements/criterion/EntityEquipmentPredicate$Builder net/minecraft/advancements/predicates/entity/EntityEquipmentPredicate$Builder
+class net/minecraft/advancements/criterion/EntityFlagsPredicate net/minecraft/advancements/predicates/entity/EntityFlagsPredicate
+class net/minecraft/advancements/criterion/EntityFlagsPredicate$Builder net/minecraft/advancements/predicates/entity/EntityFlagsPredicate$Builder
+class net/minecraft/advancements/criterion/EntityHurtPlayerTrigger net/minecraft/advancements/triggers/EntityHurtPlayerTrigger
+class net/minecraft/advancements/criterion/EntityHurtPlayerTrigger$TriggerInstance net/minecraft/advancements/triggers/EntityHurtPlayerTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/EntityPredicate net/minecraft/advancements/predicates/entity/EntityPredicate
+class net/minecraft/advancements/criterion/EntityPredicate$Builder net/minecraft/advancements/predicates/entity/EntityPredicate$Builder
+class net/minecraft/advancements/criterion/EntitySubPredicate net/minecraft/advancements/predicates/entity/EntitySubPredicate
+class net/minecraft/advancements/criterion/EntitySubPredicates net/minecraft/advancements/predicates/entity/EntitySubPredicates
+class net/minecraft/advancements/criterion/EntityTypePredicate net/minecraft/advancements/predicates/entity/EntityTypePredicate
+class net/minecraft/advancements/criterion/FallAfterExplosionTrigger net/minecraft/advancements/triggers/FallAfterExplosionTrigger
+class net/minecraft/advancements/criterion/FallAfterExplosionTrigger$TriggerInstance net/minecraft/advancements/triggers/FallAfterExplosionTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/FilledBucketTrigger net/minecraft/advancements/triggers/FilledBucketTrigger
+class net/minecraft/advancements/criterion/FilledBucketTrigger$TriggerInstance net/minecraft/advancements/triggers/FilledBucketTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/FishingHookPredicate net/minecraft/advancements/predicates/entity/FishingHookPredicate
+class net/minecraft/advancements/criterion/FishingRodHookedTrigger net/minecraft/advancements/triggers/FishingRodHookedTrigger
+class net/minecraft/advancements/criterion/FishingRodHookedTrigger$TriggerInstance net/minecraft/advancements/triggers/FishingRodHookedTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/FluidPredicate net/minecraft/advancements/predicates/FluidPredicate
+class net/minecraft/advancements/criterion/FluidPredicate$Builder net/minecraft/advancements/predicates/FluidPredicate$Builder
+class net/minecraft/advancements/criterion/FoodPredicate net/minecraft/advancements/predicates/FoodPredicate
+class net/minecraft/advancements/criterion/FoodPredicate$Builder net/minecraft/advancements/predicates/FoodPredicate$Builder
+class net/minecraft/advancements/criterion/GameTypePredicate net/minecraft/advancements/predicates/GameTypePredicate
+class net/minecraft/advancements/criterion/ImpossibleTrigger net/minecraft/advancements/triggers/ImpossibleTrigger
+class net/minecraft/advancements/criterion/ImpossibleTrigger$TriggerInstance net/minecraft/advancements/triggers/ImpossibleTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/InputPredicate net/minecraft/advancements/predicates/InputPredicate
+class net/minecraft/advancements/criterion/InventoryChangeTrigger net/minecraft/advancements/triggers/InventoryChangeTrigger
+class net/minecraft/advancements/criterion/InventoryChangeTrigger$TriggerInstance net/minecraft/advancements/triggers/InventoryChangeTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/InventoryChangeTrigger$TriggerInstance$Slots net/minecraft/advancements/triggers/InventoryChangeTrigger$TriggerInstance$Slots
+class net/minecraft/advancements/criterion/ItemDurabilityTrigger net/minecraft/advancements/triggers/ItemDurabilityTrigger
+class net/minecraft/advancements/criterion/ItemDurabilityTrigger$TriggerInstance net/minecraft/advancements/triggers/ItemDurabilityTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/ItemPredicate net/minecraft/advancements/predicates/ItemPredicate
+class net/minecraft/advancements/criterion/ItemPredicate$Builder net/minecraft/advancements/predicates/ItemPredicate$Builder
+class net/minecraft/advancements/criterion/ItemUsedOnLocationTrigger net/minecraft/advancements/triggers/ItemUsedOnLocationTrigger
+class net/minecraft/advancements/criterion/ItemUsedOnLocationTrigger$TriggerInstance net/minecraft/advancements/triggers/ItemUsedOnLocationTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/KilledByArrowTrigger net/minecraft/advancements/triggers/KilledByArrowTrigger
+class net/minecraft/advancements/criterion/KilledByArrowTrigger$TriggerInstance net/minecraft/advancements/triggers/KilledByArrowTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/KilledTrigger net/minecraft/advancements/triggers/KilledTrigger
+class net/minecraft/advancements/criterion/KilledTrigger$TriggerInstance net/minecraft/advancements/triggers/KilledTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/LevitationTrigger net/minecraft/advancements/triggers/LevitationTrigger
+class net/minecraft/advancements/criterion/LevitationTrigger$TriggerInstance net/minecraft/advancements/triggers/LevitationTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/LightPredicate net/minecraft/advancements/predicates/LightPredicate
+class net/minecraft/advancements/criterion/LightPredicate$Builder net/minecraft/advancements/predicates/LightPredicate$Builder
+class net/minecraft/advancements/criterion/LightningBoltPredicate net/minecraft/advancements/predicates/entity/LightningBoltPredicate
+class net/minecraft/advancements/criterion/LightningStrikeTrigger net/minecraft/advancements/triggers/LightningStrikeTrigger
+class net/minecraft/advancements/criterion/LightningStrikeTrigger$TriggerInstance net/minecraft/advancements/triggers/LightningStrikeTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/LocationPredicate net/minecraft/advancements/predicates/LocationPredicate
+class net/minecraft/advancements/criterion/LocationPredicate$Builder net/minecraft/advancements/predicates/LocationPredicate$Builder
+class net/minecraft/advancements/criterion/LocationPredicate$PositionPredicate net/minecraft/advancements/predicates/LocationPredicate$PositionPredicate
+class net/minecraft/advancements/criterion/LootTableTrigger net/minecraft/advancements/triggers/LootTableTrigger
+class net/minecraft/advancements/criterion/LootTableTrigger$TriggerInstance net/minecraft/advancements/triggers/LootTableTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/MinMaxBounds net/minecraft/advancements/predicates/MinMaxBounds
+class net/minecraft/advancements/criterion/MinMaxBounds$Bounds net/minecraft/advancements/predicates/MinMaxBounds$Bounds
+class net/minecraft/advancements/criterion/MinMaxBounds$Bounds$1 net/minecraft/advancements/predicates/MinMaxBounds$Bounds$1
+class net/minecraft/advancements/criterion/MinMaxBounds$Doubles net/minecraft/advancements/predicates/MinMaxBounds$Doubles
+class net/minecraft/advancements/criterion/MinMaxBounds$FloatDegrees net/minecraft/advancements/predicates/MinMaxBounds$FloatDegrees
+class net/minecraft/advancements/criterion/MinMaxBounds$Ints net/minecraft/advancements/predicates/MinMaxBounds$Ints
+class net/minecraft/advancements/criterion/MobEffectsPredicate net/minecraft/advancements/predicates/MobEffectsPredicate
+class net/minecraft/advancements/criterion/MobEffectsPredicate$Builder net/minecraft/advancements/predicates/MobEffectsPredicate$Builder
+class net/minecraft/advancements/criterion/MobEffectsPredicate$MobEffectInstancePredicate net/minecraft/advancements/predicates/MobEffectsPredicate$MobEffectInstancePredicate
+class net/minecraft/advancements/criterion/MovementPredicate net/minecraft/advancements/predicates/entity/MovementPredicate
+class net/minecraft/advancements/criterion/NbtPredicate net/minecraft/advancements/predicates/NbtPredicate
+class net/minecraft/advancements/criterion/PickedUpItemTrigger net/minecraft/advancements/triggers/PickedUpItemTrigger
+class net/minecraft/advancements/criterion/PickedUpItemTrigger$TriggerInstance net/minecraft/advancements/triggers/PickedUpItemTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/PlayerHurtEntityTrigger net/minecraft/advancements/triggers/PlayerHurtEntityTrigger
+class net/minecraft/advancements/criterion/PlayerHurtEntityTrigger$TriggerInstance net/minecraft/advancements/triggers/PlayerHurtEntityTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/PlayerInteractTrigger net/minecraft/advancements/triggers/PlayerInteractTrigger
+class net/minecraft/advancements/criterion/PlayerInteractTrigger$TriggerInstance net/minecraft/advancements/triggers/PlayerInteractTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/PlayerPredicate net/minecraft/advancements/predicates/entity/PlayerPredicate
+class net/minecraft/advancements/criterion/PlayerPredicate$AdvancementCriterionsPredicate net/minecraft/advancements/predicates/entity/PlayerPredicate$AdvancementCriterionsPredicate
+class net/minecraft/advancements/criterion/PlayerPredicate$AdvancementDonePredicate net/minecraft/advancements/predicates/entity/PlayerPredicate$AdvancementDonePredicate
+class net/minecraft/advancements/criterion/PlayerPredicate$AdvancementPredicate net/minecraft/advancements/predicates/entity/PlayerPredicate$AdvancementPredicate
+class net/minecraft/advancements/criterion/PlayerPredicate$Builder net/minecraft/advancements/predicates/entity/PlayerPredicate$Builder
+class net/minecraft/advancements/criterion/PlayerPredicate$StatMatcher net/minecraft/advancements/predicates/entity/PlayerPredicate$StatMatcher
+class net/minecraft/advancements/criterion/PlayerTrigger net/minecraft/advancements/triggers/PlayerTrigger
+class net/minecraft/advancements/criterion/PlayerTrigger$TriggerInstance net/minecraft/advancements/triggers/PlayerTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/RaiderPredicate net/minecraft/advancements/predicates/entity/RaiderPredicate
+class net/minecraft/advancements/criterion/RecipeCraftedTrigger net/minecraft/advancements/triggers/RecipeCraftedTrigger
+class net/minecraft/advancements/criterion/RecipeCraftedTrigger$TriggerInstance net/minecraft/advancements/triggers/RecipeCraftedTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/RecipeUnlockedTrigger net/minecraft/advancements/triggers/RecipeUnlockedTrigger
+class net/minecraft/advancements/criterion/RecipeUnlockedTrigger$TriggerInstance net/minecraft/advancements/triggers/RecipeUnlockedTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/SheepPredicate net/minecraft/advancements/predicates/entity/SheepPredicate
+class net/minecraft/advancements/criterion/ShotCrossbowTrigger net/minecraft/advancements/triggers/ShotCrossbowTrigger
+class net/minecraft/advancements/criterion/ShotCrossbowTrigger$TriggerInstance net/minecraft/advancements/triggers/ShotCrossbowTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/SimpleCriterionTrigger net/minecraft/advancements/triggers/SimpleCriterionTrigger
+class net/minecraft/advancements/criterion/SimpleCriterionTrigger$SimpleInstance net/minecraft/advancements/triggers/SimpleCriterionTrigger$SimpleInstance
+class net/minecraft/advancements/criterion/SingleComponentItemPredicate net/minecraft/advancements/predicates/SingleComponentItemPredicate
+class net/minecraft/advancements/criterion/SlideDownBlockTrigger net/minecraft/advancements/triggers/SlideDownBlockTrigger
+class net/minecraft/advancements/criterion/SlideDownBlockTrigger$TriggerInstance net/minecraft/advancements/triggers/SlideDownBlockTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/SlotsPredicate net/minecraft/advancements/predicates/SlotsPredicate
+class net/minecraft/advancements/criterion/SpearMobsTrigger net/minecraft/advancements/triggers/SpearMobsTrigger
+class net/minecraft/advancements/criterion/SpearMobsTrigger$TriggerInstance net/minecraft/advancements/triggers/SpearMobsTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/StartRidingTrigger net/minecraft/advancements/triggers/StartRidingTrigger
+class net/minecraft/advancements/criterion/StartRidingTrigger$TriggerInstance net/minecraft/advancements/triggers/StartRidingTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/StatePropertiesPredicate net/minecraft/advancements/predicates/StatePropertiesPredicate
+class net/minecraft/advancements/criterion/StatePropertiesPredicate$Builder net/minecraft/advancements/predicates/StatePropertiesPredicate$Builder
+class net/minecraft/advancements/criterion/StatePropertiesPredicate$ExactMatcher net/minecraft/advancements/predicates/StatePropertiesPredicate$ExactMatcher
+class net/minecraft/advancements/criterion/StatePropertiesPredicate$PropertyMatcher net/minecraft/advancements/predicates/StatePropertiesPredicate$PropertyMatcher
+class net/minecraft/advancements/criterion/StatePropertiesPredicate$RangedMatcher net/minecraft/advancements/predicates/StatePropertiesPredicate$RangedMatcher
+class net/minecraft/advancements/criterion/StatePropertiesPredicate$ValueMatcher net/minecraft/advancements/predicates/StatePropertiesPredicate$ValueMatcher
+class net/minecraft/advancements/criterion/SummonedEntityTrigger net/minecraft/advancements/triggers/SummonedEntityTrigger
+class net/minecraft/advancements/criterion/SummonedEntityTrigger$TriggerInstance net/minecraft/advancements/triggers/SummonedEntityTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/TagPredicate net/minecraft/advancements/predicates/TagPredicate
+class net/minecraft/advancements/criterion/TameAnimalTrigger net/minecraft/advancements/triggers/TameAnimalTrigger
+class net/minecraft/advancements/criterion/TameAnimalTrigger$TriggerInstance net/minecraft/advancements/triggers/TameAnimalTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/TargetBlockTrigger net/minecraft/advancements/triggers/TargetBlockTrigger
+class net/minecraft/advancements/criterion/TargetBlockTrigger$TriggerInstance net/minecraft/advancements/triggers/TargetBlockTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/TradeTrigger net/minecraft/advancements/triggers/TradeTrigger
+class net/minecraft/advancements/criterion/TradeTrigger$TriggerInstance net/minecraft/advancements/triggers/TradeTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/UsedEnderEyeTrigger net/minecraft/advancements/triggers/UsedEnderEyeTrigger
+class net/minecraft/advancements/criterion/UsedEnderEyeTrigger$TriggerInstance net/minecraft/advancements/triggers/UsedEnderEyeTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/UsedTotemTrigger net/minecraft/advancements/triggers/UsedTotemTrigger
+class net/minecraft/advancements/criterion/UsedTotemTrigger$TriggerInstance net/minecraft/advancements/triggers/UsedTotemTrigger$TriggerInstance
+class net/minecraft/advancements/criterion/UsingItemTrigger net/minecraft/advancements/triggers/UsingItemTrigger
+class net/minecraft/advancements/criterion/UsingItemTrigger$TriggerInstance net/minecraft/advancements/triggers/UsingItemTrigger$TriggerInstance
+
+# Rendering
+class com/mojang/blaze3d/vertex/VertexFormat$Mode com/mojang/blaze3d/PrimitiveTopology
+class com/mojang/blaze3d/buffers/GpuBuffer$MappedView com/mojang/blaze3d/buffers/GpuBufferSlice$MappedView
+
+# EntityType/BlockEntityType constants moved to EntityTypes/BlockEntityTypes
+field net/minecraft/world/entity/EntityType BOGGED Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes BOGGED Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType BREEZE Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes BREEZE Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType BREEZE_WIND_CHARGE Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes BREEZE_WIND_CHARGE Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType CHICKEN Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes CHICKEN Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType COW Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes COW Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType CREEPER Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes CREEPER Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType DONKEY Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes DONKEY Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType DRAGON_FIREBALL Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes DRAGON_FIREBALL Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType DROWNED Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes DROWNED Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType EXPERIENCE_ORB Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes EXPERIENCE_ORB Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType FIREBALL Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes FIREBALL Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType GHAST Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes GHAST Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType GIANT Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes GIANT Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType GOAT Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes GOAT Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType GUARDIAN Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes GUARDIAN Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType HAPPY_GHAST Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes HAPPY_GHAST Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType HOGLIN Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes HOGLIN Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType HORSE Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes HORSE Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType HUSK Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes HUSK Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType ILLUSIONER Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes ILLUSIONER Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType ITEM Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes ITEM Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType LIGHTNING_BOLT Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes LIGHTNING_BOLT Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType MINECART Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes MINECART Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType MULE Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes MULE Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType OCELOT Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes OCELOT Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType PANDA Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes PANDA Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType PARROT Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes PARROT Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType PIG Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes PIG Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType PIGLIN Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes PIGLIN Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType PIGLIN_BRUTE Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes PIGLIN_BRUTE Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType PLAYER Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes PLAYER Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType POLAR_BEAR Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes POLAR_BEAR Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType RAVAGER Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes RAVAGER Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType SHEEP Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes SHEEP Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType SHULKER Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes SHULKER Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType SKELETON Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes SKELETON Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType SKELETON_HORSE Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes SKELETON_HORSE Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType SMALL_FIREBALL Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes SMALL_FIREBALL Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType SPAWNER_MINECART Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes SPAWNER_MINECART Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType SPIDER Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes SPIDER Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType STRAY Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes STRAY Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType TADPOLE Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes TADPOLE Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType TNT Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes TNT Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType TURTLE Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes TURTLE Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType VILLAGER Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes VILLAGER Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType WANDERING_TRADER Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes WANDERING_TRADER Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType ZOGLIN Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes ZOGLIN Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType ZOMBIE Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes ZOMBIE Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType ZOMBIE_HORSE Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes ZOMBIE_HORSE Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType ZOMBIE_VILLAGER Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes ZOMBIE_VILLAGER Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/entity/EntityType ZOMBIFIED_PIGLIN Lnet/minecraft/world/entity/EntityType; -> net/minecraft/world/entity/EntityTypes ZOMBIFIED_PIGLIN Lnet/minecraft/world/entity/EntityType;
+field net/minecraft/world/level/block/entity/BlockEntityType DECORATED_POT Lnet/minecraft/world/level/block/entity/BlockEntityType; -> net/minecraft/world/level/block/entity/BlockEntityTypes DECORATED_POT Lnet/minecraft/world/level/block/entity/BlockEntityType;
+field net/minecraft/world/level/block/entity/BlockEntityType JIGSAW Lnet/minecraft/world/level/block/entity/BlockEntityType; -> net/minecraft/world/level/block/entity/BlockEntityTypes JIGSAW Lnet/minecraft/world/level/block/entity/BlockEntityType;
+field net/minecraft/world/level/block/entity/BlockEntityType MOB_SPAWNER Lnet/minecraft/world/level/block/entity/BlockEntityType; -> net/minecraft/world/level/block/entity/BlockEntityTypes MOB_SPAWNER Lnet/minecraft/world/level/block/entity/BlockEntityType;
+field net/minecraft/world/level/block/entity/BlockEntityType STRUCTURE_BLOCK Lnet/minecraft/world/level/block/entity/BlockEntityType; -> net/minecraft/world/level/block/entity/BlockEntityTypes STRUCTURE_BLOCK Lnet/minecraft/world/level/block/entity/BlockEntityType;
+
+# Dyed blocks/items became ColorCollections (Blocks.WOOL.pick(DyeColor.WHITE), ...)
+field net/minecraft/world/level/block/Blocks BLACK_CANDLE Lnet/minecraft/world/level/block/Block; -> shim
+field net/minecraft/world/level/block/Blocks COPPER_BLOCK Lnet/minecraft/world/level/block/Block; -> shim
+field net/minecraft/world/level/block/Blocks ORANGE_CANDLE Lnet/minecraft/world/level/block/Block; -> shim
+field net/minecraft/world/level/block/Blocks RED_CANDLE Lnet/minecraft/world/level/block/Block; -> shim
+field net/minecraft/world/level/block/Blocks WHITE_CANDLE Lnet/minecraft/world/level/block/Block; -> shim
+field net/minecraft/world/level/block/Blocks WHITE_CARPET Lnet/minecraft/world/level/block/Block; -> shim
+field net/minecraft/world/level/block/Blocks WHITE_WOOL Lnet/minecraft/world/level/block/Block; -> shim
+field net/minecraft/world/item/Items BLUE_STAINED_GLASS_PANE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items CYAN_CANDLE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items CYAN_DYE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items CYAN_STAINED_GLASS_PANE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items MAGENTA_STAINED_GLASS_PANE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items ORANGE_DYE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items PINK_CANDLE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items PINK_CARPET Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items PINK_DYE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items PINK_STAINED_GLASS_PANE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items PINK_WOOL Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items PURPLE_CANDLE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items PURPLE_STAINED_GLASS_PANE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items RED_CANDLE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items RED_DYE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items RED_STAINED_GLASS_PANE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items WHITE_DYE Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items WHITE_WOOL Lnet/minecraft/world/item/Item; -> shim
+field net/minecraft/world/item/Items YELLOW_STAINED_GLASS_PANE Lnet/minecraft/world/item/Item; -> shim
+
+# Tags that became BlockItemTags
+field net/minecraft/tags/BlockTags SAPLINGS Lnet/minecraft/tags/TagKey; -> shim
+field net/minecraft/tags/ItemTags COPPER_GOLEM_STATUES Lnet/minecraft/tags/TagKey; -> shim
+field net/minecraft/tags/ItemTags LANTERNS Lnet/minecraft/tags/TagKey; -> shim
+field net/minecraft/tags/ItemTags SLABS Lnet/minecraft/tags/TagKey; -> shim
+field net/minecraft/tags/ItemTags SMALL_FLOWERS Lnet/minecraft/tags/TagKey; -> shim
+field net/minecraft/tags/ItemTags STAIRS Lnet/minecraft/tags/TagKey; -> shim
+
+# Potions are typed as Holder instead of Holder.Reference
+field net/minecraft/world/item/alchemy/Potions AWKWARD Lnet/minecraft/core/Holder$Reference; -> shim
+field net/minecraft/world/item/alchemy/Potions WEAKNESS Lnet/minecraft/core/Holder$Reference; -> shim
+
+# Getters that lost their "get" prefix
+method net/minecraft/client/renderer/GameRenderer getMainCamera ()Lnet/minecraft/client/Camera; -> net/minecraft/client/renderer/GameRenderer mainCamera ()Lnet/minecraft/client/Camera;
+method net/minecraft/client/renderer/GameRenderer getLighting ()Lcom/mojang/blaze3d/platform/Lighting; -> net/minecraft/client/renderer/GameRenderer lighting ()Lcom/mojang/blaze3d/platform/Lighting;
+method net/minecraft/client/renderer/GameRenderer getFeatureRenderDispatcher ()Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher; -> net/minecraft/client/renderer/GameRenderer featureRenderDispatcher ()Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;
+method net/minecraft/client/renderer/LevelRenderer getParticlesTarget ()Lcom/mojang/blaze3d/pipeline/RenderTarget; -> net/minecraft/client/renderer/LevelRenderer particlesTarget ()Lcom/mojang/blaze3d/pipeline/RenderTarget;
+method net/minecraft/world/level/chunk/ChunkAccess markPosForPostprocessing (Lnet/minecraft/core/BlockPos;)V -> net/minecraft/world/level/chunk/ChunkAccess markPosForPostProcessing (Lnet/minecraft/core/BlockPos;)V
+method net/minecraft/world/level/chunk/ProtoChunk markPosForPostprocessing (Lnet/minecraft/core/BlockPos;)V -> net/minecraft/world/level/chunk/ProtoChunk markPosForPostProcessing (Lnet/minecraft/core/BlockPos;)V
+
+# Removed helpers
+method net/minecraft/core/BlockPos getCenter ()Lnet/minecraft/world/phys/Vec3; -> shim
+method net/minecraft/ChatFormatting getColor ()Ljava/lang/Integer; -> shim
+method net/minecraft/world/entity/animal/equine/ZombieHorse setBodyArmorItem (Lnet/minecraft/world/item/ItemStack;)V -> shim
+method com/legacy/rediscovered/entity/dragon/RedDragonOffspringEntity setBodyArmorItem (Lnet/minecraft/world/item/ItemStack;)V -> shim
+
+# The screen and the HUD were split: Minecraft.gui is now the screen manager, the old Gui is Hud (Gui.hud)
+field net/minecraft/client/Minecraft screen Lnet/minecraft/client/gui/screens/Screen; -> shim:client
+method net/minecraft/client/Minecraft setScreen (Lnet/minecraft/client/gui/screens/Screen;)V -> shim:client
+method net/minecraft/client/Minecraft getMainRenderTarget ()Lcom/mojang/blaze3d/pipeline/RenderTarget; -> shim:client
+field net/minecraft/client/Options hideGui Z -> shim:client
+method net/minecraft/client/gui/Gui getChat ()Lnet/minecraft/client/gui/components/ChatComponent; -> shim:client
+method net/minecraft/client/gui/Gui getBossOverlay ()Lnet/minecraft/client/gui/components/BossHealthOverlay; -> shim:client
+
+# Entity spawning takes PostSpawnProcessor/EntitySpawnRequest instead of Consumer/EntitySpawnReason
+method net/minecraft/world/entity/EntityType spawn (Lnet/minecraft/server/level/ServerLevel;Ljava/util/function/Consumer;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntitySpawnReason;ZZ)Lnet/minecraft/world/entity/Entity; -> shim
+method net/minecraft/world/entity/EntityType create (Lnet/minecraft/server/level/ServerLevel;Ljava/util/function/Consumer;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntitySpawnReason;ZZ)Lnet/minecraft/world/entity/Entity; -> shim
+method net/minecraft/world/entity/EntityType create (Lnet/minecraft/world/level/storage/ValueInput;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/EntitySpawnReason;)Ljava/util/Optional; -> shim
+method net/minecraft/world/entity/EntityType createDefaultStackConfig (Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;)Ljava/util/function/Consumer; -> shim
+method net/minecraft/world/entity/EntityType appendDefaultStackConfig (Ljava/util/function/Consumer;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/entity/LivingEntity;)Ljava/util/function/Consumer; -> shim
+method net/minecraft/world/entity/EntityType loadEntityRecursive (Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/EntityProcessor;)Lnet/minecraft/world/entity/Entity; -> shim
+
+# Data generation: TagAppender only accepts ResourceKeys now
+method net/minecraft/data/tags/TagAppender add (Ljava/lang/Object;)Lnet/minecraft/data/tags/TagAppender; -> shim
+method net/minecraft/data/tags/TagAppender add ([Ljava/lang/Object;)Lnet/minecraft/data/tags/TagAppender; -> shim
+method net/minecraft/data/tags/TagAppender addOptional (Ljava/lang/Object;)Lnet/minecraft/data/tags/TagAppender; -> shim

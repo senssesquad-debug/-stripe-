@@ -1,5 +1,6 @@
 package com.legacy.structure_gel.core.client.renderers.building_tool;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.legacy.structure_gel.core.SGConfig;
 import com.legacy.structure_gel.core.client.SGRenderType;
 import com.legacy.structure_gel.core.client.renderers.BuildingToolRenderer;
@@ -8,7 +9,7 @@ import com.legacy.structure_gel.core.item.building_tool.BuildingToolItem;
 import com.legacy.structure_gel.core.item.building_tool.CapturedBlocks;
 import com.legacy.structure_gel.core.item.building_tool.ToolModeProperty;
 import com.legacy.structure_gel.core.item.building_tool.modes.CloneTool;
-import com.mojang.blaze3d.buffers.GpuBuffer.MappedView;
+import com.mojang.blaze3d.buffers.GpuBufferSlice.MappedView;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
@@ -16,7 +17,6 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Objects;
@@ -123,7 +123,7 @@ public class CloneToolRenderer extends BuildingToolRenderer.ForCorners {
                 this.destLastRenderInfo.isFinished = false;
                 this.destFutureRender = CompletableFuture.supplyAsync(() -> {
                     Pose posex = new PoseStack().last();
-                    BufferBuilder buffBuilderx = new BufferBuilder(this.destBufferBuilder, Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+                    BufferBuilder buffBuilderx = new BufferBuilder(this.destBufferBuilder, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION_COLOR);
                     BuildingToolRenderer.RenderInfo destRenderInfox = new BuildingToolRenderer.RenderInfo();
                     this.buildDest(mc, stack, posex, buffBuilderx, camX, camY, camZ, destRenderInfox);
                     MeshData meshx = buffBuilderx.build();
@@ -151,9 +151,7 @@ public class CloneToolRenderer extends BuildingToolRenderer.ForCorners {
 
                             this.destBuffer.rotate();
 
-                            try (MappedView view = RenderSystem.getDevice()
-                                    .createCommandEncoder()
-                                    .mapBuffer(this.destBuffer.currentBuffer().slice(), false, true)) {
+                            try (MappedView view = this.destBuffer.currentBuffer().slice().map(false, true)) {
                                 view.data().put(buffer);
                                 this.destIndexCount = result.indexCount();
                             }
@@ -171,7 +169,7 @@ public class CloneToolRenderer extends BuildingToolRenderer.ForCorners {
             }
         } else {
             Pose pose = new PoseStack().last();
-            BufferBuilder buffBuilder = new BufferBuilder(this.destBufferBuilder, Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            BufferBuilder buffBuilder = new BufferBuilder(this.destBufferBuilder, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION_COLOR);
             BuildingToolRenderer.RenderInfo destRenderInfo = new BuildingToolRenderer.RenderInfo();
             this.buildDest(mc, stack, pose, buffBuilder, camX, camY, camZ, destRenderInfo);
 
@@ -191,7 +189,7 @@ public class CloneToolRenderer extends BuildingToolRenderer.ForCorners {
 
                     this.destBuffer.rotate();
 
-                    try (MappedView view = RenderSystem.getDevice().createCommandEncoder().mapBuffer(this.destBuffer.currentBuffer().slice(), false, true)) {
+                    try (MappedView view = this.destBuffer.currentBuffer().slice().map(false, true)) {
                         view.data().put(buffer);
                         this.destIndexCount = mesh.drawState().indexCount();
                     }

@@ -29,7 +29,7 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.phys.Vec3;
 
 public class NetherReactorPulseParticle extends Particle {
-    public static final ParticleRenderType PARTICLE_RENDER_TYPE = new ParticleRenderType(RediscoveredMod.find("nether_reactor_pulse"));
+    public static final ParticleRenderType PARTICLE_RENDER_TYPE = new ParticleRenderType(RediscoveredMod.find("nether_reactor_pulse"), RediscoveredMod.find("nether_reactor_pulse"));
     private static final RenderType RENDER_TYPE = RenderTypes.entityTranslucent(RediscoveredMod.locate("textures/particle/nether_reactor_pulse_0.png"));
     private final Model<Unit> model;
     private float alpha = 1.0F;

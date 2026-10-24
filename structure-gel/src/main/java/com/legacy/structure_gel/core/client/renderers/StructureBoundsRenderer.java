@@ -1,5 +1,6 @@
 package com.legacy.structure_gel.core.client.renderers;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.legacy.structure_gel.api.util.Positions;
 import com.legacy.structure_gel.core.StructureGelMod;
 import com.legacy.structure_gel.core.client.ClientProxy;
@@ -7,7 +8,7 @@ import com.legacy.structure_gel.core.client.SGRenderPipelines;
 import com.legacy.structure_gel.core.structure.StructureInfo;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.buffers.GpuBuffer.MappedView;
+import com.mojang.blaze3d.buffers.GpuBufferSlice.MappedView;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -17,14 +18,13 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalDouble;
-import java.util.OptionalInt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MappableRingBuffer;
 import net.minecraft.core.BlockPos;
@@ -96,7 +96,7 @@ public class StructureBoundsRenderer {
 
     private boolean buildMesh(double camX, double camY, double camZ) {
         Pose pose = new PoseStack().last();
-        BufferBuilder buffBuilder = new BufferBuilder(ClientProxy.WIREFRAME_BUFFER_BUILDER, Mode.QUADS, SGRenderPipelines.WORLD_WIREFRAME.getVertexFormat());
+        BufferBuilder buffBuilder = new BufferBuilder(ClientProxy.WIREFRAME_BUFFER_BUILDER, PrimitiveTopology.QUADS, SGRenderPipelines.WORLD_WIREFRAME.getVertexFormatBinding(0));
         BoundingBox fullBounds = this.structureInfo.fullBounds();
         int minX = fullBounds.minX();
         int minY = fullBounds.minY();
@@ -132,7 +132,7 @@ public class StructureBoundsRenderer {
 
                 this.ringBuffer.rotate();
 
-                try (MappedView view = RenderSystem.getDevice().createCommandEncoder().mapBuffer(this.ringBuffer.currentBuffer().slice(), false, true)) {
+                try (MappedView view = this.ringBuffer.currentBuffer().slice().map(false, true)) {
                     view.data().put(buffer);
                     this.indexCount = mesh.drawState().indexCount();
                 }
@@ -146,10 +146,10 @@ public class StructureBoundsRenderer {
 
     protected void draw(float xOffset, float yOffset, float zOffset) {
         GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms()
-            .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(1.0F, 1.0F, 1.0F, 1.0F), new Vector3f(xOffset, yOffset, zOffset), new Matrix4f());
-        RenderTarget mainRenderTarget = Minecraft.getInstance().getMainRenderTarget();
-        RenderTarget particleTarget = Minecraft.getInstance().levelRenderer.getParticlesTarget();
-        AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(Mode.QUADS);
+            .writeTransform(RenderSystem.getModelViewMatrixCopy(), new Vector4f(1.0F, 1.0F, 1.0F, 1.0F), new Vector3f(xOffset, yOffset, zOffset), new Matrix4f());
+        RenderTarget mainRenderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
+        RenderTarget particleTarget = Minecraft.getInstance().levelRenderer.particlesTarget();
+        AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
         GpuBuffer indexBuffer = indices.getBuffer(this.indexCount);
         GpuTextureView colorTexture;
         GpuTextureView depthTexture;
@@ -163,13 +163,13 @@ public class StructureBoundsRenderer {
 
         try (RenderPass renderPass = RenderSystem.getDevice()
                 .createCommandEncoder()
-                .createRenderPass(() -> "Structure Bounds", colorTexture, OptionalInt.empty(), depthTexture, OptionalDouble.empty())) {
+                .createRenderPass(() -> "Structure Bounds", colorTexture, Optional.empty(), depthTexture, OptionalDouble.empty())) {
             renderPass.setPipeline(SGRenderPipelines.WORLD_WIREFRAME);
-            renderPass.setVertexBuffer(0, this.ringBuffer.currentBuffer());
+            renderPass.setVertexBuffer(0, this.ringBuffer.currentBuffer().slice());
             RenderSystem.bindDefaultUniforms(renderPass);
             renderPass.setUniform("DynamicTransforms", dynamicTransforms);
             renderPass.setIndexBuffer(indexBuffer, indices.type());
-            renderPass.drawIndexed(0, 0, this.indexCount, 1);
+            renderPass.drawIndexed(this.indexCount, 1, 0, 0, 0);
         }
     }
 

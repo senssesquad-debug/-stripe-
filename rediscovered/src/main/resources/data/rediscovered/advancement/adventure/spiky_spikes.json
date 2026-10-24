@@ -8,7 +8,7 @@
             "condition": "minecraft:entity_properties",
             "entity": "this",
             "predicate": {
-              "type": "minecraft:guardian"
+              "entity_type": "minecraft:guardian"
             }
           }
         ]

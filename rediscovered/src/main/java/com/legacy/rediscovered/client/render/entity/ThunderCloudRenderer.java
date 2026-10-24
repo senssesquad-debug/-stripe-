@@ -106,8 +106,6 @@ public class ThunderCloudRenderer<T extends ThunderCloudEntity, S extends Thunde
                 state.lightCoords,
                 OverlayTexture.NO_OVERLAY,
                 null,
-                false,
-                false,
                 ARGB.white(a),
                 null,
                 state.outlineColor
@@ -130,8 +128,6 @@ public class ThunderCloudRenderer<T extends ThunderCloudEntity, S extends Thunde
             state.lightCoords,
             OverlayTexture.NO_OVERLAY,
             null,
-            false,
-            false,
             ARGB.white(alpha),
             null,
             state.outlineColor

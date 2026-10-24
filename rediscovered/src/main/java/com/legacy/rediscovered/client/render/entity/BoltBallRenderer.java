@@ -85,8 +85,6 @@ public class BoltBallRenderer<T extends BoltBallEntity, S extends BoltBallRender
             state.lightCoords,
             OverlayTexture.NO_OVERLAY,
             windSprite,
-            false,
-            false,
             ARGB.white(windAlpha),
             null,
             state.outlineColor
@@ -107,8 +105,6 @@ public class BoltBallRenderer<T extends BoltBallEntity, S extends BoltBallRender
             state.lightCoords,
             OverlayTexture.NO_OVERLAY,
             windSprite,
-            false,
-            false,
             ARGB.white(windAlpha),
             null,
             state.outlineColor
@@ -127,8 +123,6 @@ public class BoltBallRenderer<T extends BoltBallEntity, S extends BoltBallRender
             state.lightCoords,
             OverlayTexture.NO_OVERLAY,
             windSprite,
-            false,
-            false,
             ARGB.white(windAlpha),
             null,
             state.outlineColor

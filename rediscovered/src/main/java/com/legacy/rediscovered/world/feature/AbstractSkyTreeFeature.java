@@ -30,7 +30,9 @@ import net.minecraft.world.level.levelgen.feature.configurations.TreeConfigurati
 import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer.FoliageSetter;
+import net.minecraft.world.level.levelgen.blockpredicates.BlockPredicate;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.RuleBasedStateProvider;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.StraightTrunkPlacer;
 import net.minecraft.world.level.material.Fluids;
 
@@ -40,7 +42,9 @@ public abstract class AbstractSkyTreeFeature extends TreeFeature {
             new StraightTrunkPlacer(4, 2, 0),
             BlockStateProvider.simple(Blocks.OAK_LEAVES.defaultBlockState()),
             new BlobFoliagePlacer(ConstantInt.of(2), ConstantInt.of(0), 3),
-            new TwoLayersFeatureSize(1, 0, 1)
+            new TwoLayersFeatureSize(1, 0, 1),
+            // 26.1.2's TreeConfiguration.PLACE_BELOW_OVERWORLD_TRUNKS, which this constructor used to default to
+            RuleBasedStateProvider.ifTrueThenProvide(BlockPredicate.not(BlockPredicate.matchesTag(BlockTags.CANNOT_REPLACE_BELOW_TREE_TRUNK)), Blocks.DIRT)
         )
         .ignoreVines()
         .build();

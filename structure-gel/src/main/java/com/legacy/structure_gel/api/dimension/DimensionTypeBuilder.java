@@ -145,7 +145,7 @@ public class DimensionTypeBuilder {
             this.minY,
             this.height,
             logicalH,
-            this.infiniburn,
+            context.lookup(Registries.BLOCK).getOrThrow(this.infiniburn),
             this.ambientLight,
             new MonsterSettings(this.monsterSpawnLightTest, this.monsterSpawnBlockLightLimit),
             this.skybox,

@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+version = '2.22.0'
+group = 'com.legacy'
+base.archivesName = "structure_gel-${minecraft_version}"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+neoForge {
+    version = neo_version
+}
+
+apply from: rootProject.file('gradle/patched-mod.gradle')
+configurePatchedMod(rootProject.file('libs/structure_gel-26.1.2-2.22.0.jar'))
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-Xmaxerrs', '2000']
+}

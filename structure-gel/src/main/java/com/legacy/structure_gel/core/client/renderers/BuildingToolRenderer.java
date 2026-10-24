@@ -1,5 +1,6 @@
 package com.legacy.structure_gel.core.client.renderers;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.legacy.structure_gel.api.util.Positions;
 import com.legacy.structure_gel.core.SGConfig;
 import com.legacy.structure_gel.core.client.ClientProxy;
@@ -20,7 +21,7 @@ import com.legacy.structure_gel.core.item.building_tool.SmartBoundingBox;
 import com.legacy.structure_gel.core.registry.SGRegistry;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
-import com.mojang.blaze3d.buffers.GpuBuffer.MappedView;
+import com.mojang.blaze3d.buffers.GpuBufferSlice.MappedView;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -32,7 +33,6 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.MeshData;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.PoseStack.Pose;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.datafixers.util.Pair;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
-import java.util.OptionalInt;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
@@ -148,7 +147,7 @@ public abstract class BuildingToolRenderer implements IRenderBase {
                 this.lastRenderInfo.isFinished = false;
                 this.futureRender = CompletableFuture.supplyAsync(() -> {
                     Pose posex = new PoseStack().last();
-                    BufferBuilder buffBuilderx = new BufferBuilder(this.byteBufferBuilder, Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+                    BufferBuilder buffBuilderx = new BufferBuilder(this.byteBufferBuilder, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION_COLOR);
                     BuildingToolRenderer.RenderInfo renderInfox = new BuildingToolRenderer.RenderInfo();
                     this.buildMain(mc, stack, posex, buffBuilderx, camX, camY, camZ, renderInfox);
                     MeshData meshx = buffBuilderx.build();
@@ -176,9 +175,7 @@ public abstract class BuildingToolRenderer implements IRenderBase {
 
                             this.lineBuffer.rotate();
 
-                            try (MappedView view = RenderSystem.getDevice()
-                                    .createCommandEncoder()
-                                    .mapBuffer(this.lineBuffer.currentBuffer().slice(), false, true)) {
+                            try (MappedView view = this.lineBuffer.currentBuffer().slice().map(false, true)) {
                                 view.data().put(buffer);
                                 this.indexCount = result.indexCount;
                             }
@@ -197,7 +194,7 @@ public abstract class BuildingToolRenderer implements IRenderBase {
             }
         } else {
             Pose pose = new PoseStack().last();
-            BufferBuilder buffBuilder = new BufferBuilder(ClientProxy.WIREFRAME_BUFFER_BUILDER, Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            BufferBuilder buffBuilder = new BufferBuilder(ClientProxy.WIREFRAME_BUFFER_BUILDER, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION_COLOR);
             BuildingToolRenderer.RenderInfo renderInfo = new BuildingToolRenderer.RenderInfo();
             this.buildMain(mc, stack, pose, buffBuilder, camX, camY, camZ, renderInfo);
 
@@ -215,7 +212,7 @@ public abstract class BuildingToolRenderer implements IRenderBase {
 
                     this.lineBuffer.rotate();
 
-                    try (MappedView view = RenderSystem.getDevice().createCommandEncoder().mapBuffer(this.lineBuffer.currentBuffer().slice(), false, true)) {
+                    try (MappedView view = this.lineBuffer.currentBuffer().slice().map(false, true)) {
                         view.data().put(buffer);
                         this.indexCount = mesh.drawState().indexCount();
                     }
@@ -240,10 +237,10 @@ public abstract class BuildingToolRenderer implements IRenderBase {
 
     protected void draw(MappableRingBuffer buffer, int indexCount, float xOffset, float yOffset, float zOffset) {
         GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms()
-            .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(1.0F, 1.0F, 1.0F, 1.0F), new Vector3f(xOffset, yOffset, zOffset), new Matrix4f());
-        RenderTarget mainRenderTarget = Minecraft.getInstance().getMainRenderTarget();
-        RenderTarget particleTarget = Minecraft.getInstance().levelRenderer.getParticlesTarget();
-        AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(Mode.QUADS);
+            .writeTransform(RenderSystem.getModelViewMatrixCopy(), new Vector4f(1.0F, 1.0F, 1.0F, 1.0F), new Vector3f(xOffset, yOffset, zOffset), new Matrix4f());
+        RenderTarget mainRenderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
+        RenderTarget particleTarget = Minecraft.getInstance().levelRenderer.particlesTarget();
+        AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
         GpuBuffer indexBuffer = indices.getBuffer(indexCount);
         GpuTextureView colorTexture;
         GpuTextureView depthTexture;
@@ -257,13 +254,13 @@ public abstract class BuildingToolRenderer implements IRenderBase {
 
         try (RenderPass renderPass = RenderSystem.getDevice()
                 .createCommandEncoder()
-                .createRenderPass(() -> "Building Tool", colorTexture, OptionalInt.empty(), depthTexture, OptionalDouble.empty())) {
+                .createRenderPass(() -> "Building Tool", colorTexture, Optional.empty(), depthTexture, OptionalDouble.empty())) {
             renderPass.setPipeline(SGRenderPipelines.WORLD_WIREFRAME);
-            renderPass.setVertexBuffer(0, buffer.currentBuffer());
+            renderPass.setVertexBuffer(0, buffer.currentBuffer().slice());
             RenderSystem.bindDefaultUniforms(renderPass);
             renderPass.setUniform("DynamicTransforms", dynamicTransforms);
             renderPass.setIndexBuffer(indexBuffer, indices.type());
-            renderPass.drawIndexed(0, 0, indexCount, 1);
+            renderPass.drawIndexed(indexCount, 1, 0, 0, 0);
         }
     }
 
@@ -509,7 +506,7 @@ public abstract class BuildingToolRenderer implements IRenderBase {
         protected BuildingToolRenderer.RenderInfo build(Minecraft mc, LocalPlayer player, ItemStack stack, double camX, double camY, double camZ) {
             BuildingToolRenderer.RenderInfo ret = super.build(mc, player, stack, camX, camY, camZ);
             Pose pose = new PoseStack().last();
-            BufferBuilder buffBuilder = new BufferBuilder(ClientProxy.WIREFRAME_BUFFER_BUILDER, Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            BufferBuilder buffBuilder = new BufferBuilder(ClientProxy.WIREFRAME_BUFFER_BUILDER, PrimitiveTopology.QUADS, DefaultVertexFormat.POSITION_COLOR);
             this.buildTarget(mc, stack, pose, buffBuilder, camX, camY, camZ, ret);
 
             try (MeshData mesh = buffBuilder.build()) {
@@ -526,7 +523,7 @@ public abstract class BuildingToolRenderer implements IRenderBase {
 
                     this.targetBuffer.rotate();
 
-                    try (MappedView view = RenderSystem.getDevice().createCommandEncoder().mapBuffer(this.targetBuffer.currentBuffer().slice(), false, true)) {
+                    try (MappedView view = this.targetBuffer.currentBuffer().slice().map(false, true)) {
                         view.data().put(buffer);
                         this.targetIndexCount = mesh.drawState().indexCount();
                     }
@@ -538,7 +535,7 @@ public abstract class BuildingToolRenderer implements IRenderBase {
 
         @Override
         protected void render(Minecraft mc, LocalPlayer player, ItemStack stack, double camX, double camY, double camZ) {
-            Vec3i camPos = mc.gameRenderer.getMainCamera().blockPosition();
+            Vec3i camPos = mc.gameRenderer.mainCamera().blockPosition();
             int dist = 300;
             if (this.pos != null && this.pos.closerThan(camPos, dist) || this.secondPos != null && this.secondPos.closerThan(camPos, dist)) {
                 super.render(mc, player, stack, camX, camY, camZ);

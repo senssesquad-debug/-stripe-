@@ -50,10 +50,7 @@ public class ClientUtil {
         int packedLight
     ) {
         if (component != null) {
-            Vec3 vec = Vec3.atCenterOf(pos);
-            nodeCollector.submitNameTag(
-                poseStack, new Vec3(0.5, 1.0, 0.5), 0, component, true, packedLight, cameraRenderState.pos.distanceToSqr(vec), cameraRenderState
-            );
+            nodeCollector.submitNameTag(poseStack, new Vec3(0.5, 1.0, 0.5), 0, component, true, packedLight, cameraRenderState);
         }
     }
 }

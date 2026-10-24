@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+    id 'net.neoforged.moddev' version '2.0.148'
+}
+
+version = '2.2.0'
+group = 'com.legacy'
+base.archivesName = "rediscovered-${minecraft_version}"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+neoForge {
+    version = neo_version
+}
+
+apply from: rootProject.file('gradle/patched-mod.gradle')
+configurePatchedMod(rootProject.file('libs/rediscovered-26.1.2-2.2.0.jar'))
+
+evaluationDependsOn(':structure-gel')
+
+dependencies {
+    // The ported Structure Gel jar (original classes + patched ones).
+    compileOnly files(rootProject.project(':structure-gel').tasks.named('jar'))
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-Xmaxerrs', '2000']
+}

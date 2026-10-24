@@ -68,10 +68,10 @@ public class RedDragonEggRenderer<T extends RedDragonEggBlockEntity, S extends R
             }
 
             poseStack.translate(-0.5, -0.5, -0.5);
-            submitNodeCollector.submitMovingBlock(poseStack, egg.movingBlockRenderState);
+            submitNodeCollector.submitMovingBlock(poseStack, egg.movingBlockRenderState, 0);
             if (Minecraft.getInstance().hitResult instanceof BlockHitResult blockHit
                 && blockHit.getBlockPos().equals(egg.blockPos)
-                && !Minecraft.getInstance().options.hideGui) {
+                && !Minecraft.getInstance().gui.hud.isHidden()) {
                 poseStack.pushPose();
                 RediscoveredRendering.renderHitOutline(
                     poseStack,

@@ -1,0 +1,79 @@
+// Shared build logic for the ported mods.
+//
+// 1. The original 26.1.2 mod jar (libs/) is run through the porter (porter/), which rewrites
+//    references to APIs that were moved or renamed in the target Minecraft version according to
+//    port-rules/common.rules and the mod's own port.rules.
+// 2. Classes that can't be fixed that way live in src/main/java (decompiled and adjusted by hand),
+//    together with the "shim" classes the porter redirects calls to. They are compiled against
+//    the ported jar and replace their counterparts, including all nested/anonymous classes.
+// 3. Resources in src/main/resources replace the original ones.
+// Every other class and resource is taken from the original jar unchanged.
+
+ext.configurePatchedMod = { File originalJar ->
+    def javaRoot = file('src/main/java')
+    def resourcesRoot = file('src/main/resources')
+    def ruleFiles = [rootProject.file('port-rules/common.rules'), file('port.rules')]
+    def portedJar = layout.buildDirectory.file('ported/' + originalJar.name)
+
+    def portJar = tasks.register('portJar', JavaExec) {
+        group = 'build'
+        description = 'Rewrites the original mod jar for the target Minecraft version.'
+        dependsOn ':porter:jar'
+        classpath = rootProject.project(':porter').sourceSets.main.runtimeClasspath
+        mainClass = 'porter.Porter'
+        def unusedReport = layout.buildDirectory.file('ported/unused-rules.txt')
+        inputs.file(originalJar)
+        inputs.files(ruleFiles)
+        outputs.file(portedJar)
+        outputs.file(unusedReport)
+        args = [originalJar.absolutePath, portedJar.get().asFile.absolutePath, ruleFiles*.absolutePath.join(','), unusedReport.get().asFile.absolutePath]
+    }
+
+    // Top-level classes that are replaced by recompiled sources.
+    def patchedClasses = provider {
+        def set = [] as Set
+        if (javaRoot.exists()) {
+            javaRoot.eachFileRecurse(groovy.io.FileType.FILES) { f ->
+                if (f.name.endsWith('.java'))
+                    set << javaRoot.toPath().relativize(f.toPath()).toString().replace(File.separatorChar, '/' as char).replaceAll(/\.java$/, '')
+            }
+        }
+        set
+    }
+    // Resources that are replaced by files in src/main/resources.
+    def patchedResources = provider {
+        def set = [] as Set
+        if (resourcesRoot.exists()) {
+            resourcesRoot.eachFileRecurse(groovy.io.FileType.FILES) { f ->
+                set << resourcesRoot.toPath().relativize(f.toPath()).toString().replace(File.separatorChar, '/' as char)
+            }
+        }
+        set
+    }
+
+    dependencies {
+        compileOnly files(portedJar) { builtBy portJar }
+    }
+
+    tasks.named('jar', Jar) {
+        dependsOn portJar
+        duplicatesStrategy = DuplicatesStrategy.FAIL
+        from(portedJar.map { zipTree(it) }) {
+            exclude 'META-INF/MANIFEST.MF'
+            exclude { FileTreeElement el ->
+                if (el.directory)
+                    return false
+                def path = el.relativePath.pathString
+                if (patchedResources.get().contains(path))
+                    return true
+                if (path.endsWith('.class')) {
+                    def name = path.substring(0, path.length() - 6)
+                    def dollar = name.indexOf('$')
+                    def top = dollar >= 0 ? name.substring(0, dollar) : name
+                    return patchedClasses.get().contains(top)
+                }
+                return false
+            }
+        }
+    }
+}

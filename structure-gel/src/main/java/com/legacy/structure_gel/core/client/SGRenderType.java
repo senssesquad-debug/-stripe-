@@ -11,8 +11,11 @@ public abstract class SGRenderType extends RenderTypes {
         StructureGelMod.locate("world_wireframe").toString(), RenderSetup.builder(SGRenderPipelines.WORLD_WIREFRAME).sortOnUpload().createRenderSetup()
     );
 
+    // RenderType no longer exposes its buffer size; 1536 is the RenderSetup default used for WORLD_WIREFRAME
+    private static final int WIREFRAME_BUFFER_SIZE = 1536;
+
     public static ByteBufferBuilder createWireframeBuffer() {
-        return new ByteBufferBuilder(WORLD_WIREFRAME.bufferSize());
+        return new ByteBufferBuilder(WIREFRAME_BUFFER_SIZE);
     }
 
     private SGRenderType() {

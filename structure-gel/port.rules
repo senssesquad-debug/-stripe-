@@ -1,0 +1,10 @@
+# Structure Gel specific redirects for Minecraft 26.2 (see porter/ for the rule syntax).
+shim com/legacy/structure_gel/port/Port26_2
+shim client com/legacy/structure_gel/port/Port26_2Client
+
+# StructureProcessorType is no longer a functional interface; the registry holds the MapCodecs directly.
+unwrap-lambda net/minecraft/world/level/levelgen/structure/templatesystem/StructureProcessorType codec ()Lcom/mojang/serialization/MapCodec;
+
+# Surface rules need a biome lookup now
+method net/minecraft/data/worldgen/SurfaceRuleData overworld ()Lnet/minecraft/world/level/levelgen/SurfaceRules$RuleSource; -> shim
+method net/minecraft/data/worldgen/SurfaceRuleData overworldLike (ZZZ)Lnet/minecraft/world/level/levelgen/SurfaceRules$RuleSource; -> shim

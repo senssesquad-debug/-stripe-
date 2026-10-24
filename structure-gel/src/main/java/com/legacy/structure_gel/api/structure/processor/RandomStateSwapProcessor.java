@@ -1,6 +1,5 @@
 package com.legacy.structure_gel.api.structure.processor;
 
-import com.legacy.structure_gel.core.registry.SGRegistry;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -11,10 +10,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 
-public class RandomStateSwapProcessor extends StructureProcessor {
+public class RandomStateSwapProcessor implements StructureProcessor {
     public static final MapCodec<RandomStateSwapProcessor> CODEC = RecordCodecBuilder.mapCodec(
         instance -> instance.group(
                 BlockState.CODEC.fieldOf("condition").forGetter(processor -> processor.condition),
@@ -48,7 +46,7 @@ public class RandomStateSwapProcessor extends StructureProcessor {
     @Nullable
     @Override
     public StructureBlockInfo processBlock(
-        LevelReader level, BlockPos pos, BlockPos pos2, StructureBlockInfo existing, StructureBlockInfo placed, StructurePlaceSettings settings
+        LevelReader level, BlockPos pos, BlockPos pos2, BlockPos templateRelativePos, StructureBlockInfo placed, StructurePlaceSettings settings
     ) {
         return !placed.state().equals(this.condition) || this.chance != 1.0F && !(settings.getRandom(placed.pos()).nextFloat() < this.chance)
             ? placed
@@ -56,7 +54,7 @@ public class RandomStateSwapProcessor extends StructureProcessor {
     }
 
     @Override
-    protected StructureProcessorType<?> getType() {
-        return SGRegistry.Processors.REPLACE_BLOCK.get();
+    public MapCodec<? extends StructureProcessor> codec() {
+        return CODEC;
     }
 }

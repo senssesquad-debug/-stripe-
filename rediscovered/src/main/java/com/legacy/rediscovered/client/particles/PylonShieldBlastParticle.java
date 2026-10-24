@@ -26,7 +26,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 
 public class PylonShieldBlastParticle extends Particle {
-    public static final ParticleRenderType PARTICLE_RENDER_TYPE = new ParticleRenderType(RediscoveredMod.find("pylon_shield_blast"));
+    public static final ParticleRenderType PARTICLE_RENDER_TYPE = new ParticleRenderType(RediscoveredMod.find("pylon_shield_blast"), RediscoveredMod.find("pylon_shield_blast"));
     private final ModelPart model = Minecraft.getInstance().getEntityModels().bakeLayer(RediscoveredRenderRefs.DRAGON_PYLON).getChild("cube");
     private final float initialRotation;
     final float startSize;

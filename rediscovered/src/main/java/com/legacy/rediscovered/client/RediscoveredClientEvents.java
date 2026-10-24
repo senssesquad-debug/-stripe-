@@ -55,7 +55,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.client.renderer.CubeMap;
-import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.AbstractHorseRenderer;
 import net.minecraft.client.renderer.entity.GiantMobRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -144,7 +144,7 @@ public class RediscoveredClientEvents {
         private static final CustomBlockOutlineRenderer NO_OUTLINE = new CustomBlockOutlineRenderer() {
             @Override
             public boolean render(
-                BlockOutlineRenderState renderState, BufferSource buffer, PoseStack poseStack, boolean translucentPass, LevelRenderState levelRenderState
+                BlockOutlineRenderState renderState, SubmitNodeCollector submitNodeCollector, PoseStack poseStack, LevelRenderState levelRenderState
             ) {
                 return true;
             }
@@ -211,7 +211,7 @@ public class RediscoveredClientEvents {
             Minecraft mc = mc();
             if (mc.player != null) {
                 int action = event.getAction();
-                if ((action == 1 || action == 2) && mc.screen == null && mc.options.keyAttack.getKey().getValue() == event.getButton()) {
+                if ((action == 1 || action == 2) && mc.gui.screen() == null && mc.options.keyAttack.getKey().getValue() == event.getButton()) {
                     Pair<InteractionHand, ItemStack> heldBow = QuiverData.getHeldBow(mc.player);
                     if (!heldBow.getSecond().isEmpty()
                         && !QuiverData.isHoldingAmmo(mc.player, heldBow.getSecond())
@@ -248,7 +248,7 @@ public class RediscoveredClientEvents {
         @SubscribeEvent
         public static void onClientPreTick(Pre event) {
             if (event.getLevel().isClientSide()) {
-                RediscoveredClientEvents.ACTIVE_DRAGON_FIGHTS.removeIf(uuid -> !mc().gui.getBossOverlay().events.keySet().contains(uuid));
+                RediscoveredClientEvents.ACTIVE_DRAGON_FIGHTS.removeIf(uuid -> !mc().gui.hud.getBossOverlay().events.keySet().contains(uuid));
                 if (RediscoveredClientEvents.ACTIVE_DRAGON_FIGHTS.isEmpty()) {
                     RediscoveredClientEvents.dragonThunderTime -= 0.02F;
                 } else {
@@ -413,9 +413,9 @@ public class RediscoveredClientEvents {
                     state.setRenderData(RediscoveredClientEvents.GIANT_SMASH_ANIM, gi.rediscovered$getSmashAnim());
                 }
             });
-            event.registerEntityModifier(TypeToken.of(LivingEntityRenderer.class), RediscoveredClientEvents.ModEvents::modifyScale);
+            event.registerEntityModifier((TypeToken) TypeToken.of(LivingEntityRenderer.class), RediscoveredClientEvents.ModEvents::modifyScale);
             if (RediscoveredClientEvents.isAprilFoolsDay()) {
-                event.registerEntityModifier(TypeToken.of(AbstractHorseRenderer.class), RediscoveredClientEvents.ModEvents::modifyHorseState);
+                event.registerEntityModifier((TypeToken) TypeToken.of(AbstractHorseRenderer.class), RediscoveredClientEvents.ModEvents::modifyHorseState);
                 event.registerEntityModifier(TypeToken.of(VillagerRenderer.class), (villager, state) -> state.villagerData = null);
             }
         }

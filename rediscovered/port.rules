@@ -1,0 +1,18 @@
+# Rediscovered specific redirects for Minecraft 26.2 (see porter/ for the rule syntax).
+shim com/legacy/rediscovered/port/Port26_2
+shim client com/legacy/rediscovered/port/Port26_2Client
+
+# LivingEntity.knockback gained a damage source; keep the "no knockback" overrides working.
+bridge com/legacy/rediscovered/entity/ScarecrowEntity knockback (DDD)V -> knockback (DDDLnet/minecraft/world/damagesource/DamageSource;FZ)V 0,1,2
+bridge com/legacy/rediscovered/entity/dragon/DragonPylonEntity knockback (DDD)V -> knockback (DDDLnet/minecraft/world/damagesource/DamageSource;FZ)V 0,1,2
+bridge com/legacy/rediscovered/entity/dragon/RedDragonBossEntity knockback (DDD)V -> knockback (DDDLnet/minecraft/world/damagesource/DamageSource;FZ)V 0,1,2
+
+# Entity ids are allocated by ServerLevel now; multipart dragons still reserve a block of ids for their parts.
+field com/legacy/rediscovered/entity/dragon/AbstractRedDragonEntity ENTITY_COUNTER Ljava/util/concurrent/atomic/AtomicInteger; -> net/minecraft/server/level/ServerLevel ENTITY_COUNTER Ljava/util/concurrent/atomic/AtomicInteger;
+
+# Vanilla removed the item "snapback" animation from container screens.
+method com/legacy/rediscovered/client/gui/GuardPigmanInventoryScreen extractSnapbackItem (Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V -> shim:client
+
+# PictureInPictureRenderState.pose() returns the read-only Matrix3x2fc now
+bridge com/legacy/rediscovered/client/gui/EntityPiPRenderState pose ()Lorg/joml/Matrix3x2f; -> pose ()Lorg/joml/Matrix3x2fc; -
+bridge com/legacy/rediscovered/client/gui/ItemPiPRenderState pose ()Lorg/joml/Matrix3x2f; -> pose ()Lorg/joml/Matrix3x2fc; -

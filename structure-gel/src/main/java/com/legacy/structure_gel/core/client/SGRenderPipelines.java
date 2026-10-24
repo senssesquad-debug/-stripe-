@@ -1,12 +1,12 @@
 package com.legacy.structure_gel.core.client;
 
 import com.legacy.structure_gel.core.StructureGelMod;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 
@@ -16,7 +16,8 @@ public class SGRenderPipelines {
         .withVertexShader(StructureGelMod.locate("core/world_wireframe"))
         .withFragmentShader(StructureGelMod.locate("core/world_wireframe"))
         .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
-        .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, Mode.QUADS)
+        .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
+        .withPrimitiveTopology(PrimitiveTopology.QUADS)
         .withDepthStencilState(DepthStencilState.DEFAULT)
         .withCull(true)
         .build();

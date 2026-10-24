@@ -1,5 +1,6 @@
 package com.legacy.rediscovered.client.render.world;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.legacy.rediscovered.RediscoveredConfig;
 import com.legacy.rediscovered.RediscoveredMod;
 import com.legacy.rediscovered.client.render.RediscoveredRenderPipelines;
@@ -8,7 +9,7 @@ import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.buffers.Std140Builder;
 import com.mojang.blaze3d.buffers.Std140SizeCalculator;
-import com.mojang.blaze3d.buffers.GpuBuffer.MappedView;
+import com.mojang.blaze3d.buffers.GpuBufferSlice.MappedView;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.NativeImage;
@@ -16,7 +17,6 @@ import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.systems.RenderSystem.AutoStorageIndexBuffer;
 import com.mojang.blaze3d.textures.GpuTextureView;
-import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalDouble;
-import java.util.OptionalInt;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
@@ -330,14 +330,14 @@ public class FluffyCloudRenderer implements AutoCloseable {
                 this.prevCloudStatus = cloudStatus;
                 this.cloudFaces.rotate();
 
-                try (MappedView view = RenderSystem.getDevice().createCommandEncoder().mapBuffer(this.cloudFaces.currentBuffer(), false, true)) {
+                try (MappedView view = this.cloudFaces.currentBuffer().map(false, true)) {
                     this.buildMesh(relativeCameraPos, view.data(), cellX, cellZ, fancyClouds, radiusCells, texture);
                     this.quadCount = view.data().position() / 6;
                 }
             }
 
             if (this.quadCount != 0) {
-                try (MappedView view = RenderSystem.getDevice().createCommandEncoder().mapBuffer(this.cloudInfo.currentBuffer(), false, true)) {
+                try (MappedView view = this.cloudInfo.currentBuffer().map(false, true)) {
                     Std140Builder.intoBuffer(view.data())
                         .putVec4(ARGB.vector4fFromARGB32(color))
                         .putVec3(-xInCell, relativeBottomY, -zInCell)
@@ -345,10 +345,10 @@ public class FluffyCloudRenderer implements AutoCloseable {
                 }
 
                 GpuBufferSlice dynamicTransforms = RenderSystem.getDynamicUniforms()
-                    .writeTransform(RenderSystem.getModelViewMatrix(), new Vector4f(1.0F, 1.0F, 1.0F, alphaMod), new Vector3f(), new Matrix4f());
-                AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(Mode.QUADS);
+                    .writeTransform(RenderSystem.getModelViewMatrixCopy(), new Vector4f(1.0F, 1.0F, 1.0F, alphaMod), new Vector3f(), new Matrix4f());
+                AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(PrimitiveTopology.QUADS);
                 GpuBuffer indexBuffer = indices.getBuffer(6 * this.quadCount);
-                RenderTarget mainRenderTarget = Minecraft.getInstance().getMainRenderTarget();
+                RenderTarget mainRenderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
                 GpuTextureView colorTexture = mainRenderTarget.getColorTextureView();
                 GpuTextureView depthTexture = mainRenderTarget.getDepthTextureView();
                 RenderPipeline renderPipeline = fancyClouds ? RediscoveredRenderPipelines.FLUFFY_CLOUDS : RediscoveredRenderPipelines.FLAT_FLUFFY_CLOUDS;
@@ -357,7 +357,7 @@ public class FluffyCloudRenderer implements AutoCloseable {
 
                 try (RenderPass renderPass = RenderSystem.getDevice()
                         .createCommandEncoder()
-                        .createRenderPass(() -> "Fluffy Clouds", colorTexture, OptionalInt.empty(), depthTexture, OptionalDouble.empty())) {
+                        .createRenderPass(() -> "Fluffy Clouds", colorTexture, Optional.empty(), depthTexture, OptionalDouble.empty())) {
                     renderPass.setPipeline(renderPipeline);
                     RenderSystem.bindDefaultUniforms(renderPass);
                     renderPass.setUniform("DynamicTransforms", dynamicTransforms);
@@ -365,7 +365,7 @@ public class FluffyCloudRenderer implements AutoCloseable {
                     renderPass.setUniform("CloudInfo", this.cloudInfo.currentBuffer());
                     renderPass.setUniform("CloudFaces", this.cloudFaces.currentBuffer());
                     renderPass.bindTexture("Sampler0", fluffTexture.getTextureView(), fluffTexture.getSampler());
-                    renderPass.drawIndexed(0, 0, 6 * this.quadCount, 1);
+                    renderPass.drawIndexed(6 * this.quadCount, 1, 0, 0, 0);
                 }
             }
 

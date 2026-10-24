@@ -1,6 +1,5 @@
 package com.legacy.structure_gel.api.structure.processor;
 
-import com.legacy.structure_gel.core.registry.SGRegistry;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
@@ -8,11 +7,10 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate.StructureBlockInfo;
 import org.jspecify.annotations.Nullable;
 
-public class RetainExistingProcessor extends StructureProcessor {
+public class RetainExistingProcessor implements StructureProcessor {
     public static final RetainExistingProcessor INSTANCE = new RetainExistingProcessor();
     public static final MapCodec<RetainExistingProcessor> CODEC = MapCodec.unit(() -> INSTANCE);
 
@@ -21,7 +19,7 @@ public class RetainExistingProcessor extends StructureProcessor {
         LevelReader level,
         BlockPos targetPosition,
         BlockPos referencePos,
-        StructureBlockInfo originalBlockInfo,
+        BlockPos templateRelativePos,
         StructureBlockInfo processedBlockInfo,
         StructurePlaceSettings settings
     ) {
@@ -30,7 +28,7 @@ public class RetainExistingProcessor extends StructureProcessor {
     }
 
     @Override
-    protected StructureProcessorType<?> getType() {
-        return SGRegistry.Processors.RETAIN_EXISTING.get();
+    public MapCodec<? extends StructureProcessor> codec() {
+        return CODEC;
     }
 }

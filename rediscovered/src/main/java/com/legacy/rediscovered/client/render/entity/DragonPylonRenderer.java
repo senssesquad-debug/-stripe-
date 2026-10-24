@@ -166,7 +166,7 @@ public class DragonPylonRenderer<T extends DragonPylonEntity, S extends DragonPy
             poseStack.mulPose(Axis.XP.rotationDegrees(rotation * 0.4F));
             poseStack.mulPose(Axis.ZP.rotationDegrees(rotation * -0.1F));
             submitNodeCollector.order(1 + i)
-                .submitModelPart(cube, poseStack, type, lightCoords, OverlayTexture.NO_OVERLAY, sprite, false, false, ARGB.white(alpha), null, 0);
+                .submitModelPart(cube, poseStack, type, lightCoords, OverlayTexture.NO_OVERLAY, sprite, ARGB.white(alpha), null, 0);
             scale *= scaleMul;
         }
 

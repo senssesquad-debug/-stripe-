@@ -33,8 +33,8 @@ public interface RediscoveredSurfaceRules {
         }
 
         @Override
-        public KeyDispatchDataCodec<? extends ConditionSource> codec() {
-            return CODEC;
+        public MapCodec<? extends ConditionSource> codec() {
+            return CODEC.codec();
         }
 
         class RandomCondition implements Condition {

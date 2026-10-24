@@ -85,7 +85,7 @@ public class DragonArmorModel implements ItemModel {
                         String suffix = material.value().assets().base().suffix();
                         this.itemsWithTrims
                             .get(decor)
-                            .computeIfAbsent(suffix, s -> this.createTrimLayer(layer.baseTrimTexture, s))
+                            .computeIfAbsent(suffix, (java.util.function.Function<String, ItemModel>) s -> this.createTrimLayer(layer.baseTrimTexture, s))
                             .update(state, stack, resolver, context, level, owner, seed);
                     },
                     () -> this.itemsWithoutTrim

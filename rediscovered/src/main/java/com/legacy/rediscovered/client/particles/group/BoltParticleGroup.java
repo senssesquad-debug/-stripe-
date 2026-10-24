@@ -18,7 +18,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 
 public class BoltParticleGroup<P extends Particle & IBoltParticle> extends ParticleGroup<P> {
-    public static final ParticleRenderType PARTICLE_RENDER_TYPE = new ParticleRenderType(RediscoveredMod.find("lightning_bolt"));
+    public static final ParticleRenderType PARTICLE_RENDER_TYPE = new ParticleRenderType(RediscoveredMod.find("lightning_bolt"), RediscoveredMod.find("lightning_bolt"));
 
     public BoltParticleGroup(ParticleEngine engine) {
         super(engine);
