@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Happy Panda — Chinese Restaurant · Daugavpils</title>
+  <meta name="description" content="Happy Panda — authentic Chinese cuisine in Daugavpils. Menu, delivery, takeaway and table reservations.">
+  <meta name="theme-color" content="#8A1018">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23B5121B'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' fill='%23D5A63C'%3E%E7%86%8A%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Ma+Shan+Zheng&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- ===== Preloader ===== -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__seal">
+      <span class="hanzi">熊猫</span>
+    </div>
+    <div class="loader__bar"><span id="loaderBar"></span></div>
+  </div>
+
+  <!-- ===== Header ===== -->
+  <header class="header" id="header">
+    <a href="#top" class="logo" aria-label="Happy Panda — home">
+      <svg class="logo__mark" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="30" fill="var(--red)" stroke="var(--gold)" stroke-width="2"/>
+        <circle cx="16" cy="16" r="7" fill="var(--wood)"/>
+        <circle cx="48" cy="16" r="7" fill="var(--wood)"/>
+        <ellipse cx="32" cy="35" rx="18" ry="16" fill="var(--ivory)"/>
+        <ellipse cx="25" cy="33" rx="5" ry="6.5" fill="var(--wood)" transform="rotate(-20 25 33)"/>
+        <ellipse cx="39" cy="33" rx="5" ry="6.5" fill="var(--wood)" transform="rotate(20 39 33)"/>
+        <circle cx="25.5" cy="32.5" r="1.6" fill="var(--ivory)"/>
+        <circle cx="38.5" cy="32.5" r="1.6" fill="var(--ivory)"/>
+        <ellipse cx="32" cy="41" rx="3" ry="2" fill="var(--wood)"/>
+        <path d="M28 45 q4 3 8 0" stroke="var(--wood)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="logo__text">Happy Panda<small>快乐熊猫</small></span>
+    </a>
+
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="#menu" data-i18n="nav.menu">Menu</a>
+      <a href="#about" data-i18n="nav.about">About</a>
+      <a href="#delivery" data-i18n="nav.delivery">Delivery</a>
+      <a href="#reserve" data-i18n="nav.reserve">Reservations</a>
+      <a href="#contacts" data-i18n="nav.contacts">Contacts</a>
+    </nav>
+
+    <div class="header__actions">
+      <div class="lang" role="group" aria-label="Language">
+        <button data-lang="lv">LV</button>
+        <button data-lang="en" class="is-active">EN</button>
+        <button data-lang="ru">RU</button>
+      </div>
+      <button class="cart-btn" id="cartOpen" aria-label="Open cart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7Z"/><path d="M9 7V5.5a3 3 0 0 1 6 0V7"/></svg>
+        <span class="cart-btn__count" id="cartCount">0</span>
+      </button>
+      <button class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- ===== Hero ===== -->
+    <section class="hero" id="hero">
+      <div class="hero__bg"></div>
+      <div class="hero__clouds" aria-hidden="true"></div>
+
+      <div class="lanterns" aria-hidden="true">
+        <div class="lantern" data-depth="0.6" style="--x:4%;--y:12%;--s:.9"></div>
+        <div class="lantern" data-depth="1.2" style="--x:90%;--y:9%;--s:1.1"></div>
+        <div class="lantern" data-depth="0.35" style="--x:58%;--y:8%;--s:.6"></div>
+        <div class="lantern" data-depth="0.9" style="--x:40%;--y:70%;--s:.7"></div>
+      </div>
+
+      <div class="hero__vertical hanzi" aria-hidden="true">快乐熊猫</div>
+
+      <div class="hero__inner">
+        <div class="hero__copy">
+          <p class="eyebrow"><span class="eyebrow__line"></span><span data-i18n="hero.eyebrow">Authentic Chinese cuisine · Daugavpils</span></p>
+          <h1 class="hero__title">
+            <span class="split">Happy</span>
+            <span class="split split--gold">Panda</span>
+          </h1>
+          <p class="hero__lead" data-i18n="hero.lead">Hand-folded dumplings, fiery woks and family recipes — served warm under red lanterns.</p>
+          <div class="hero__cta">
+            <a href="#menu" class="btn btn--red" data-i18n="hero.order">Order online</a>
+            <a href="#reserve" class="btn btn--ghost" data-i18n="hero.book">Book a table</a>
+          </div>
+          <ul class="hero__facts">
+            <li><strong>10:00–22:00</strong><span data-i18n="hero.daily">every day</span></li>
+            <li><strong>45 min</strong><span data-i18n="hero.deliveryTime">average delivery</span></li>
+            <li><strong>40+</strong><span data-i18n="hero.dishes">dishes on the menu</span></li>
+          </ul>
+        </div>
+
+        <div class="hero__stage" id="heroStage">
+          <div class="plate3d" id="plate3d">
+            <div class="plate3d__ring"></div>
+            <div class="plate3d__ring plate3d__ring--2"></div>
+            <div class="plate3d__dish">
+              <img src="https://images.unsplash.com/photo-1563245372-f21724e3856d?w=900&h=900&fit=crop&q=80" alt="Steamed bao buns in a bamboo steamer" width="900" height="900">
+            </div>
+            <div class="plate3d__shadow"></div>
+          </div>
+          <div class="hero__badge">
+            <span class="hanzi">福</span>
+            <span data-i18n="hero.badge">Chef's signature</span>
+          </div>
+        </div>
+      </div>
+
+      <a href="#journey" class="scroll-cue" aria-label="Scroll down"><span data-i18n="hero.scroll">Scroll</span><i></i></a>
+    </section>
+
+    <!-- ===== Marquee ===== -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee__track">
+        <span>Dumplings</span><b>✦</b><span class="hanzi">饺子</span><b>✦</b><span>Wok fire</span><b>✦</b><span class="hanzi">锅气</span><b>✦</b><span>Peking duck</span><b>✦</b><span class="hanzi">北京烤鸭</span><b>✦</b><span>Dim sum</span><b>✦</b><span class="hanzi">点心</span><b>✦</b>
+        <span>Dumplings</span><b>✦</b><span class="hanzi">饺子</span><b>✦</b><span>Wok fire</span><b>✦</b><span class="hanzi">锅气</span><b>✦</b><span>Peking duck</span><b>✦</b><span class="hanzi">北京烤鸭</span><b>✦</b><span>Dim sum</span><b>✦</b><span class="hanzi">点心</span><b>✦</b>
+      </div>
+    </div>
+
+    <!-- ===== 3D Journey (pinned depth tunnel) ===== -->
+    <section class="journey" id="journey">
+      <div class="journey__viewport">
+        <div class="journey__intro">
+          <p class="eyebrow eyebrow--gold"><span class="eyebrow__line"></span><span data-i18n="journey.eyebrow">From wok to table</span></p>
+          <h2 class="section-title" data-i18n="journey.title">A journey through flavour</h2>
+        </div>
+        <div class="journey__world" id="journeyWorld">
+          <article class="jcard" data-z="0">
+            <div class="jcard__img"><img src="https://images.unsplash.com/photo-1525755662778-989d0524087e?w=900&q=75" alt="" loading="lazy"></div>
+            <div class="jcard__text">
+              <span class="jcard__num hanzi">火</span>
+              <h3 data-i18n="journey.c1t">The breath of the wok</h3>
+              <p data-i18n="journey.c1p">Searing heat and seconds of precision give every dish its smoky <em>wok hei</em>.</p>
+            </div>
+          </article>
+          <article class="jcard jcard--right" data-z="1">
+            <div class="jcard__img"><img src="https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=900&q=75" alt="" loading="lazy"></div>
+            <div class="jcard__text">
+              <span class="jcard__num hanzi">手</span>
+              <h3 data-i18n="journey.c2t">Folded by hand</h3>
+              <p data-i18n="journey.c2p">Our dumplings are rolled, filled and pleated every morning — never frozen, never rushed.</p>
+            </div>
+          </article>
+          <article class="jcard" data-z="2">
+            <div class="jcard__img"><img src="https://images.unsplash.com/photo-1585032226651-759b368d7246?w=900&q=75" alt="" loading="lazy"></div>
+            <div class="jcard__text">
+              <span class="jcard__num hanzi">味</span>
+              <h3 data-i18n="journey.c3t">Sauces of the provinces</h3>
+              <p data-i18n="journey.c3p">Sichuan pepper, black bean, sweet-and-sour — recipes carried across generations.</p>
+            </div>
+          </article>
+          <article class="jcard jcard--right" data-z="3">
+            <div class="jcard__img"><img src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=900&q=75" alt="" loading="lazy"></div>
+            <div class="jcard__text">
+              <span class="jcard__num hanzi">家</span>
+              <h3 data-i18n="journey.c4t">One big table</h3>
+              <p data-i18n="journey.c4p">Chinese food is meant to be shared. Order a few dishes, spin the table, and enjoy together.</p>
+            </div>
+          </article>
+        </div>
+        <div class="journey__progress"><span id="journeyBar"></span></div>
+      </div>
+    </section>
+
+    <!-- ===== Signature 3D ring ===== -->
+    <section class="signature" id="signature">
+      <div class="signature__pin">
+        <div class="signature__head">
+          <p class="eyebrow eyebrow--gold"><span class="eyebrow__line"></span><span data-i18n="sig.eyebrow">Chef's selection</span></p>
+          <h2 class="section-title" data-i18n="sig.title">Signature dishes</h2>
+        </div>
+        <div class="ring-stage">
+          <div class="ring" id="ring"></div>
+        </div>
+        <div class="signature__caption" id="sigCaption" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <!-- ===== Menu ===== -->
+    <section class="menu" id="menu">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow"><span class="eyebrow__line"></span><span data-i18n="menu.eyebrow">Order for delivery or takeaway</span></p>
+          <h2 class="section-title" data-i18n="menu.title">Our menu</h2>
+          <span class="section-head__hanzi hanzi" aria-hidden="true">菜单</span>
+        </div>
+        <div class="tabs" id="tabs" role="tablist"></div>
+        <div class="dishes" id="dishes"></div>
+      </div>
+    </section>
+
+    <!-- ===== About ===== -->
+    <section class="about" id="about">
+      <svg class="dragon" id="dragon" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <path d="M-40 420 C 120 300, 220 520, 380 400 S 600 180, 760 300 S 980 520, 1120 340 S 1240 160, 1260 200" />
+        <path class="dragon__fin" d="M-40 440 C 120 320, 220 540, 380 420 S 600 200, 760 320 S 980 540, 1120 360" />
+        <g class="dragon__head" transform="translate(1110 330)">
+          <path d="M0 0 q40 -50 90 -30 q-20 10 -10 22 q30 4 40 30 q-40 -6 -60 10 q-30 20 -60 -32z"/>
+          <circle cx="58" cy="-16" r="5"/>
+          <path d="M70 -40 q30 -40 70 -40 M60 -36 q10 -50 50 -70"/>
+        </g>
+      </svg>
+      <div class="container about__grid">
+        <div class="about__media">
+          <div class="about__frame tilt">
+            <img src="https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=1000&q=75" alt="Table of dumplings and small plates" loading="lazy">
+          </div>
+          <div class="about__stamp hanzi">正宗</div>
+        </div>
+        <div class="about__copy">
+          <p class="eyebrow eyebrow--gold"><span class="eyebrow__line"></span><span data-i18n="about.eyebrow">Our story</span></p>
+          <h2 class="section-title" data-i18n="about.title">A little piece of China in Daugavpils</h2>
+          <p data-i18n="about.p1">Happy Panda brings the warmth of a family-run Chinese kitchen to the heart of the city. Our chefs cook the dishes they grew up with — balanced, generous and honest.</p>
+          <p data-i18n="about.p2">Visit us on the second floor of the Solo shopping centre, or let us bring the feast to your door.</p>
+          <ul class="about__stats">
+            <li><strong class="count" data-to="40">0</strong><span data-i18n="about.s1">dishes</span></li>
+            <li><strong class="count" data-to="12">0</strong><span data-i18n="about.s2">hours open daily</span></li>
+            <li><strong class="count" data-to="100">0</strong><span>%</span><span data-i18n="about.s3">fresh daily</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Delivery ===== -->
+    <section class="delivery" id="delivery">
+      <div class="container">
+        <div class="section-head section-head--center">
+          <p class="eyebrow"><span class="eyebrow__line"></span><span data-i18n="del.eyebrow">Delivery &amp; takeaway</span><span class="eyebrow__line"></span></p>
+          <h2 class="section-title" data-i18n="del.title">Hot to your door</h2>
+        </div>
+        <div class="steps">
+          <article class="step tilt">
+            <span class="step__num hanzi">一</span>
+            <h3 data-i18n="del.s1t">Choose</h3>
+            <p data-i18n="del.s1p">Pick your favourite dishes from the menu and add them to your cart.</p>
+          </article>
+          <article class="step tilt">
+            <span class="step__num hanzi">二</span>
+            <h3 data-i18n="del.s2t">Order</h3>
+            <p data-i18n="del.s2p">Choose delivery or pickup, leave your address and phone number.</p>
+          </article>
+          <article class="step tilt">
+            <span class="step__num hanzi">三</span>
+            <h3 data-i18n="del.s3t">Enjoy</h3>
+            <p data-i18n="del.s3p">We cook to order and deliver across Daugavpils — usually within 45 minutes.</p>
+          </article>
+        </div>
+        <ul class="del-info">
+          <li><span data-i18n="del.min">Minimum order</span><strong>€15</strong></li>
+          <li><span data-i18n="del.fee">Delivery fee</span><strong>€2.50</strong></li>
+          <li><span data-i18n="del.free">Free delivery from</span><strong>€35</strong></li>
+          <li><span data-i18n="del.pickup">Takeaway discount</span><strong>−10%</strong></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ===== Reservation ===== -->
+    <section class="reserve" id="reserve">
+      <div class="container reserve__grid">
+        <div class="reserve__copy">
+          <p class="eyebrow eyebrow--gold"><span class="eyebrow__line"></span><span data-i18n="res.eyebrow">Reservations</span></p>
+          <h2 class="section-title" data-i18n="res.title">Save your seat at the table</h2>
+          <p data-i18n="res.lead">Birthdays, business lunches or a quiet dinner for two — book a table and we will have it ready, tea already warm.</p>
+          <a class="reserve__phone" href="tel:+37128822888">+371 28822888</a>
+        </div>
+        <form class="form card" id="reserveForm" novalidate>
+          <div class="form__row">
+            <label><span data-i18n="form.name">Name</span><input name="name" required autocomplete="name"></label>
+            <label><span data-i18n="form.phone">Phone</span><input name="phone" type="tel" required autocomplete="tel" placeholder="+371"></label>
+          </div>
+          <div class="form__row form__row--3">
+            <label><span data-i18n="form.date">Date</span><input name="date" type="date" required></label>
+            <label><span data-i18n="form.time">Time</span>
+              <select name="time" required id="timeSelect"></select>
+            </label>
+            <label><span data-i18n="form.guests">Guests</span>
+              <select name="guests">
+                <option>1</option><option selected>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option value="9+">9+</option>
+              </select>
+            </label>
+          </div>
+          <label><span data-i18n="form.comment">Comment</span><textarea name="comment" rows="3"></textarea></label>
+          <button class="btn btn--red btn--block" type="submit" data-i18n="res.submit">Book a table</button>
+          <p class="form__note" data-i18n="res.note">We will call you back to confirm your reservation.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===== Contacts ===== -->
+    <section class="contacts" id="contacts">
+      <div class="container contacts__grid">
+        <div class="contacts__info">
+          <p class="eyebrow eyebrow--gold"><span class="eyebrow__line"></span><span data-i18n="con.eyebrow">Find us</span></p>
+          <h2 class="section-title" data-i18n="con.title">Contacts</h2>
+          <dl>
+            <div><dt data-i18n="con.address">Address</dt><dd data-i18n="con.addressVal">Rīgas iela 9, “Solo” shopping centre, 2nd floor, Daugavpils</dd></div>
+            <div><dt data-i18n="con.hours">Opening hours</dt><dd data-i18n="con.hoursVal">Every day 10:00 – 22:00</dd></div>
+            <div><dt data-i18n="con.phone">Phone</dt><dd><a href="tel:+37128822888">+371 28822888</a></dd></div>
+            <div><dt>E-mail</dt><dd><a href="mailto:info@happypanda.lv">info@happypanda.lv</a></dd></div>
+          </dl>
+          <div class="socials">
+            <a href="https://www.facebook.com/" aria-label="Facebook" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v2H7v4h3v6h4v-6h3l1-4h-4V8Z"/></svg></a>
+            <a href="https://www.instagram.com/" aria-label="Instagram" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.5"/><circle cx="17" cy="7" r=".8"/></svg></a>
+          </div>
+        </div>
+        <div class="contacts__map card">
+          <iframe title="Map — Happy Panda" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=R%C4%ABgas+iela+9,+Daugavpils&z=16&output=embed"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__grid">
+      <div>
+        <div class="footer__logo">Happy Panda <span class="hanzi">快乐熊猫</span></div>
+        <p data-i18n="foot.tag">Authentic Chinese cuisine since day one.</p>
+      </div>
+      <nav aria-label="Footer">
+        <a href="#menu" data-i18n="nav.menu">Menu</a>
+        <a href="#delivery" data-i18n="nav.delivery">Delivery</a>
+        <a href="#reserve" data-i18n="nav.reserve">Reservations</a>
+        <a href="#contacts" data-i18n="nav.contacts">Contacts</a>
+      </nav>
+      <p class="footer__copy">© <span id="year"></span> Happy Panda. <span data-i18n="foot.rights">All rights reserved.</span></p>
+    </div>
+  </footer>
+
+  <!-- ===== Cart drawer ===== -->
+  <div class="overlay" id="overlay"></div>
+  <aside class="drawer" id="drawer" aria-label="Cart" aria-hidden="true">
+    <div class="drawer__head">
+      <h3 data-i18n="cart.title">Your order</h3>
+      <button class="icon-btn" id="cartClose" aria-label="Close">×</button>
+    </div>
+    <div class="drawer__body" id="cartItems"></div>
+    <div class="drawer__foot">
+      <div class="seg" role="radiogroup" id="orderType">
+        <button type="button" data-type="delivery" class="is-active" data-i18n="cart.delivery">Delivery</button>
+        <button type="button" data-type="pickup" data-i18n="cart.pickup">Pickup</button>
+      </div>
+      <div class="totals" id="totals"></div>
+      <form class="form" id="checkoutForm" novalidate>
+        <label><span data-i18n="form.name">Name</span><input name="name" required autocomplete="name"></label>
+        <label><span data-i18n="form.phone">Phone</span><input name="phone" type="tel" required autocomplete="tel" placeholder="+371"></label>
+        <label class="addr"><span data-i18n="form.address">Address</span><input name="address" autocomplete="street-address"></label>
+        <button class="btn btn--red btn--block" type="submit" id="checkoutBtn" data-i18n="cart.checkout">Place order</button>
+      </form>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>
