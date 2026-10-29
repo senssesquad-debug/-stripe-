@@ -15,13 +15,20 @@
     set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage unavailable */ } }
   };
 
-  const DELIVERY_FEE = 2.5, FREE_FROM = 35, MIN_ORDER = 15, PICKUP_DISCOUNT = 0.1;
 
   /* ---------------- i18n ---------------- */
   const browserLang = (navigator.language || "en").slice(0, 2);
   let lang = store.get("hp-lang", ["lv", "ru", "en"].includes(browserLang) ? browserLang : "en");
   const t = key => (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
   const money = n => "€" + n.toFixed(2);
+
+  /* Dishes with portions carry `prices: {small, large}`; others a single `price` */
+  const portionsOf = d => (d.prices ? Object.keys(d.prices) : []);
+  const priceOf = (d, portion) => (d.prices ? d.prices[portion] ?? Object.values(d.prices)[0] : d.price);
+  const priceLabel = d => (d.prices ? Object.values(d.prices).map(money).join(" / ") : money(d.price));
+  const chosenPortion = {};
+  const portionFor = d => chosenPortion[d.id] || portionsOf(d)[0];
+  const catHanzi = d => (CATS.find(c => c.id === d.cat) || {}).hanzi || "菜";
 
   function applyLang() {
     document.documentElement.lang = lang;
@@ -37,8 +44,8 @@
   /* ---------------- Menu ---------------- */
   let activeCat = CATS[0].id;
   const dishMedia = d => d.img
-    ? `<img src="${d.img}" alt="${d.name.en}" loading="lazy" width="700" height="525">`
-    : `<div class="dish__placeholder"><span class="hanzi">${d.hanzi}</span></div>`;
+    ? `<img src="${d.img}" alt="${d.name[lang]}" loading="lazy" width="720" height="480">`
+    : `<div class="dish__placeholder"><span class="hanzi">${catHanzi(d)}</span></div>`;
 
   function renderTabs() {
     $("#tabs").innerHTML = CATS.map(c => `
@@ -53,17 +60,18 @@
       <article class="dish" data-id="${d.id}">
         <div class="dish__media">
           ${dishMedia(d)}
-          <div class="dish__tags">
-            ${d.spicy ? `<span class="tag">🌶 ${t("menu.spicy")}</span>` : ""}
-            ${d.veg ? `<span class="tag tag--veg">${t("menu.veg")}</span>` : ""}
-          </div>
+          <div class="dish__tags">${d.spicy ? `<span class="tag">🌶 ${t("menu.spicy")}</span>` : ""}</div>
+          ${d.num ? `<span class="dish__num">${d.num}</span>` : ""}
         </div>
         <div class="dish__body">
-          <span class="dish__hanzi">${d.hanzi}</span>
           <h3 class="dish__name">${d.name[lang]}</h3>
-          <p class="dish__desc">${d.desc[lang]}</p>
+          <p class="dish__desc">${d.desc[lang] || ""}</p>
+          ${portionsOf(d).length > 1 ? `
+          <div class="portion" role="radiogroup" aria-label="${t("menu.portion")}">
+            ${portionsOf(d).map(p => `<button type="button" data-portion="${p}" data-dish="${d.id}" class="${p === portionFor(d) ? "is-active" : ""}">${t("menu." + p)}</button>`).join("")}
+          </div>` : ""}
           <div class="dish__foot">
-            <span class="price">${money(d.price)}</span>
+            <span class="price">${money(priceOf(d, portionFor(d)))}</span>
             <button class="add-btn" data-add="${d.id}">+ ${t("menu.add")}</button>
           </div>
         </div>
@@ -85,15 +93,15 @@
   let orderType = store.get("hp-type", "delivery");
   const byId = id => DISHES.find(d => d.id === id);
 
+  // Cart keys are "<dish id>" or "<dish id>:<portion>"
   function cartLines() {
-    return Object.entries(cart).filter(([id, q]) => q > 0 && byId(id)).map(([id, q]) => ({ d: byId(id), q }));
+    return Object.entries(cart).map(([key, q]) => {
+      const [id, portion] = key.split(":");
+      const d = byId(id);
+      return d && q > 0 ? { key, d, portion, q, price: priceOf(d, portion) } : null;
+    }).filter(Boolean);
   }
-  function totals() {
-    const subtotal = cartLines().reduce((s, l) => s + l.d.price * l.q, 0);
-    const fee = orderType === "delivery" && subtotal > 0 && subtotal < FREE_FROM ? DELIVERY_FEE : 0;
-    const discount = orderType === "pickup" ? subtotal * PICKUP_DISCOUNT : 0;
-    return { subtotal, fee, discount, total: subtotal + fee - discount };
-  }
+  const totals = () => ({ total: cartLines().reduce((s, l) => s + l.price * l.q, 0) });
 
   function renderCart() {
     const lines = cartLines();
@@ -101,24 +109,20 @@
     const badge = $("#cartCount");
     badge.textContent = count; badge.classList.toggle("is-visible", count > 0);
 
-    $("#cartItems").innerHTML = lines.length ? lines.map(({ d, q }) => `
+    $("#cartItems").innerHTML = lines.length ? lines.map(({ key, d, portion, q, price }) => `
       <div class="citem">
-        <div class="citem__thumb">${d.img ? `<img src="${d.img.replace("w=700&h=700", "w=120&h=120")}" alt="">` : d.hanzi}</div>
-        <div><div class="citem__name">${d.name[lang]}</div><div class="citem__price">${money(d.price)} × ${q}</div></div>
-        <div class="qty"><button data-dec="${d.id}" aria-label="−">−</button><span>${q}</span><button data-inc="${d.id}" aria-label="+">+</button></div>
+        <div class="citem__thumb">${d.img ? `<img src="${d.img}" alt="">` : catHanzi(d)}</div>
+        <div><div class="citem__name">${d.num ? d.num + " · " : ""}${d.name[lang]}</div>
+          <div class="citem__price">${portion && portionsOf(d).length > 1 ? t("menu." + portion) + " " + t("menu.portion") + " · " : ""}${money(price)} × ${q}</div></div>
+        <div class="qty"><button data-dec="${key}" aria-label="−">−</button><span>${q}</span><button data-inc="${key}" aria-label="+">+</button></div>
       </div>`).join("")
       : `<div class="drawer__empty"><span class="hanzi">空</span>${t("cart.empty")}</div>`;
 
-    const tt = totals();
-    const belowMin = orderType === "delivery" && tt.subtotal > 0 && tt.subtotal < MIN_ORDER;
     $("#totals").innerHTML = `
-      <div><span>${t("cart.subtotal")}</span><span>${money(tt.subtotal)}</span></div>
-      ${orderType === "delivery" ? `<div><span>${t("cart.fee")}</span><span>${tt.fee ? money(tt.fee) : t("cart.free")}</span></div>` : ""}
-      ${tt.discount ? `<div><span>${t("cart.discount")}</span><span>−${money(tt.discount)}</span></div>` : ""}
-      <div class="total"><span>${t("cart.total")}</span><span>${money(tt.total)}</span></div>
-      ${belowMin ? `<div class="warn">${t("cart.min")}</div>` : ""}`;
+      <div class="total"><span>${t("cart.total")}</span><span>${money(totals().total)}</span></div>
+      ${orderType === "delivery" ? `<div class="note">${t("cart.feeNote")}</div>` : ""}`;
 
-    $("#checkoutBtn").disabled = !lines.length || belowMin;
+    $("#checkoutBtn").disabled = !lines.length;
     $("#checkoutBtn").style.opacity = $("#checkoutBtn").disabled ? .5 : 1;
     $$("#orderType button").forEach(b => b.classList.toggle("is-active", b.dataset.type === orderType));
     $("#drawer").classList.toggle("is-pickup", orderType === "pickup");
@@ -126,9 +130,10 @@
   }
 
   function addToCart(id, sourceEl) {
-    cart[id] = (cart[id] || 0) + 1;
-    renderCart();
     const d = byId(id);
+    const key = d.prices ? `${id}:${portionFor(d)}` : id;
+    cart[key] = (cart[key] || 0) + 1;
+    renderCart();
     toast(`${d.name[lang]} — ${t("cart.added")}`);
     flyToCart(d, sourceEl);
   }
@@ -150,6 +155,15 @@
   }
 
   document.addEventListener("click", e => {
+    const portionBtn = e.target.closest("[data-portion]");
+    if (portionBtn) {
+      const d = byId(portionBtn.dataset.dish);
+      chosenPortion[d.id] = portionBtn.dataset.portion;
+      const card = portionBtn.closest(".dish");
+      $$("[data-portion]", card).forEach(b => b.classList.toggle("is-active", b === portionBtn));
+      $(".price", card).textContent = money(priceOf(d, chosenPortion[d.id]));
+      return;
+    }
     const add = e.target.closest("[data-add]");
     if (add) { addToCart(add.dataset.add, add.closest(".dish, .signature__caption") || add); return; }
     const inc = e.target.closest("[data-inc]");
@@ -195,7 +209,7 @@
     if (!validate(form, extra)) return;
     const order = {
       type: orderType,
-      items: cartLines().map(l => ({ id: l.d.id, name: l.d.name.en, qty: l.q, price: l.d.price })),
+      items: cartLines().map(l => ({ num: l.d.num, name: l.d.name.lv, portion: l.portion || null, qty: l.q, price: l.price })),
       ...totals(),
       customer: Object.fromEntries(new FormData(form))
     };
@@ -260,7 +274,7 @@
   }
 
   /* ---------------- Signature ring ---------------- */
-  const SIG = DISHES.filter(d => d.signature && d.img).concat(DISHES.filter(d => d.img && !d.signature)).slice(0, 8);
+  const SIG = ["801", "918", "919", "408", "701", "504", "1208", "907"].map(byId).filter(Boolean);
   let ringIndex = 0;
 
   function renderRing() {
@@ -269,7 +283,7 @@
     ring.innerHTML = SIG.map((d, i) => `
       <div class="ring__item" data-i="${i}" style="transform: rotateY(${i * step}deg) translateZ(var(--r))">
         <img src="${d.img}" alt="${d.name[lang]}" loading="lazy">
-        <div class="ring__label"><span class="hanzi">${d.hanzi}</span>${d.name[lang]}</div>
+        <div class="ring__label"><span class="ring__num">${d.num}</span>${d.name[lang]}</div>
       </div>`).join("");
     updateCaption(ringIndex, true);
   }
@@ -278,8 +292,8 @@
     ringIndex = i;
     const d = SIG[i];
     $("#sigCaption").innerHTML = `
-      <h3>${d.name[lang]}</h3><p>${d.desc[lang]}</p>
-      <div class="row"><span class="price">${money(d.price)}</span><button class="add-btn add-btn--gold" data-add="${d.id}">+ ${t("menu.add")}</button></div>`;
+      <h3>${d.name[lang]}</h3><p>${d.desc[lang] || ""}</p>
+      <div class="row"><span class="price">${priceLabel(d)}</span><button class="add-btn add-btn--gold" data-add="${d.id}">+ ${t("menu.add")}</button></div>`;
     if (hasGsap && !force && !reduceMotion) gsap.fromTo("#sigCaption > *", { opacity: 0, y: 14 }, { opacity: 1, y: 0, stagger: .05, duration: .4 });
   }
 
@@ -440,7 +454,7 @@
 
     // ---- About: frame swings in 3D, image parallax, dragon draws itself
     gsap.fromTo(".about__frame", { rotateY: -30, rotateX: 10 }, { rotateY: 8, rotateX: -4, ease: "none", scrollTrigger: { trigger: "#about", start: "top bottom", end: "bottom top", scrub: true } });
-    gsap.fromTo(".about__frame img", { yPercent: -10 }, { yPercent: 0, ease: "none", scrollTrigger: { trigger: "#about", start: "top bottom", end: "bottom top", scrub: true } });
+    gsap.fromTo(".about__frame img", { yPercent: -10, scale: 1.25 }, { yPercent: 0, scale: 1.25, ease: "none", scrollTrigger: { trigger: "#about", start: "top bottom", end: "bottom top", scrub: true } });
     gsap.from(".about__stamp", { scrollTrigger: { trigger: ".about__media", start: "top 70%" }, scale: 0, rotate: -90, duration: 1, ease: "back.out(1.8)" });
     $$("#dragon path").forEach(p => {
       const len = p.getTotalLength();
