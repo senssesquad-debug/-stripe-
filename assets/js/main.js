@@ -1,4 +1,7 @@
-/* Happy Panda — interactions, 3D scroll, cart, reservations */
+/* Happy Panda — interactions, cart, reservations and restrained 3D motion.
+   Motion rules: scrolling never drives text. Content appears once and then stays put;
+   only the dish gallery (signature carousel) and decorative pictures move. While the page
+   is pinch-zoomed, all ambient motion pauses. */
 (() => {
   "use strict";
 
@@ -8,6 +11,7 @@
   const DISHES = window.HP_DISHES;
   const I18N = window.HP_I18N;
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const canHover = matchMedia("(hover: hover) and (pointer: fine)").matches;
   const hasGsap = typeof window.gsap !== "undefined" && typeof window.ScrollTrigger !== "undefined";
 
   const store = {
@@ -15,10 +19,16 @@
     set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage unavailable */ } }
   };
 
+  /* ---------------- Zoom awareness ---------------- */
+  // When someone pinch-zooms to read or look closer, freeze everything that moves on its own.
+  const isZoomed = () => !!(window.visualViewport && window.visualViewport.scale > 1.05);
+  if (window.visualViewport) {
+    visualViewport.addEventListener("resize", () => document.documentElement.classList.toggle("is-zoomed", isZoomed()));
+  }
 
   /* ---------------- i18n ---------------- */
   const browserLang = (navigator.language || "en").slice(0, 2);
-  let lang = store.get("hp-lang", ["lv", "ru", "en"].includes(browserLang) ? browserLang : "en");
+  let lang = store.get("hp-lang", ["lv", "ru", "en"].includes(browserLang) ? browserLang : "lv");
   const t = key => (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key;
   const money = n => "€" + n.toFixed(2);
 
@@ -29,11 +39,14 @@
   const chosenPortion = {};
   const portionFor = d => chosenPortion[d.id] || portionsOf(d)[0];
   const catHanzi = d => (CATS.find(c => c.id === d.cat) || {}).hanzi || "菜";
+  const byId = id => DISHES.find(d => d.id === id);
 
   function applyLang() {
     document.documentElement.lang = lang;
     $$("[data-i18n]").forEach(el => { el.innerHTML = t(el.dataset.i18n); });
     $$(".lang button").forEach(b => b.classList.toggle("is-active", b.dataset.lang === lang));
+    const hero = byId("918");
+    if (hero) { $("#heroBadgeName").textContent = hero.name[lang]; $("#heroImg").alt = hero.name[lang]; }
     renderTabs(); renderDishes(); renderRing(); renderCart();
     if (hasGsap) ScrollTrigger.refresh();
   }
@@ -41,10 +54,15 @@
     lang = b.dataset.lang; store.set("hp-lang", lang); applyLang();
   }));
 
+  // Real counts from the menu: dishes (without sauces and drinks) and sections
+  const dishCount = DISHES.filter(d => !["sauces", "drinks"].includes(d.cat) && d.num).length;
+  $$(".js-dish-count").forEach(el => (el.textContent = Math.floor(dishCount / 10) * 10));
+  $$(".js-cat-count").forEach(el => (el.textContent = CATS.length));
+
   /* ---------------- Menu ---------------- */
   let activeCat = CATS[0].id;
   const dishMedia = d => d.img
-    ? `<img src="${d.img}" alt="${d.name[lang]}" loading="lazy" width="720" height="480">`
+    ? `<img src="${d.img}" alt="${d.name[lang]}" loading="lazy" width="720" height="480"${d.fit ? ' class="is-contain"' : ""}>`
     : `<div class="dish__placeholder"><span class="hanzi">${catHanzi(d)}</span></div>`;
 
   function renderTabs() {
@@ -54,7 +72,16 @@
       </button>`).join("");
   }
 
+  function renderInfo() {
+    const c = CATS.find(x => x.id === activeCat);
+    const parts = [c.hours && `<strong>${c.hours[lang]}</strong>`, c.note && c.note[lang]].filter(Boolean);
+    const info = $("#menuInfo");
+    info.hidden = !parts.length;
+    info.innerHTML = parts.join("<br>");
+  }
+
   function renderDishes(animate) {
+    renderInfo();
     const list = DISHES.filter(d => d.cat === activeCat);
     $("#dishes").innerHTML = list.map(d => `
       <article class="dish" data-id="${d.id}">
@@ -65,20 +92,22 @@
         </div>
         <div class="dish__body">
           <h3 class="dish__name">${d.name[lang]}</h3>
-          <p class="dish__desc">${d.desc[lang] || ""}</p>
+          ${d.desc[lang] ? `<p class="dish__desc">${d.desc[lang]}</p>` : ""}
+          ${d.allergens && d.allergens[lang] ? `<p class="dish__allergens">${t("menu.allergens")}: ${d.allergens[lang]}</p>` : ""}
+          <div class="dish__spacer"></div>
           ${portionsOf(d).length > 1 ? `
           <div class="portion" role="radiogroup" aria-label="${t("menu.portion")}">
             ${portionsOf(d).map(p => `<button type="button" data-portion="${p}" data-dish="${d.id}" class="${p === portionFor(d) ? "is-active" : ""}">${t("menu." + p)}</button>`).join("")}
           </div>` : ""}
           <div class="dish__foot">
-            <span class="price">${money(priceOf(d, portionFor(d)))}</span>
-            <button class="add-btn" data-add="${d.id}">+ ${t("menu.add")}</button>
+            <span class="price">${priceOf(d, portionFor(d)) != null ? money(priceOf(d, portionFor(d))) : ""}</span>
+            ${priceOf(d, portionFor(d)) != null ? `<button class="add-btn" data-add="${d.id}">+ ${t("menu.add")}</button>` : ""}
           </div>
         </div>
       </article>`).join("");
-    bindTilt($$(".dish"), 8);
+    if (canHover && !reduceMotion) bindTilt($$(".dish"), 5);
     if (animate && hasGsap && !reduceMotion) {
-      gsap.fromTo(".dish", { opacity: 0, y: 40, rotateX: -25 }, { opacity: 1, y: 0, rotateX: 0, duration: .7, stagger: .06, ease: "power3.out" });
+      gsap.fromTo(".dish", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: .45, stagger: .03, ease: "power2.out", clearProps: "all" });
     }
   }
 
@@ -91,14 +120,13 @@
   /* ---------------- Cart ---------------- */
   let cart = store.get("hp-cart", {});
   let orderType = store.get("hp-type", "delivery");
-  const byId = id => DISHES.find(d => d.id === id);
 
   // Cart keys are "<dish id>" or "<dish id>:<portion>"
   function cartLines() {
     return Object.entries(cart).map(([key, q]) => {
       const [id, portion] = key.split(":");
       const d = byId(id);
-      return d && q > 0 ? { key, d, portion, q, price: priceOf(d, portion) } : null;
+      return d && q > 0 && priceOf(d, portion) != null ? { key, d, portion, q, price: priceOf(d, portion) } : null;
     }).filter(Boolean);
   }
   const totals = () => ({ total: cartLines().reduce((s, l) => s + l.price * l.q, 0) });
@@ -116,7 +144,7 @@
           <div class="citem__price">${portion && portionsOf(d).length > 1 ? t("menu." + portion) + " " + t("menu.portion") + " · " : ""}${money(price)} × ${q}</div></div>
         <div class="qty"><button data-dec="${key}" aria-label="−">−</button><span>${q}</span><button data-inc="${key}" aria-label="+">+</button></div>
       </div>`).join("")
-      : `<div class="drawer__empty"><span class="hanzi">空</span>${t("cart.empty")}</div>`;
+      : `<div class="drawer__empty"><img src="assets/img/logo.svg" alt="" width="72" height="72">${t("cart.empty")}</div>`;
 
     $("#totals").innerHTML = `
       <div class="total"><span>${t("cart.total")}</span><span>${money(totals().total)}</span></div>
@@ -129,29 +157,14 @@
     store.set("hp-cart", cart); store.set("hp-type", orderType);
   }
 
-  function addToCart(id, sourceEl) {
+  function addToCart(id) {
     const d = byId(id);
     const key = d.prices ? `${id}:${portionFor(d)}` : id;
     cart[key] = (cart[key] || 0) + 1;
     renderCart();
     toast(`${d.name[lang]} — ${t("cart.added")}`);
-    flyToCart(d, sourceEl);
-  }
-
-  function flyToCart(d, sourceEl) {
     const btn = $("#cartOpen");
-    if (!sourceEl || !hasGsap || reduceMotion) { btn.classList.remove("bump"); void btn.offsetWidth; btn.classList.add("bump"); return; }
-    const from = sourceEl.getBoundingClientRect(), to = btn.getBoundingClientRect();
-    const el = document.createElement("div");
-    el.className = "fly";
-    el.innerHTML = d.img ? `<img src="${d.img}" alt="">` : "";
-    document.body.appendChild(el);
-    gsap.set(el, { left: from.left + from.width / 2 - 30, top: from.top + from.height / 2 - 30 });
-    gsap.to(el, {
-      left: to.left + to.width / 2 - 30, top: to.top + to.height / 2 - 30,
-      scale: .25, rotation: 360, duration: .9, ease: "power2.in",
-      onComplete() { el.remove(); btn.classList.remove("bump"); void btn.offsetWidth; btn.classList.add("bump"); }
-    });
+    btn.classList.remove("bump"); void btn.offsetWidth; btn.classList.add("bump");
   }
 
   document.addEventListener("click", e => {
@@ -165,7 +178,7 @@
       return;
     }
     const add = e.target.closest("[data-add]");
-    if (add) { addToCart(add.dataset.add, add.closest(".dish, .signature__caption") || add); return; }
+    if (add) { addToCart(add.dataset.add); return; }
     const inc = e.target.closest("[data-inc]");
     if (inc) { cart[inc.dataset.inc]++; renderCart(); return; }
     const dec = e.target.closest("[data-dec]");
@@ -179,11 +192,11 @@
 
   const drawer = $("#drawer"), overlay = $("#overlay");
   function openCart(open) {
+    if (open) toggleNav(false);
     drawer.classList.toggle("is-open", open);
     overlay.classList.toggle("is-open", open);
     drawer.setAttribute("aria-hidden", String(!open));
     document.body.classList.toggle("is-locked", open);
-    if (lenis) open ? lenis.stop() : lenis.start();
   }
   $("#cartOpen").addEventListener("click", () => openCart(true));
   $("#cartClose").addEventListener("click", () => openCart(false));
@@ -247,248 +260,175 @@
     clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("is-visible"), ms);
   }
 
-  /* ---------------- Mobile nav ---------------- */
-  const burger = $("#burger"), nav = $("#nav");
+  /* ---------------- Mobile menu ---------------- */
+  const burger = $("#burger"), mnav = $("#mnav");
   function toggleNav(open) {
-    nav.classList.toggle("is-open", open);
+    mnav.classList.toggle("is-open", open);
+    mnav.setAttribute("aria-hidden", String(!open));
     burger.setAttribute("aria-expanded", String(open));
+    document.body.classList.toggle("is-menu-open", open);
   }
-  burger.addEventListener("click", () => toggleNav(!nav.classList.contains("is-open")));
-  $$("a", nav).forEach(a => a.addEventListener("click", () => toggleNav(false)));
+  burger.addEventListener("click", () => toggleNav(!mnav.classList.contains("is-open")));
+  $$("a", mnav).forEach(a => a.addEventListener("click", () => toggleNav(false)));
+  matchMedia("(min-width: 1081px)").addEventListener("change", e => { if (e.matches) toggleNav(false); });
 
-  /* ---------------- Hover tilt ---------------- */
-  function bindTilt(els, max = 10) {
-    if (reduceMotion || matchMedia("(hover: none)").matches) return;
+  /* ---------------- Header ---------------- */
+  const header = $("#header");
+  const onScroll = () => header.classList.toggle("is-scrolled", scrollY > 40);
+  addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  /* ---------------- Hover tilt (mouse only) ---------------- */
+  function bindTilt(els, max = 8) {
     els.forEach(el => {
       el.addEventListener("pointermove", e => {
+        if (e.pointerType !== "mouse") return;
         const r = el.getBoundingClientRect();
         const x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
-        el.style.transform = `perspective(900px) rotateY(${x * max}deg) rotateX(${-y * max}deg) translateZ(0)`;
+        el.style.transform = `perspective(900px) rotateY(${x * max}deg) rotateX(${-y * max}deg)`;
       });
       el.addEventListener("pointerleave", () => {
-        el.style.transition = "transform .6s cubic-bezier(.2,.8,.2,1)";
+        el.style.transition = "transform .5s cubic-bezier(.2,.8,.2,1)";
         el.style.transform = "";
-        setTimeout(() => (el.style.transition = ""), 600);
+        setTimeout(() => (el.style.transition = ""), 500);
       });
     });
   }
 
-  /* ---------------- Signature ring ---------------- */
+  /* ---------------- Signature carousel ---------------- */
+  // A 3D ring of dish photos. It turns with the arrows, a swipe, a click on a side dish,
+  // or slowly by itself while it is on screen — never with page scrolling.
   const SIG = ["801", "918", "919", "408", "701", "504", "1208", "907"].map(byId).filter(Boolean);
-  let ringIndex = 0;
+  const ring = $("#ring"), stage = $("#ringStage");
+  let ringIndex = 0, ringTurns = 0, lastInteraction = 0, ringVisible = false, hovering = false;
 
   function renderRing() {
-    const ring = $("#ring");
     const step = 360 / SIG.length;
     ring.innerHTML = SIG.map((d, i) => `
-      <div class="ring__item" data-i="${i}" style="transform: rotateY(${i * step}deg) translateZ(var(--r))">
-        <img src="${d.img}" alt="${d.name[lang]}" loading="lazy">
-        <div class="ring__label"><span class="ring__num">${d.num}</span>${d.name[lang]}</div>
-      </div>`).join("");
-    updateCaption(ringIndex, true);
+      <button class="ring__item" data-i="${i}" style="transform: rotateY(${i * step}deg) translateZ(var(--r))" aria-label="${d.name[lang]}">
+        <img src="${d.img}" alt="" loading="lazy">
+        <span class="ring__label"><span class="ring__num">${d.num}</span>${d.name[lang]}</span>
+      </button>`).join("");
+    turnTo(ringIndex, true);
   }
-  function updateCaption(i, force) {
-    if (i === ringIndex && !force) return;
-    ringIndex = i;
-    const d = SIG[i];
+
+  function turnTo(i, instant) {
+    const n = SIG.length;
+    // Keep an unwrapped counter so the ring always turns the short way round
+    const target = ((i % n) + n) % n;
+    let delta = target - (((ringTurns % n) + n) % n);
+    if (delta > n / 2) delta -= n;
+    if (delta < -n / 2) delta += n;
+    ringTurns += delta;
+    ringIndex = target;
+    ring.style.transition = instant ? "none" : "";
+    ring.style.transform = `translateZ(calc(var(--r) * -1)) rotateX(-6deg) rotateY(${-ringTurns * 360 / n}deg)`;
+    $$(".ring__item", ring).forEach((el, k) => el.classList.toggle("is-front", k === target));
+    const d = SIG[target];
     $("#sigCaption").innerHTML = `
-      <h3>${d.name[lang]}</h3><p>${d.desc[lang] || ""}</p>
+      <h3>${d.num} · ${d.name[lang]}</h3>${d.desc[lang] ? `<p>${d.desc[lang]}</p>` : ""}
       <div class="row"><span class="price">${priceLabel(d)}</span><button class="add-btn add-btn--gold" data-add="${d.id}">+ ${t("menu.add")}</button></div>`;
-    if (hasGsap && !force && !reduceMotion) gsap.fromTo("#sigCaption > *", { opacity: 0, y: 14 }, { opacity: 1, y: 0, stagger: .05, duration: .4 });
+  }
+  const userTurn = i => { lastInteraction = Date.now(); turnTo(i); };
+
+  $("#ringPrev").addEventListener("click", () => userTurn(ringIndex - 1));
+  $("#ringNext").addEventListener("click", () => userTurn(ringIndex + 1));
+  ring.addEventListener("click", e => {
+    const item = e.target.closest(".ring__item");
+    if (item && !item.classList.contains("is-front")) userTurn(+item.dataset.i);
+  });
+  stage.addEventListener("mouseenter", () => (hovering = true));
+  stage.addEventListener("mouseleave", () => (hovering = false));
+
+  // Horizontal swipe; vertical scrolling and pinch-zoom stay with the browser (touch-action: pan-y pinch-zoom)
+  let swipe = null;
+  stage.addEventListener("pointerdown", e => { if (e.isPrimary) swipe = { x: e.clientX, y: e.clientY }; });
+  stage.addEventListener("pointerup", e => {
+    if (!swipe) return;
+    const dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+    swipe = null;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) userTurn(ringIndex + (dx < 0 ? 1 : -1));
+  });
+  stage.addEventListener("pointercancel", () => (swipe = null));
+
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(([en]) => (ringVisible = en.isIntersecting), { threshold: .5 }).observe(stage);
+  }
+  if (!reduceMotion) {
+    setInterval(() => {
+      const idle = Date.now() - lastInteraction > 8000;
+      if (ringVisible && idle && !hovering && !isZoomed() && !document.hidden) turnTo(ringIndex + 1);
+    }, 5000);
   }
 
-  /* ---------------- Counters ---------------- */
-  function runCounters() {
-    $$(".count").forEach(el => {
-      const to = +el.dataset.to;
-      if (!hasGsap || reduceMotion) { el.textContent = to; return; }
-      const o = { v: 0 };
-      gsap.to(o, { v: to, duration: 2, ease: "power2.out", scrollTrigger: { trigger: el, start: "top 85%" }, onUpdate: () => (el.textContent = Math.round(o.v)) });
-    });
-  }
-
-  /* ---------------- Smooth scroll + 3D scroll scenes ---------------- */
-  let lenis = null;
-
-  function initScroll() {
-    if (!hasGsap) { runCounters(); return; }
+  /* ---------------- Entrance motion (plays once, never tied to scroll position) ---------------- */
+  function initMotion() {
+    if (!hasGsap || reduceMotion) return;
     gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.config({ ignoreMobileResize: true });
 
-    if (!reduceMotion && window.Lenis) {
-      lenis = new Lenis({ duration: 1.15, smoothWheel: true });
-      lenis.on("scroll", ScrollTrigger.update);
-      gsap.ticker.add(time => lenis.raf(time * 1000));
-      gsap.ticker.lagSmoothing(0);
-    }
+    // Hero intro on load
+    gsap.timeline({ delay: .1 })
+      .from(".hero__line", { yPercent: 40, opacity: 0, stagger: .12, duration: 1, ease: "power3.out" })
+      .from(".hero .eyebrow, .hero__lead, .hero__cta, .hero__facts li", { y: 20, opacity: 0, stagger: .06, duration: .7, ease: "power2.out" }, "-=.6")
+      .from("#heroStage", { rotation: -20, scale: .8, opacity: 0, duration: 1.4, ease: "expo.out" }, .1)
+      .from(".hero__badge", { scale: .6, opacity: 0, duration: .5, ease: "back.out(2)" }, "-=.5");
 
-    // Anchor links go through Lenis so pinned sections are handled smoothly
-    $$('a[href^="#"]').forEach(a => a.addEventListener("click", e => {
-      const id = a.getAttribute("href");
-      const target = id === "#top" ? 0 : $(id);
-      if (target === null) return;
-      e.preventDefault();
-      if (lenis) lenis.scrollTo(target, { duration: 1.6 });
-      else window.scrollTo({ top: target === 0 ? 0 : target.getBoundingClientRect().top + scrollY, behavior: "smooth" });
-    }));
-
-    // Header state
-    let lastY = 0;
-    ScrollTrigger.create({
-      start: 0, end: "max",
-      onUpdate(self) {
-        const y = self.scroll();
-        $("#header").classList.toggle("is-scrolled", y > 40);
-        $("#header").classList.toggle("is-hidden", y > lastY && y > 600 && !nav.classList.contains("is-open"));
-        lastY = y;
-      }
-    });
-
-    // Active nav link
-    $$(".nav a").forEach(a => {
-      const sec = $(a.getAttribute("href"));
-      if (!sec) return;
-      ScrollTrigger.create({ trigger: sec, start: "top 50%", end: "bottom 50%", onToggle: s => a.classList.toggle("is-active", s.isActive) });
-    });
-
-    if (reduceMotion) { runCounters(); return; }
-
-    // ---- Hero intro
-    $$(".hero__title .split").forEach(line => {
-      line.innerHTML = [...line.textContent].map(c => `<span class="char">${c}</span>`).join("");
-    });
-    const intro = gsap.timeline({ delay: .2 });
-    intro.from(".hero__title .char", { yPercent: 110, rotateX: -90, opacity: 0, stagger: .045, duration: 1, ease: "power4.out", transformOrigin: "50% 100% -40px" })
-      .from(".hero .eyebrow, .hero__lead, .hero__cta, .hero__facts li", { y: 30, opacity: 0, stagger: .08, duration: .8, ease: "power3.out" }, "-=.6")
-      .from("#heroStage", { rotation: -30, scale: .6, opacity: 0, duration: 1.6, ease: "expo.out" }, .1)
-      .from(".hero__badge", { scale: 0, opacity: 0, duration: .6, ease: "back.out(2)" }, "-=.6")
-      .from(".lantern", { yPercent: -120, stagger: .12, duration: 1.4, ease: "elastic.out(1, .6)" }, .2);
-
-    // ---- Hero: plate tilts back in 3D as you scroll, layers separate with depth
-    const plate = $("#plate3d");
-    const heroTl = gsap.timeline({ scrollTrigger: { trigger: "#hero", start: "top top", end: "bottom top", scrub: true } });
-    gsap.set(plate, { transformPerspective: 1400 });
-    heroTl.to(plate, { rotationX: 58, scale: 1.25, yPercent: 30, ease: "none" }, 0)
-      .to(".plate3d__dish img", { rotation: 50, ease: "none" }, 0)
-      .to(".hero__copy", { yPercent: -30, opacity: 0, ease: "none" }, 0)
-      .to(".hero__vertical", { yPercent: -80, ease: "none" }, 0)
-      .to(".hero__clouds", { yPercent: 20, ease: "none" }, 0);
-    $$(".lantern").forEach(l => heroTl.to(l, { y: () => -window.innerHeight * .6 * +l.dataset.depth, ease: "none" }, 0));
-
-    // Pointer parallax on the plate
-    if (matchMedia("(hover: hover)").matches) {
+    // The plate follows the mouse a little (desktop only)
+    if (canHover) {
+      const plate = $("#plate3d");
+      gsap.set(plate, { transformPerspective: 1400 });
       const ry = gsap.quickTo(plate, "rotationY", { duration: .8, ease: "power3" });
-      $("#hero").addEventListener("pointermove", e => ry(((e.clientX / innerWidth) - .5) * 24));
+      const rx = gsap.quickTo(plate, "rotationX", { duration: .8, ease: "power3" });
+      $("#hero").addEventListener("pointermove", e => {
+        if (e.pointerType !== "mouse") return;
+        ry(((e.clientX / innerWidth) - .5) * 18);
+        rx(((e.clientY / innerHeight) - .5) * -10);
+      });
     }
 
-    // ---- Marquee skews with scroll velocity
-    const skew = gsap.quickTo(".marquee__track", "skewX", { duration: .4, ease: "power3" });
-    ScrollTrigger.create({ onUpdate: s => skew(gsap.utils.clamp(-12, 12, s.getVelocity() / -250)) });
+    const once = (targets, vars, trigger, start = "top 88%") =>
+      $$(targets).forEach(el => gsap.from(el, { ...vars, scrollTrigger: { trigger: trigger || el, start, once: true } }));
 
-    // ---- Journey: camera flies through a 3D tunnel of story cards
-    const world = $("#journeyWorld");
-    const cards = $$(".jcard", world);
-    const isSmall = () => innerWidth < 900;
-    const GAP = () => (isSmall() ? 1400 : 1800);
-    const layoutCards = cam => {
-      const gap = GAP();
-      cards.forEach((c, i) => {
-        const z = -i * gap + cam;                       // distance of card from the viewer
-        const side = isSmall() ? 0 : (i % 2 ? 1 : -1) * Math.min(160, innerWidth * .08);
-        const rotY = isSmall() ? 0 : (i % 2 ? -1 : 1) * gsap.utils.clamp(0, 18, -z / 80);
-        let o = 1;
-        if (z > 0) o = gsap.utils.clamp(0, 1, 1 - z / 350);               // passing the camera
-        else if (z < -200) o = gsap.utils.clamp(0, 1, 1 - (-z - 200) / gap); // next card emerges from the fog
-        c.style.transform = `translate(-50%, -50%) translate3d(${side}px, 0, ${z}px) rotateY(${rotY}deg)`;
-        c.style.opacity = o;
-        c.style.visibility = o <= 0.01 ? "hidden" : "visible";
-        c.style.filter = z < -600 ? `blur(${Math.min(6, (-z - 600) / 400)}px)` : "none";
-        c.style.pointerEvents = Math.abs(z) < 300 ? "auto" : "none";
-      });
-    };
-    layoutCards(0);
-    ScrollTrigger.create({
-      trigger: "#journey",
-      start: "top top",
-      end: () => "+=" + innerHeight * cards.length * 1.1,
-      pin: ".journey__viewport",
-      scrub: 1,
-      invalidateOnRefresh: true,
-      onUpdate(self) {
-        const camEnd = (cards.length - 1) * GAP() + 100;
-        layoutCards(self.progress * camEnd);
-        $("#journeyBar").style.width = self.progress * 100 + "%";
-        gsap.set(".journey__intro", { opacity: 1 - gsap.utils.clamp(0, 1, self.progress * 6), y: -self.progress * 200 });
-      },
-      onRefresh: self => layoutCards(self.progress * ((cards.length - 1) * GAP() + 100))
+    // Text only fades in; it never moves after that
+    once(".section-head, .signature__head, .about__copy > *, .reserve__copy > *, .contacts dl > div, .delivery__lead", { y: 18, opacity: 0, duration: .7, ease: "power2.out" });
+    // Pictures get the 3D entrance
+    $$(".story__item").forEach((item, i) => {
+      gsap.from($(".story__img", item), { rotateY: i % 2 ? -28 : 28, rotateX: 8, opacity: 0, scale: .92, duration: 1.2, ease: "power3.out", transformPerspective: 1200, scrollTrigger: { trigger: item, start: "top 85%", once: true } });
+      gsap.from($(".story__text", item), { y: 18, opacity: 0, duration: .8, delay: .15, ease: "power2.out", scrollTrigger: { trigger: item, start: "top 85%", once: true } });
     });
+    once(".about__frame", { rotateY: -24, opacity: 0, duration: 1.2, ease: "power3.out", transformPerspective: 1200 }, null, "top 85%");
+    once(".step", { y: 30, opacity: 0, duration: .7, ease: "power2.out" });
+    once(".ring-stage", { rotateX: 30, scale: .85, opacity: 0, duration: 1.2, ease: "power3.out" }, null, "top 85%");
+    gsap.from(".dish", { y: 20, opacity: 0, stagger: .04, duration: .6, ease: "power2.out", clearProps: "all", scrollTrigger: { trigger: "#dishes", start: "top 90%", once: true } });
 
-    // ---- Signature dishes: rotating 3D carousel driven by scroll
-    const ring = $("#ring");
-    ScrollTrigger.create({
-      trigger: "#signature",
-      start: "top top",
-      end: () => "+=" + innerHeight * 2.4,
-      pin: ".signature__pin",
-      scrub: 1,
-      onUpdate(self) {
-        const n = SIG.length, step = 360 / n;
-        const angle = self.progress * step * (n - 1);
-        ring.style.transform = `translateZ(calc(var(--r) * -1)) rotateX(-6deg) rotateY(${-angle}deg)`;
-        updateCaption(Math.round(angle / step) % n);
-      }
-    });
-    ring.style.transform = "translateZ(calc(var(--r) * -1)) rotateX(-6deg) rotateY(0deg)";
-    gsap.from(".ring-stage", { scrollTrigger: { trigger: "#signature", start: "top 80%", end: "top top", scrub: true }, rotateX: 50, scale: .7, opacity: 0, ease: "none" });
-
-    // ---- Section headings & cards reveal with 3D flip
-    $$(".section-title, .section-head .eyebrow, .about__copy p, .reserve__copy p, .reserve__phone, .contacts dl > div")
-      .filter(el => !el.closest(".journey, .signature"))
-      .forEach(el => {
-      gsap.from(el, { scrollTrigger: { trigger: el, start: "top 88%" }, y: 50, rotateX: -40, opacity: 0, duration: 1, ease: "power3.out", transformPerspective: 800, transformOrigin: "50% 100%" });
-    });
-    gsap.from(".dish", { scrollTrigger: { trigger: "#dishes", start: "top 85%" }, y: 60, rotateX: -30, opacity: 0, stagger: .08, duration: .9, ease: "power3.out", transformOrigin: "50% 0" });
-    gsap.from(".step", { scrollTrigger: { trigger: ".steps", start: "top 85%" }, y: 80, rotateY: -35, opacity: 0, stagger: .15, duration: 1.1, ease: "power3.out", transformPerspective: 1000 });
-    gsap.from(".del-info li", { scrollTrigger: { trigger: ".del-info", start: "top 90%" }, y: 30, opacity: 0, stagger: .08, duration: .7 });
-    gsap.from("#reserveForm", { scrollTrigger: { trigger: "#reserve", start: "top 70%" }, rotateY: 25, x: 80, opacity: 0, duration: 1.2, ease: "power3.out", transformPerspective: 1200 });
-    gsap.from(".contacts__map", { scrollTrigger: { trigger: "#contacts", start: "top 70%" }, rotateX: 30, y: 60, opacity: 0, duration: 1.2, ease: "power3.out", transformPerspective: 1200 });
-
-    // ---- About: frame swings in 3D, image parallax, dragon draws itself
-    gsap.fromTo(".about__frame", { rotateY: -30, rotateX: 10 }, { rotateY: 8, rotateX: -4, ease: "none", scrollTrigger: { trigger: "#about", start: "top bottom", end: "bottom top", scrub: true } });
-    gsap.fromTo(".about__frame img", { yPercent: -10, scale: 1.25 }, { yPercent: 0, scale: 1.25, ease: "none", scrollTrigger: { trigger: "#about", start: "top bottom", end: "bottom top", scrub: true } });
-    gsap.from(".about__stamp", { scrollTrigger: { trigger: ".about__media", start: "top 70%" }, scale: 0, rotate: -90, duration: 1, ease: "back.out(1.8)" });
+    // The dragon line draws itself once
     $$("#dragon path").forEach(p => {
       const len = p.getTotalLength();
       gsap.set(p, { strokeDasharray: p.classList.contains("dragon__fin") ? "2 10" : len, strokeDashoffset: len });
-      gsap.to(p, { strokeDashoffset: 0, ease: "none", scrollTrigger: { trigger: "#about", start: "top 80%", end: "bottom 40%", scrub: true } });
+      gsap.to(p, { strokeDashoffset: 0, duration: 2.5, ease: "power1.inOut", scrollTrigger: { trigger: "#about", start: "top 75%", once: true } });
     });
-
-    runCounters();
   }
 
   /* ---------------- Boot ---------------- */
   function boot() {
     $("#year").textContent = new Date().getFullYear();
     applyLang();
-    bindTilt($$(".tilt"), 10);
-    initScroll();
+    initMotion();
   }
 
-  // Preloader: wait for fonts and hero image, but never longer than 2.5s
+  // Preloader: wait for fonts and the hero image, but never longer than 2s
   const bar = $("#loaderBar");
   bar.style.width = "35%";
-  const heroImg = $(".plate3d__dish img");
-  const ready = Promise.race([
+  const heroImg = $("#heroImg");
+  Promise.race([
     Promise.all([
       document.fonts ? document.fonts.ready : Promise.resolve(),
       heroImg.complete ? Promise.resolve() : new Promise(r => { heroImg.onload = heroImg.onerror = r; })
     ]),
-    new Promise(r => setTimeout(r, 2500))
-  ]);
-  ready.then(() => {
+    new Promise(r => setTimeout(r, 2000))
+  ]).then(() => {
     bar.style.width = "100%";
-    setTimeout(() => {
-      $("#loader").classList.add("is-done");
-      boot();
-    }, 250);
+    setTimeout(() => { $("#loader").classList.add("is-done"); boot(); }, 200);
   });
 })();
