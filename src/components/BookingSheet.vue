@@ -94,6 +94,16 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+.sheet::before {
+  /* same strip above the sheet, under translucent browser bars */
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 50vh;
+  background: var(--black);
+}
 .sheet {
   position: fixed;
   inset: 0;

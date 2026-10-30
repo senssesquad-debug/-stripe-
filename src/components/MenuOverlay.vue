@@ -149,14 +149,16 @@ function book(e) {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
   grid-template-rows: 1fr;
-  padding: calc(var(--header-h) + 32px) var(--gutter) 36px;
+  /* bottom room so the last rows clear floating browser toolbars (iOS) */
+  padding: calc(var(--header-h) + 32px) var(--gutter) calc(36px + env(safe-area-inset-bottom));
   gap: var(--gutter);
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
 .menu__visual {
-  position: absolute;
+  /* fixed so the photo stays put while the menu itself scrolls */
+  position: fixed;
   right: 0;
   top: 0;
   bottom: 0;
@@ -272,6 +274,7 @@ function book(e) {
 
 @media (max-width: 900px) {
   .menu {
+    padding-bottom: calc(110px + env(safe-area-inset-bottom));
     grid-template-columns: 1fr;
     grid-template-rows: auto auto;
     align-content: start;

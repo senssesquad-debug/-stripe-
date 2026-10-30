@@ -109,6 +109,16 @@ onBeforeUnmount(() => off?.())
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 }
+.header.is-menu::before {
+  /* iOS draws the page under its translucent top bar; keep that strip dark too */
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 50vh;
+  background: rgba(8, 8, 7, 0.94);
+}
 .header.is-menu::after {
   transform: scaleX(1);
 }
