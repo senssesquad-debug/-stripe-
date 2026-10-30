@@ -57,7 +57,8 @@ async function getJson(endpoint, timeout = 3500) {
 
 let refreshed = false
 export async function refreshLive() {
-  if (refreshed) return
+  // static previews (VITE_PREVIEW) have no API next to them: snapshot only
+  if (refreshed || import.meta.env.VITE_PREVIEW) return
   refreshed = true
   const code = state.dept
   const [dept, feed] = await Promise.all([
@@ -98,7 +99,8 @@ function pickText(list, lang, field) {
 export function media(key) {
   if (!key) return null
   const local = snapshot.media[key]
-  if (local) return local
+  // snapshot paths are root-relative; prefix the deploy base (sub-folder hosting)
+  if (local) return { ...local, src: import.meta.env.BASE_URL + local.src.replace(/^\//, '') }
   if (/^https?:/.test(key)) return { src: key }
   return { src: FILES_CDN + key }
 }

@@ -18,6 +18,6 @@ export function applyHead(route, t) {
   document.title = title
   setMeta('meta[property="og:title"]', 'content', title)
 
-  const url = ORIGIN + (route.path === '/' ? '/' : route.path)
+  const url = ORIGIN + (route.path === '/' ? '/' : route.path.replace(/\/$/, ''))
   setMeta('link[rel="canonical"]', 'href', url)
 }

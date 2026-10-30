@@ -14,5 +14,5 @@ export const boot = {
 
 // Pages without a 3D scene should not hold the loader.
 setTimeout(() => {
-  if (!location.pathname.endsWith('/home')) resolveScene()
+  if (!/\/home\/?$/.test(location.pathname)) resolveScene()
 }, 0)

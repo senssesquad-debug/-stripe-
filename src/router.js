@@ -38,7 +38,7 @@ const routes = [
 ]
 
 export const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
   // Scrolling is owned by the smooth-scroll controller (see useScroll.js).
   scrollBehavior: () => false,
