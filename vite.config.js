@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { copyFile, mkdir, readFile } from 'node:fs/promises'
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises'
 
 const origin = process.env.JZ_ORIGIN || 'https://www.jzbarbershop.com'
+const buildId = process.env.GITHUB_SHA || String(Date.now())
 
 // Static hosts have no SPA rewrites. Besides 404.html, every public route gets
 // its own copy of the app shell, so deep links such as /lv/dpils-alejas/prices
@@ -12,6 +13,7 @@ const spaFallback = () => ({
   apply: 'build',
   async closeBundle() {
     await copyFile('dist/index.html', 'dist/404.html')
+    await writeFile('dist/version.json', JSON.stringify({ id: buildId }))
     const snapshot = JSON.parse(await readFile('src/data/snapshot.json', 'utf8'))
     const pages = ['home', 'team', 'services', 'prices', 'contacts', 'booking', 'privacy-policy']
     for (const dept of snapshot.departmentCodes) {
@@ -39,6 +41,7 @@ export default defineConfig({
   // e.g. VITE_BASE=/jz-barbershop/ when published under a sub-path
   base: process.env.VITE_BASE || '/',
   plugins: [vue(), previewNoindex(), spaFallback()],
+  define: { __BUILD_ID__: JSON.stringify(buildId) },
   server: {
     // In development the live public API and file storage are proxied, so the
     // site renders exactly what the admin panel currently publishes.

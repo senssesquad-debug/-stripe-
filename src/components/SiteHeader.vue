@@ -264,11 +264,25 @@ onBeforeUnmount(() => off?.())
   .brand__name {
     font-size: 1.15rem;
   }
-  .tools__book,
-  .tools__lang {
+  .tools {
+    gap: 6px;
+  }
+  /* language stays one tap away on phones; booking lives in the bottom bar */
+  .tools__book {
     display: none;
   }
+  .tools__lang :deep(.lang__item) {
+    padding: 10px 6px;
+  }
+  .burger {
+    padding-left: 10px;
+  }
   .burger__label {
+    display: none;
+  }
+}
+@media (max-width: 370px) {
+  .brand__name {
     display: none;
   }
 }
