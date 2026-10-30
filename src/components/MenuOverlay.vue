@@ -3,6 +3,7 @@ import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSite } from '../composables/useSite.js'
 import { gsap, reducedMotion, lockScroll } from '../composables/useMotion.js'
+import { useBooking } from '../composables/useBooking.js'
 import LangSwitch from './LangSwitch.vue'
 import Icon from './Icon.vue'
 import imgPosters from '../assets/interior-posters.webp'
@@ -14,6 +15,7 @@ const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close'])
 const route = useRoute()
 const { t, to, info, hours, bookingUrl } = useSite()
+const { openBooking } = useBooking()
 
 const root = ref(null)
 const active = ref(0)
@@ -64,8 +66,13 @@ function onKey(e) {
 window.addEventListener('keydown', onKey)
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', onKey)
-  lockScroll(false)
+  if (props.open) lockScroll(false)
 })
+
+function book(e) {
+  openBooking(e)
+  if (e.defaultPrevented) emit('close')
+}
 </script>
 
 <template>
@@ -78,6 +85,7 @@ onBeforeUnmount(() => {
     :aria-label="t.ui.menu"
     :aria-hidden="open ? 'false' : 'true'"
     :inert="!open || undefined"
+    data-lenis-prevent
   >
     <div class="menu__visual" aria-hidden="true">
       <img v-for="(src, i) in images" :key="i" :src="src" alt="" :class="{ 'is-on': i === active }" loading="lazy" />
@@ -88,7 +96,7 @@ onBeforeUnmount(() => {
         <li v-for="(item, i) in items" :key="item.key" class="menu__item" @pointerenter="active = i">
           <component
             :is="item.internal ? 'RouterLink' : 'a'"
-            v-bind="item.internal ? { to: item.href } : { href: item.href }"
+            v-bind="item.internal ? { to: item.href } : { href: item.href, onClick: book }"
             class="menu__link"
             :class="{ 'is-active': route.meta.page === item.key }"
             @focus="active = i"
@@ -144,6 +152,8 @@ onBeforeUnmount(() => {
   padding: calc(var(--header-h) + 32px) var(--gutter) 36px;
   gap: var(--gutter);
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 .menu__visual {
   position: absolute;

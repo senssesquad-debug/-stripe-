@@ -1,14 +1,16 @@
 <script setup>
 // The four steps of the shop's online booking, shown as a ledger. Each row
-// previews what that step offers using live data; the CTA opens the booking.
+// previews what that step offers using live data and opens the booking form.
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useSite } from '../composables/useSite.js'
 import { revealIn } from '../composables/useMotion.js'
+import { useBooking } from '../composables/useBooking.js'
 import BookLink from '../components/BookLink.vue'
 import Icon from '../components/Icon.vue'
 
 const props = defineProps({ index: { type: String, default: '06' }, heading: { type: Boolean, default: true } })
-const { t, info, services, team, hours } = useSite()
+const { t, info, services, team, hours, bookingUrl } = useSite()
+const { openBooking } = useBooking()
 const root = ref(null)
 const openDays = computed(() => hours.value.filter((h) => !h.closed))
 
@@ -27,6 +29,7 @@ onBeforeUnmount(() => undo?.())
 
       <ol class="steps">
         <li v-for="(step, i) in t.steps" :key="i" class="step" data-reveal="fade" :data-delay="i * 0.06">
+          <a :href="bookingUrl" class="step__btn" data-cursor @click="openBooking">
           <span class="step__no serif" aria-hidden="true">{{ i + 1 }}</span>
           <span class="step__text serif" aria-hidden="true">{{ step.replace(/^\d+\.\s*/, '') }}</span>
           <span class="visually-hidden">{{ step }}</span>
@@ -47,6 +50,8 @@ onBeforeUnmount(() => undo?.())
               <span class="step__chip"><Icon name="phone" /> +371 ···</span>
             </template>
           </span>
+          <span class="step__go" aria-hidden="true"><Icon name="arrow" /></span>
+          </a>
         </li>
       </ol>
 
@@ -69,13 +74,32 @@ onBeforeUnmount(() => undo?.())
 }
 .step {
   position: relative;
+  border-bottom: 1px solid var(--hair);
+  overflow: hidden;
+  isolation: isolate;
+}
+.step__btn {
   display: grid;
-  grid-template-columns: clamp(60px, 9vw, 150px) 1fr auto;
+  grid-template-columns: clamp(60px, 9vw, 150px) 1fr auto auto;
   align-items: center;
   gap: clamp(12px, 2vw, 32px);
   padding: clamp(18px, 2.4vw, 34px) 0;
-  border-bottom: 1px solid var(--hair);
-  overflow: hidden;
+}
+.step__go {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid var(--hair-strong);
+  border-radius: 50%;
+  color: var(--champagne);
+  transition: background 0.4s, color 0.4s, transform 0.6s var(--ease-out);
+}
+.step:hover .step__go,
+.step__btn:focus-visible .step__go {
+  background: var(--ivory);
+  color: var(--black);
+  transform: translateX(4px);
 }
 .step::before {
   content: '';
@@ -154,11 +178,17 @@ onBeforeUnmount(() => undo?.())
   color: var(--champagne);
 }
 @media (max-width: 860px) {
-  .step {
-    grid-template-columns: 56px 1fr;
+  .step__btn {
+    grid-template-columns: 56px 1fr auto;
+  }
+  .step__go {
+    grid-column: 3;
+    grid-row: 1;
+    width: 42px;
+    height: 42px;
   }
   .step__peek {
-    grid-column: 2;
+    grid-column: 2 / -1;
     justify-content: flex-start;
     opacity: 0.8;
   }

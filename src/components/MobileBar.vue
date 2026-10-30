@@ -3,9 +3,11 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useSite } from '../composables/useSite.js'
 import { onScroll } from '../composables/useMotion.js'
+import { useBooking } from '../composables/useBooking.js'
 import Icon from './Icon.vue'
 
 const { t, info, bookingUrl } = useSite()
+const { openBooking } = useBooking()
 const visible = ref(false)
 let off
 onMounted(() => {
@@ -18,7 +20,7 @@ onBeforeUnmount(() => off?.())
 
 <template>
   <div class="mbar" :class="{ 'is-visible': visible }">
-    <a :href="bookingUrl" class="mbar__book">
+    <a :href="bookingUrl" class="mbar__book" @click="openBooking">
       <span>{{ t.bookOnline }}</span>
       <Icon name="arrow" />
     </a>

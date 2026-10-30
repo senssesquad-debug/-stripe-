@@ -47,9 +47,10 @@ audited inventory. In short:
   `FacebookFeed`, …). When this frontend is served from jzbarbershop.com (or in `npm run dev`, which proxies
   `/api` and `/storage`), content is read live, so admin-panel edits appear immediately. Anywhere else the
   bundled snapshot (`src/data/snapshot.json` + `public/media/*.webp`) is used.
-- **Booking** — every booking button opens the existing booking system (service → barber → date →
-  SMS-verified phone). Its URL is `VITE_BOOKING_URL` (default
-  `https://www.jzbarbershop.com/{lang}/{dept}/booking`).
+- **Booking** — every booking button (and each step of the booking ledger) opens the shop's existing
+  booking system (service → barber → date → SMS-verified phone) in a full-screen sheet inside the site,
+  so appointments go through the real system without leaving the page. Its URL is `VITE_BOOKING_URL`
+  (default `https://www.jzbarbershop.com/{lang}/{dept}/booking`).
 - **URLs** — identical to the original: `/`, `/:dept`, `/:lang/:dept/{home,team,services,prices,contacts,booking,privacy-policy}`.
 - **SEO** — original title, description, Open Graph tags, canonical, Google site verification, `robots.txt`
   and both sitemaps are kept; per-page titles/canonicals, `<html lang>` and BarberShop JSON-LD were added.

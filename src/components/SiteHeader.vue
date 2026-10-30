@@ -3,6 +3,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSite } from '../composables/useSite.js'
 import { onScroll } from '../composables/useMotion.js'
+import { useBooking } from '../composables/useBooking.js'
 import LangSwitch from './LangSwitch.vue'
 import logo from '../assets/logo.webp'
 
@@ -11,6 +12,7 @@ defineProps({ menuOpen: Boolean })
 
 const route = useRoute()
 const { t, to, bookingUrl } = useSite()
+const { openBooking } = useBooking()
 const hidden = ref(false)
 const scrolled = ref(false)
 const light = ref(false)
@@ -34,7 +36,7 @@ onBeforeUnmount(() => off?.())
 </script>
 
 <template>
-  <header class="header" :class="{ 'is-hidden': hidden && !menuOpen, 'is-scrolled': scrolled, 'is-light': light && !menuOpen }">
+  <header class="header" :class="{ 'is-hidden': hidden && !menuOpen, 'is-scrolled': scrolled, 'is-light': light && !menuOpen, 'is-menu': menuOpen }">
     <RouterLink :to="to('home')" class="brand" aria-label="JZ Barbershop">
       <img :src="logo" alt="" width="44" height="44" class="brand__logo" />
       <span class="brand__name">JZ Barbershop</span>
@@ -55,7 +57,7 @@ onBeforeUnmount(() => off?.())
 
     <div class="tools">
       <LangSwitch class="tools__lang" />
-      <a :href="bookingUrl" class="tools__book" data-cursor>{{ t.nav.booking }}</a>
+      <a :href="bookingUrl" class="tools__book" data-cursor @click="openBooking">{{ t.nav.booking }}</a>
       <button
         class="burger"
         type="button"
@@ -100,6 +102,14 @@ onBeforeUnmount(() => off?.())
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
 }
 .header.is-scrolled::after {
+  transform: scaleX(1);
+}
+.header.is-menu {
+  background: rgba(8, 8, 7, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.header.is-menu::after {
   transform: scaleX(1);
 }
 .header.is-light {

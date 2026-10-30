@@ -85,7 +85,7 @@ Descriptions exist in lv/en/ru. Last names are stored in the API but the origina
 
 | Item | Original | Redesign |
 |---|---|---|
-| Online booking | 4-step form (service → barber → date → phone + name) with SMS code verification, `Public/BusyBookingTime`, `WeekSchedulesByDate`, `SendSmsCode`, `VerifySmsCode` | Every booking button opens the existing booking system (`VITE_BOOKING_URL`, default `https://www.jzbarbershop.com/{lang}/{dept}/booking`). The booking page presents the same 4 steps. |
+| Online booking | 4-step form (service → barber → date → phone + name) with SMS code verification, `Public/BusyBookingTime`, `WeekSchedulesByDate`, `SendSmsCode`, `VerifySmsCode` | Every booking button and each of the 4 steps opens the existing booking system in an in-site sheet (`VITE_BOOKING_URL`, default `https://www.jzbarbershop.com/{lang}/{dept}/booking`). |
 | Content | `Public/MainPageInfo`, `DepartmentCodes`, `DepartmentDataByCode`, `FacebookFeed` | Same API, read live when served from the same origin (or via the dev proxy); otherwise the synced snapshot. |
 | Images | `/storage/jz-public/…` | Same paths live; optimised WebP copies in `public/media` for the snapshot. |
 | Map | Google Maps on the contacts page | Google Maps embed (loads when scrolled near) + “Skatīt kartē” link. |

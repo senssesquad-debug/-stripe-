@@ -151,6 +151,7 @@ onBeforeUnmount(() => {
         aria-modal="true"
         :aria-label="t.zoom"
         tabindex="-1"
+        data-lenis-prevent
         @click.self="closeZoom"
       >
         <button type="button" class="zoom__close" :aria-label="t.ui.close" @click="closeZoom"><Icon name="close" /></button>

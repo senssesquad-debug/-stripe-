@@ -38,9 +38,14 @@ export function scrollToEl(target, offset = 0) {
   else el.scrollIntoView({ behavior: reducedMotion.value ? 'auto' : 'smooth' })
 }
 
+// Counted, so overlays can hand over to each other (menu → booking sheet)
+// without one of them unlocking the page underneath the other.
+let locks = 0
 export function lockScroll(locked) {
-  if (lenis) locked ? lenis.stop() : lenis.start()
-  document.documentElement.classList.toggle('is-locked', locked)
+  locks = Math.max(0, locks + (locked ? 1 : -1))
+  const on = locks > 0
+  if (lenis) on ? lenis.stop() : lenis.start()
+  document.documentElement.classList.toggle('is-locked', on)
 }
 
 export function onScroll(cb) {

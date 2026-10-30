@@ -5,6 +5,7 @@ import SiteHeader from '../components/SiteHeader.vue'
 import MenuOverlay from '../components/MenuOverlay.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import MobileBar from '../components/MobileBar.vue'
+import BookingSheet from '../components/BookingSheet.vue'
 
 const menuOpen = ref(false)
 onMounted(() => refreshLive())
@@ -18,4 +19,5 @@ onMounted(() => refreshLive())
   </main>
   <SiteFooter />
   <MobileBar />
+  <BookingSheet />
 </template>
