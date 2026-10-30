@@ -1,0 +1,1817 @@
+{
+ "syncedAt": "2026-10-29T23:26:00.679Z",
+ "origin": "https://www.jzbarbershop.com",
+ "mainPageInfo": [
+  {
+   "code": "lv",
+   "title": "Latvija",
+   "primaryImageUrl": "flags/lv_wave.jpg",
+   "secondaryImageUrl": "flags/lv_background.jpg",
+   "languages": [
+    "lv",
+    "en",
+    "ru"
+   ],
+   "departments": [
+    {
+     "code": "dpils-alejas",
+     "title": "Daugavpils"
+    }
+   ]
+  },
+  {
+   "code": "lt",
+   "title": "Lietuva",
+   "primaryImageUrl": "flags/lt_wave.jpg",
+   "secondaryImageUrl": "flags/lt_background.jpg",
+   "languages": [
+    "lt",
+    "en",
+    "ru"
+   ],
+   "departments": []
+  }
+ ],
+ "departmentCodes": [
+  "dpils-alejas"
+ ],
+ "departments": {
+  "dpils-alejas": {
+   "id": 3,
+   "address": "Alejas iela 75, Daugavpils",
+   "email": "jzbarbershop2024@gmail.com",
+   "imageContacts": "Departments/3fd64c54-4ea0-430c-ac36-8b6103f9a641",
+   "imageMain": "Departments/90f85f79-f9c0-4474-a25c-e2fc58076ca8",
+   "phone": "+37124400021",
+   "socialFb": "https://www.facebook.com/profile.php?id=61567709297676",
+   "socialIg": "https://www.instagram.com/jz.cuts.and.shave.barbershop?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==",
+   "title": "Daugavpils",
+   "workingTimeMon": "",
+   "workingTimeTue": "09:00 - 19:00",
+   "workingTimeWed": "09:00 - 19:00",
+   "workingTimeThu": "09:00 - 19:00",
+   "workingTimeFri": "09:00 - 19:00",
+   "workingTimeSat": "09:00 - 17:00",
+   "workingTimeSun": "",
+   "gallery": [
+    {
+     "id": 23,
+     "path": "Gallery/5a391974-42e2-4648-8f78-a7794aa3b137",
+     "sortOrder": 0
+    },
+    {
+     "id": 24,
+     "path": "Gallery/2587bdf0-eacd-44dd-a223-58103609647a",
+     "sortOrder": 0
+    },
+    {
+     "id": 25,
+     "path": "Gallery/07232913-f99a-4dcf-927c-c6fd5d34f70c",
+     "sortOrder": 0
+    }
+   ],
+   "descriptions": [
+    {
+     "code": "lv",
+     "description": "Vīriešu frizētava Daugavpilī – klasiskie un mūsdienīgie griezumi, bārdas kopšana.",
+     "homeTitle": "Stils, kas runā pats par sevi",
+     "homeDesc": "JZ Barbershop – vieta, kur precizitāte, atmosfēra un meistaru pieredze satiekas.",
+     "policyTitle": "Privātuma politika",
+     "policyText": "<title>Pārzinis un apstrādātie dati</title>\n<text>Personas datu pārzinis ir JZ Barbershop nodaļa, kurā jūs veicat pierakstu (turpmāk - mēs). Nodaļas nosaukums, adrese un kontaktinformācija ir norādīta zemāk un lapā Kontakti. Veicot pierakstu, mēs apstrādājam jūsu vārdu, tālruņa numuru, izvēlēto pakalpojumu un meistaru, kā arī pieraksta datumu, laiku un statusu. Drošības un ļaunprātīgas izmantošanas novēršanai serveris apstrādā arī IP adresi un tehnisko pieprasījuma informāciju. Mēs neizmantojam analītikas vai reklāmas izsekošanas rīkus.</text>\n\n<title>Apstrādes nolūki un tiesiskais pamats</title>\n<text>Vārdu, tālruņa numuru un pieraksta informāciju izmantojam, lai izveidotu un pārvaldītu pierakstu, nosūtītu SMS verifikācijas kodu, atgādinājumus un paziņojumus par izmaiņām vai atcelšanu, kā arī sazinātos ar jums par pakalpojumu. Šī apstrāde ir vajadzīga līguma izpildei vai darbībām pirms līguma noslēgšanas (VDAR 6. panta 1. punkta b) apakšpunkts). IP adresi un tehniskos žurnālus apstrādājam, pamatojoties uz mūsu leģitīmo interesi aizsargāt vietni, novērst ļaunprātīgu izmantošanu un aizstāvēt juridiskas prasības (VDAR 6. panta 1. punkta f) apakšpunkts). Ja normatīvie akti prasa saglabāt noteiktus datus, pamats ir juridiska pienākuma izpilde (VDAR 6. panta 1. punkta c) apakšpunkts).</text>\n\n<title>Datu saņēmēji un drošība</title>\n<text>Datiem var piekļūt pilnvaroti attiecīgās nodaļas darbinieki un pakalpojumu sniedzēji, kuri palīdz uzturēt vietni un glabāt datus. Lai nosūtītu SMS, tālruņa numurs un ziņojuma saturs tiek nodots Sendberry (Think Intermedia SIA) un iesaistītajiem sakaru operatoriem. Google Maps vai Facebook saturs var nodot Google vai Meta IP adresi un tehnisko pieprasījuma informāciju saskaņā ar šo uzņēmumu noteikumiem. Datus varam izpaust valsts iestādēm, ja to prasa likums. Datu nodošanai ārpus Eiropas Ekonomikas zonas piemērojam VDAR paredzētos aizsardzības pasākumus. Datus aizsargājam ar atbilstošiem tehniskiem un organizatoriskiem pasākumiem un ierobežojam piekļuvi tiem.</text>\n\n<title>Vietējā krātuve un glabāšanas laiks</title>\n<text>Vietne izmanto pārlūkprogrammas vietējo krātuvi izvēlētās valodas un nodaļas saglabāšanai un publiskā satura īslaicīgai kešošanai. Pārlūkprogramma var piedāvāt saglabāt vārdu un tālruņa numuru atbilstoši jūsu ierīces un pārlūkprogrammas iestatījumiem. Mēs neizmantojam analītikas vai reklāmas sīkdatnes. Tehniskos servera žurnālus parasti glabājam līdz 30 dienām, bet pieraksta un klienta datus — tikai tik ilgi, cik nepieciešams pakalpojuma sniegšanai, juridisko prasību aizstāvēšanai un tiesisko pienākumu izpildei. Kad dati vairs nav vajadzīgi, tos dzēšam vai anonimizējam.</text>\n\n<title>Jūsu tiesības</title>\n<text>Jums ir tiesības pieprasīt piekļuvi saviem personas datiem un to kopiju, neprecīzu datu labošanu un datu dzēšanu, ja mums vairs nav tiesiska pamata tos glabāt. Piemērojamajos gadījumos varat pieprasīt apstrādes ierobežošanu vai datu pārnesamību un iebilst pret apstrādi, kas pamatota ar leģitīmajām interesēm. Uz pieprasījumu parasti atbildēsim viena mēneša laikā; pirms tā izpildes varam lūgt apliecināt identitāti.</text>\n\n<title>Obligātie dati un automatizēti lēmumi</title>\n<text>Vārds, tālruņa numurs un izvēlētā pieraksta informācija ir nepieciešama, lai veiktu tiešsaistes pierakstu; bez tās mēs nevaram pieņemt un apstiprināt pierakstu. Mēs nepieņemam lēmumus, kas rada juridiskas vai līdzīgi būtiskas sekas, pamatojoties tikai uz automatizētu apstrādi, un neveicam profilēšanu.</text>\n\n<title>Politikas izmaiņas</title>\n<text>Mēs varam atjaunināt šo privātuma politiku, ja mainās datu apstrāde vai normatīvās prasības. Aktuālā versija un tās atjaunināšanas datums ir pieejami šajā lapā.</text>\n\n<title>Sazinieties ar mums</title>\n<text>Lai uzdotu jautājumu vai īstenotu savas datu aizsardzības tiesības, sazinieties ar izvēlēto JZ Barbershop nodaļu, izmantojot zemāk norādīto kontaktinformāciju.</text>",
+     "policyLastSave": "2026-08-10T08:49:53.350718"
+    },
+    {
+     "code": "en",
+     "description": "Men's barbershop in Daugavpils – classic and modern cuts, beard care.",
+     "homeTitle": "A style that speaks for itself",
+     "homeDesc": "JZ Barbershop – a place where precision, atmosphere, and master's experience come together. ",
+     "policyTitle": "Privacy Policy",
+     "policyText": "<title>Data Controller and Data We Process</title>\n<text>The data controller is the JZ Barbershop location where you make your appointment (referred to below as we or us). Its name, address, and contact details are shown below and on the Contacts page. When you book, we process your name, phone number, selected service and barber, and the appointment date, time, and status. For security and abuse prevention, the server also processes your IP address and technical request information. We do not use analytics or advertising trackers.</text>\n\n<title>Purposes and Legal Bases</title>\n<text>We use your name, phone number, and appointment details to create and manage your appointment, send an SMS verification code, reminders, and notices about changes or cancellations, and contact you about the service. This processing is necessary to perform a contract or take steps at your request before entering into a contract (Article 6(1)(b) GDPR). We process IP addresses and technical logs based on our legitimate interests in securing the website, preventing abuse, and establishing or defending legal claims (Article 6(1)(f) GDPR). Where the law requires us to retain certain data, processing is based on compliance with a legal obligation (Article 6(1)(c) GDPR).</text>\n\n<title>Data Recipients and Security</title>\n<text>Your data may be accessed by authorized staff at the relevant location and service providers that help us operate the website and store data. To send an SMS, your phone number and message content are provided to Sendberry (Think Intermedia SIA) and the communications operators involved in delivery. Google Maps or Facebook content may provide Google or Meta with your IP address and technical request information under their terms. We may disclose data to public authorities where required by law. Transfers outside the European Economic Area are protected by the safeguards required by the GDPR. We use appropriate technical and organizational measures and limit access to the data.</text>\n\n<title>Local Storage and Retention</title>\n<text>The website uses browser local storage to remember your selected language and location and temporarily cache public content. Your browser may offer to save your name and phone number according to your device and browser settings. We do not use analytics or advertising cookies. Technical server logs are generally retained for up to 30 days, while appointment and customer data are kept only as long as needed to provide the service, establish or defend legal claims, and meet legal obligations. When data is no longer needed, we delete or anonymize it.</text>\n\n<title>Your Rights</title>\n<text>You have the right to request access to and a copy of your personal data, correction of inaccurate data, and deletion where we no longer have a lawful reason to retain it. Where applicable, you may request restriction or portability and object to processing based on legitimate interests. We will normally respond within one month and may need to verify your identity before acting on a request.</text>\n\n<title>Required Data and Automated Decisions</title>\n<text>Your name, phone number, and selected appointment details are required to make an online booking; without them, we cannot accept and confirm the appointment. We do not make decisions that produce legal or similarly significant effects based solely on automated processing, and we do not profile you.</text>\n\n<title>Changes to This Policy</title>\n<text>We may update this privacy policy when our processing activities or legal requirements change. The current version and its last-updated date are available on this page.</text>\n\n<title>Contact Us</title>\n<text>To ask a question or exercise your data protection rights, contact the selected JZ Barbershop location using the details below.</text>",
+     "policyLastSave": "2026-08-10T08:49:53.34978"
+    },
+    {
+     "code": "ru",
+     "description": "Мужская парикмахерская в Даугавпилсе – классические и современные стрижки, уход за бородой.",
+     "homeTitle": "Стиль, который говорит сам за себя",
+     "homeDesc": "JZ Barbershop – место, где сочетаются точность, атмосфера и опыт мастера.",
+     "policyTitle": "Политика конфиденциальности",
+     "policyText": "<title>Оператор и обрабатываемые данные</title>\n<text>Оператором персональных данных является филиал JZ Barbershop, в котором вы оформляете запись (далее - мы). Название, адрес и контактные данные филиала указаны ниже и на странице «Контакты». При оформлении записи мы обрабатываем ваше имя, номер телефона, выбранную услугу и мастера, а также дату, время и статус записи. Для безопасности и предотвращения злоупотреблений сервер также обрабатывает IP-адрес и технические сведения о запросе. Мы не используем аналитические или рекламные средства отслеживания.</text>\n\n<title>Цели и правовые основания обработки</title>\n<text>Мы используем имя, номер телефона и сведения о записи, чтобы оформить и администрировать запись, отправить код подтверждения по SMS, напоминания и уведомления об изменении или отмене, а также связаться с вами по поводу услуги. Такая обработка необходима для исполнения договора или принятия мер по вашему запросу до его заключения (пункт b части 1 статьи 6 GDPR). IP-адрес и технические журналы обрабатываются на основании нашего законного интереса в защите сайта, предотвращении злоупотреблений и предъявлении или защите юридических требований (пункт f части 1 статьи 6 GDPR). Если закон требует хранить определённые данные, основанием является выполнение юридической обязанности (пункт c части 1 статьи 6 GDPR).</text>\n\n<title>Получатели и защита данных</title>\n<text>Доступ к данным имеют уполномоченные сотрудники соответствующего филиала и поставщики услуг, которые помогают обеспечивать работу сайта и хранение данных. Для отправки SMS номер телефона и текст сообщения передаются Sendberry (Think Intermedia SIA) и операторам связи, участвующим в доставке. Материалы Google Maps или Facebook могут передавать Google или Meta IP-адрес и технические сведения о запросе в соответствии с правилами этих компаний. Мы можем раскрыть данные государственным органам, если этого требует закон. При передаче данных за пределы Европейской экономической зоны применяются предусмотренные GDPR меры защиты. Мы используем надлежащие технические и организационные меры и ограничиваем доступ к данным.</text>\n\n<title>Локальное хранилище и срок хранения</title>\n<text>Сайт использует локальное хранилище браузера, чтобы запомнить выбранные язык и филиал и временно кэшировать общедоступные материалы. Браузер может предложить сохранить имя и номер телефона в соответствии с настройками вашего устройства и браузера. Мы не используем аналитические или рекламные файлы cookie. Технические журналы сервера обычно хранятся до 30 дней, а сведения о записях и клиентах — только столько, сколько необходимо для оказания услуги, защиты юридических требований и выполнения требований закона. Когда данные больше не нужны, мы удаляем или обезличиваем их.</text>\n\n<title>Ваши права</title>\n<text>Вы вправе запросить доступ к своим персональным данным и их копию, исправление неточных данных и удаление данных, если у нас больше нет законного основания для их хранения. В предусмотренных законом случаях можно потребовать ограничить обработку или перенести данные и возразить против обработки на основании законного интереса. Обычно мы отвечаем на запрос в течение одного месяца; перед его выполнением нам может потребоваться подтвердить вашу личность.</text>\n\n<title>Обязательные данные и автоматизированные решения</title>\n<text>Имя, номер телефона и выбранные сведения о записи необходимы для онлайн-записи; без них мы не сможем принять и подтвердить запись. Мы не принимаем решений, влекущих юридические или аналогичные существенные последствия, исключительно на основе автоматизированной обработки и не осуществляем профилирование.</text>\n\n<title>Изменения политики</title>\n<text>Мы можем обновлять эту политику конфиденциальности при изменении процессов обработки данных или требований законодательства. Актуальная версия и дата её обновления доступны на этой странице.</text>\n\n<title>Свяжитесь с нами</title>\n<text>Чтобы задать вопрос или воспользоваться своими правами в области защиты данных, свяжитесь с выбранным филиалом JZ Barbershop по указанным ниже контактным данным.</text>",
+     "policyLastSave": "2026-08-10T08:49:53.348506"
+    },
+    {
+     "code": "lt",
+     "description": "",
+     "homeTitle": "",
+     "homeDesc": "",
+     "policyTitle": "Privatumo politika",
+     "policyText": "<title>Duomenų valdytojas ir tvarkomi duomenys</title>\n<text>Asmens duomenų valdytojas yra JZ Barbershop padalinys, kuriame registruojatės paslaugai (toliau - mes). Padalinio pavadinimas, adresas ir kontaktiniai duomenys nurodyti toliau ir puslapyje Kontaktai. Registruojantis tvarkome jūsų vardą, telefono numerį, pasirinktą paslaugą ir meistrą, taip pat registracijos datą, laiką ir būseną. Saugumo ir piktnaudžiavimo prevencijai serveris taip pat tvarko IP adresą ir techninę užklausos informaciją. Nenaudojame analizės ar reklamos sekimo priemonių.</text>\n\n<title>Tvarkymo tikslai ir teisinis pagrindas</title>\n<text>Vardą, telefono numerį ir registracijos informaciją naudojame registracijai sukurti ir administruoti, SMS patvirtinimo kodui, priminimams bei pranešimams apie pakeitimus ar atšaukimą siųsti ir susisiekti su jumis dėl paslaugos. Šie duomenys būtini sutarčiai vykdyti arba veiksmams prieš sudarant sutartį atlikti (BDAR 6 straipsnio 1 dalies b punktas). IP adresą ir techninius žurnalus tvarkome remdamiesi teisėtu interesu apsaugoti svetainę, užkirsti kelią piktnaudžiavimui ir ginti teisinius reikalavimus (BDAR 6 straipsnio 1 dalies f punktas). Kai teisės aktai įpareigoja saugoti tam tikrus duomenis, pagrindas yra teisinės prievolės vykdymas (BDAR 6 straipsnio 1 dalies c punktas).</text>\n\n<title>Duomenų gavėjai ir saugumas</title>\n<text>Duomenis gali pasiekti įgalioti atitinkamo padalinio darbuotojai ir paslaugų teikėjai, padedantys prižiūrėti svetainę ir saugoti duomenis. SMS žinutei išsiųsti telefono numeris ir žinutės turinys perduodami Sendberry (Think Intermedia SIA) ir susijusiems ryšio operatoriams. Google Maps ar Facebook turinys gali perduoti Google arba Meta IP adresą ir techninę užklausos informaciją pagal šių bendrovių taisykles. Duomenis galime atskleisti valstybės institucijoms, kai to reikalauja įstatymai. Duomenų perdavimui už Europos ekonominės erdvės ribų taikome BDAR nustatytas apsaugos priemones. Duomenis saugome tinkamomis techninėmis ir organizacinėmis priemonėmis ir ribojame prieigą prie jų.</text>\n\n<title>Vietinė saugykla ir saugojimo trukmė</title>\n<text>Svetainė naudoja naršyklės vietinę saugyklą pasirinktai kalbai ir padaliniui įsiminti bei viešam turiniui laikinai išsaugoti. Naršyklė gali pasiūlyti išsaugoti vardą ir telefono numerį pagal jūsų įrenginio ir naršyklės nustatymus. Nenaudojame analizės ar reklamos slapukų. Techninius serverio žurnalus paprastai saugome iki 30 dienų, o registracijos ir kliento duomenis — tik tiek, kiek reikia paslaugai suteikti, teisiniams reikalavimams ginti ir teisinėms prievolėms vykdyti. Kai duomenų nebereikia, juos ištriname arba nuasmeniname.</text>\n\n<title>Jūsų teisės</title>\n<text>Turite teisę susipažinti su savo asmens duomenimis ir gauti jų kopiją, ištaisyti netikslius duomenis ir juos ištrinti, kai nebeturime teisinio pagrindo saugoti. Kai taikoma, galite prašyti apriboti duomenų tvarkymą ar juos perkelti ir nesutikti su teisėtu interesu grindžiamu tvarkymu. Į prašymą paprastai atsakysime per vieną mėnesį; prieš jį vykdydami galime paprašyti patvirtinti jūsų tapatybę.</text>\n\n<title>Privalomi duomenys ir automatizuoti sprendimai</title>\n<text>Vardas, telefono numeris ir pasirinktos registracijos informacija būtini registracijai internetu atlikti; be šių duomenų negalime jos priimti ir patvirtinti. Nepriimame vien automatizuotu duomenų tvarkymu pagrįstų sprendimų, kurie sukelia teisines ar panašiai reikšmingas pasekmes, ir nevykdome profiliavimo.</text>\n\n<title>Politikos pakeitimai</title>\n<text>Šią privatumo politiką galime atnaujinti pasikeitus duomenų tvarkymui ar teisės aktų reikalavimams. Naujausia jos versija ir atnaujinimo data skelbiamos šiame puslapyje.</text>\n\n<title>Susisiekite su mumis</title>\n<text>Norėdami užduoti klausimą arba pasinaudoti savo duomenų apsaugos teisėmis, susisiekite su pasirinktu JZ Barbershop padaliniu toliau nurodytais kontaktiniais duomenimis.</text>",
+     "policyLastSave": "2026-08-10T08:49:53.346608"
+    }
+   ],
+   "languages": [
+    {
+     "code": "lv",
+     "title": "Latviešu"
+    },
+    {
+     "code": "en",
+     "title": "English"
+    },
+    {
+     "code": "ru",
+     "title": "Русский"
+    }
+   ],
+   "services": [
+    {
+     "id": 15,
+     "imageUrl": "Services/4cf58380-9651-44b0-8c34-0a7d9d3faf29",
+     "price": 22,
+     "isMultiBarber": false,
+     "duration": 45,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      18,
+      19,
+      44
+     ],
+     "texts": [
+      {
+       "code": "ru",
+       "description": "Классические и современные стрижки, текстуры и формы, сушка феном и укладки на каждый день или для особых случаев.",
+       "firstRoleLabel": null,
+       "secondRoleLabel": null,
+       "title": "Мужская стрижка"
+      },
+      {
+       "code": "lv",
+       "description": "Klasiskie un modernie griezumi, tekstūra un formas, fēnošana un stailings ikdienai vai pasākumam.",
+       "firstRoleLabel": null,
+       "secondRoleLabel": null,
+       "title": "Matu griezums"
+      },
+      {
+       "code": "en",
+       "description": "Classic and modern cuts, textures and shapes, blow-drying and styling for everyday or special occasions.",
+       "firstRoleLabel": null,
+       "secondRoleLabel": null,
+       "title": "Men's haircut"
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "imageUrl": "Services/a607dfe4-2379-4c51-a875-2eb820b5c36a",
+     "price": 22,
+     "isMultiBarber": false,
+     "duration": 45,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      44,
+      19,
+      18
+     ],
+     "texts": [
+      {
+       "code": "lt",
+       "description": "Aiškios linijos, karštas rankšluostis, aliejai ir balzamai — patogi ir tiksli priežiūra.",
+       "firstRoleLabel": null,
+       "secondRoleLabel": null,
+       "title": "Barzdos korekcija"
+      },
+      {
+       "code": "ru",
+       "description": "Четкие линии, горячее полотенце, масла и бальзамы — комфортный и точный уход.",
+       "firstRoleLabel": null,
+       "secondRoleLabel": null,
+       "title": "Коррекция бороды"
+      },
+      {
+       "code": "lv",
+       "description": "Asas līnijas, karstais dvielis, eļļas un balzami — komfortabla un precīza kopšana.",
+       "firstRoleLabel": null,
+       "secondRoleLabel": null,
+       "title": "Bārdas korekcija"
+      },
+      {
+       "code": "en",
+       "description": "Sharp lines, hot towel, oils and balms — comfortable and precise care.",
+       "firstRoleLabel": null,
+       "secondRoleLabel": null,
+       "title": "Beard correction"
+      }
+     ]
+    },
+    {
+     "id": 18,
+     "imageUrl": "Services/31498d62-4696-48ea-95c3-81c84313951b",
+     "price": 38,
+     "isMultiBarber": false,
+     "duration": 60,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      17,
+      15,
+      19,
+      44
+     ],
+     "texts": [
+      {
+       "code": "en",
+       "description": "A complete service for men who value style and a well-groomed look. A precise haircut and perfectly shaped beard will highlight your individuality.",
+       "firstRoleLabel": null,
+       "secondRoleLabel": null,
+       "title": "Haircut + Beard trim"
+      },
+      {
+       "code": "lv",
+       "description": "Komplekss pakalpojums vīriešiem, kas novērtē stilu un koptu izskatu. Precīzs matu griezums un ideāli ieveidota bārda izcels individualitāti.",
+       "firstRoleLabel": null,
+       "secondRoleLabel": null,
+       "title": "Matu griezums + Bārdas korekcija"
+      },
+      {
+       "code": "lt",
+       "description": "Kompleksinė paslauga vyrams, vertinantiems stilių ir tvarkingą įvaizdį. Tiksli šukuosena ir idealiai suformuota barzda pabrėš individualumą.",
+       "firstRoleLabel": null,
+       "secondRoleLabel": null,
+       "title": "Plaukų kirpimas + barzdos korekcija"
+      },
+      {
+       "code": "ru",
+       "description": "Комплексная услуга для тех, кто ценит стиль и аккуратность. Чёткая стрижка и идеальная форма бороды подчеркнут индивидуальность и придадут ухоженный вид.",
+       "firstRoleLabel": null,
+       "secondRoleLabel": null,
+       "title": "Стрижка волос + Коррекция бороды"
+      }
+     ]
+    },
+    {
+     "id": 19,
+     "imageUrl": "Services/2f944093-2787-4604-b458-9cef3c15974b",
+     "price": 38,
+     "isMultiBarber": true,
+     "duration": 45,
+     "secondDuration": 45,
+     "excludedServiceIds": [
+      23,
+      43,
+      17,
+      20,
+      22,
+      39,
+      42,
+      44,
+      25,
+      18,
+      15,
+      41,
+      21,
+      40
+     ],
+     "texts": [
+      {
+       "code": "lt",
+       "description": "Bendra tėvo ir sūnaus kirpimo paslauga. Vienas apsilankymas barbershope tampa stilingu ritualu dviem, kai svarbu ne tik atnaujinti įvaizdį, bet ir praleisti laiką kartu.",
+       "firstRoleLabel": "Tėvas",
+       "secondRoleLabel": "Sūnus",
+       "title": "Tėvas ir Sūnus (iki 12 metų)"
+      },
+      {
+       "code": "lv",
+       "description": "Kopīga matu griešana tēvam un dēlam. Viena vizīte barbershopā pārtop stilīgā rituālā, kur svarīgi ir ne tikai izskats, bet arī kopā pavadītais laiks.",
+       "firstRoleLabel": "Tēvs",
+       "secondRoleLabel": "Dēls",
+       "title": "Tēvs un Dēls (līdz 12 gadiem)"
+      },
+      {
+       "code": "en",
+       "description": "A stylish haircut for father and son. One visit turns into a shared ritual where it’s not just about the look, but about spending quality time together.",
+       "firstRoleLabel": "Father",
+       "secondRoleLabel": "Son",
+       "title": "Father and Son (up to 12 years)"
+      },
+      {
+       "code": "ru",
+       "description": "Совместная стрижка для отца и сына. Один визит в барбершоп превращается в стильный ритуал для двоих, где важно не только обновить образ, но и провести время вместе.",
+       "firstRoleLabel": "Отец",
+       "secondRoleLabel": "Сын",
+       "title": "Отец и Сын (до 12 лет)"
+      }
+     ]
+    },
+    {
+     "id": 44,
+     "imageUrl": "Services/c14f098a-299c-49bb-abea-b53052cc06c9",
+     "price": 57,
+     "isMultiBarber": true,
+     "duration": 60,
+     "secondDuration": 45,
+     "excludedServiceIds": [
+      22,
+      19,
+      42,
+      25,
+      18,
+      15,
+      21,
+      41,
+      40,
+      23,
+      17,
+      43,
+      20,
+      39
+     ],
+     "texts": [
+      {
+       "code": "ru",
+       "description": "Стильная стрижка для отца с коррекцией бороды и стрижка для сына. Один визит превращается в общий ритуал, где важен не только внешний вид, но и качественно проведённое вместе время.",
+       "firstRoleLabel": "Отец",
+       "secondRoleLabel": "Сын",
+       "title": "Отец (+коррекция бороды) и Сын (до 12 лет)"
+      },
+      {
+       "code": "lv",
+       "description": "Stilīgs matu griezums tēvam ar bārdas korekciju un matu griezums dēlam. Viens apmeklējums kļūst par kopīgu rituālu, kurā svarīgs ir ne tikai izskats, bet arī kvalitatīvi kopā pavadīts laiks.",
+       "firstRoleLabel": "Tēvs",
+       "secondRoleLabel": "Dēls",
+       "title": "Tēvs (+bārdas korekcija) un Dēls (līdz 12 gadiem)"
+      },
+      {
+       "code": "en",
+       "description": "A stylish haircut for the father, including a beard trim, and a haircut for his son. One visit becomes a shared ritual that is not only about looking good, but also about spending quality time together.",
+       "firstRoleLabel": "Father",
+       "secondRoleLabel": "Son",
+       "title": "Father (+beard trim) and Son (up to 12 years)"
+      }
+     ]
+    },
+    {
+     "id": 20,
+     "imageUrl": "Services/ccd3452d-4845-4c26-9dfc-79c09a0b4647",
+     "price": 22,
+     "isMultiBarber": false,
+     "duration": 45,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      19,
+      44,
+      22
+     ],
+     "texts": [
+      {
+       "code": "ru",
+       "description": "Щадящее тонирование волос, которое помогает освежить образ, подчеркнуть естественный оттенок или скрыть седину. Лёгкий уход и естественный результат без резких изменений.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Тонирование волос"
+      },
+      {
+       "code": "lt",
+       "description": "Švelnus būdas atnaujinti įvaizdį, paryškinti natūralų atspalvį arba paslėpti žilus plaukus. Natūralus rezultatas be didelių pokyčių.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Plaukų tonavimas"
+      },
+      {
+       "code": "lv",
+       "description": "Saudzīga matu tonēšana, kas atsvaidzina tēlu, izceļ dabīgo toni vai palīdz noslēpt sirmos matus. Viegls kopšanas efekts un dabisks rezultāts bez krasām pārmaiņām.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Matu tonēšana"
+      },
+      {
+       "code": "en",
+       "description": "A gentle way to refresh your look, enhance your natural shade, or cover gray hair. A soft care effect with a natural finish, without drastic changes.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Hair toning"
+      }
+     ]
+    },
+    {
+     "id": 21,
+     "imageUrl": "Services/222e5381-790d-425e-9c92-d6f372cb8cd7",
+     "price": 22,
+     "isMultiBarber": false,
+     "duration": 30,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      44,
+      22,
+      19
+     ],
+     "texts": [
+      {
+       "code": "ru",
+       "description": "Аккуратное тонирование бороды для свежего и ухоженного образа. Подчёркивает естественный цвет или скрывает седину, сохраняя естественный вид.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Тонирование бороды"
+      },
+      {
+       "code": "lv",
+       "description": "Saudzīga bārdas tonēšana svaigam un koptam izskatam. Izceļ dabīgo toni vai nosedz sirmumu, saglabājot dabisku efektu.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Bārdas tonēšana"
+      },
+      {
+       "code": "lt",
+       "description": "Švelnus barzdos tonavimas, suteikiantis gaivią ir tvarkingą išvaizdą. Paryškina natūralią spalvą arba paslepia žilus plaukus, išlaikant natūralų rezultatą.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Barzdos tonavimas"
+      },
+      {
+       "code": "en",
+       "description": "A gentle coloring treatment for a fresh, well-groomed look. Enhances the natural shade or conceals gray while keeping a natural appearance.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Beard toning"
+      }
+     ]
+    },
+    {
+     "id": 22,
+     "imageUrl": "Services/3b0246c8-9b3b-4511-a247-042493f6fff5",
+     "price": 38,
+     "isMultiBarber": false,
+     "duration": 60,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      44,
+      20,
+      21,
+      19
+     ],
+     "texts": [
+      {
+       "code": "en",
+       "description": "A complete service for a fresh, well-groomed look. Enhances your natural shade, conceals gray, and highlights your style with confidence.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Hair + Beard toning"
+      },
+      {
+       "code": "lv",
+       "description": "Komplekss matu un bārdas tonēšanas pakalpojums. Svaigs un kopts tēls, dabisks tonis un pārliecība ikvienā skatienā. Lieliska izvēle, lai izceltu stilu un noslēptu sirmos matus.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Matu + Bārdas tonēšana"
+      },
+      {
+       "code": "lt",
+       "description": "Kompleksinė paslauga, suteikianti gaivų ir tvarkingą įvaizdį. Natūrali spalva, pasitikėjimas savimi ir stiliaus išryškinimas kartu su žilų plaukų paslėpimu.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Plaukų + Barzdos tonavimas"
+      },
+      {
+       "code": "ru",
+       "description": "Комплексное тонирование волос и бороды. Свежий и ухоженный образ, естественный оттенок и уверенность в каждом взгляде. Отличное решение, чтобы подчеркнуть стиль и скрыть седину.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Тонирование Волос + Бороды"
+      }
+     ]
+    },
+    {
+     "id": 23,
+     "imageUrl": "Services/1b0206fd-37ff-405c-a33e-d02743fee787",
+     "price": 17,
+     "isMultiBarber": false,
+     "duration": 30,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      44,
+      19
+     ],
+     "texts": [
+      {
+       "code": "lt",
+       "description": "Profesionalus plaukų sušukavimas, pabrėžiantis kirpimo formą ir suteikiantis stilingą, užbaigtą įvaizdį. Tinka tiek kasdienai, tiek ypatingoms progoms.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Plaukų formavimas"
+      },
+      {
+       "code": "ru",
+       "description": "Профессиональная укладка волос, которая подчеркнёт форму стрижки и придаст стильный законченный вид. Подходит как для повседневного образа, так и для особых случаев.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Укладка волос"
+      },
+      {
+       "code": "en",
+       "description": "Professional hair shaping that highlights the cut and gives a stylish, polished look. Perfect for both everyday wear and special occasions.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Hair styling"
+      },
+      {
+       "code": "lv",
+       "description": "Profesionāla matu ieveidošana, kas izceļ griezuma formu un piešķir stilīgu, pabeigtu izskatu. Lieliski piemērota gan ikdienai, gan svinīgiem brīžiem.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Matu ieveidošana"
+      }
+     ]
+    },
+    {
+     "id": 25,
+     "imageUrl": "Services/aee2f361-781f-450e-b283-d67335ef1084",
+     "price": 30,
+     "isMultiBarber": false,
+     "duration": 60,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      19,
+      44
+     ],
+     "texts": [
+      {
+       "code": "lt",
+       "description": "Visa valanda atsipalaidavimo ir priežiūros. Plaukų ir barzdos priežiūra, veido odos valymas su šveitikliu, veido masažas, karštas rankšluostis, drėkinamoji kaukė ir kremas, kad atgautumėte jėgas ir jaustumėtės gaiviai bei tvarkingai.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "SPA valanda"
+      },
+      {
+       "code": "lv",
+       "description": "ilna relaksācijas un kopšanas stunda. Matu un bārdas kopšana, sejas ādas attīrīšana ar skrubi, sejas masāža, karstais dvielis, mitrinoša maska un krēms, lai atjaunotu spēkus un sajustos svaigi un sakopts.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "SPA stunda"
+      },
+      {
+       "code": "en",
+       "description": "A full hour of relaxation and grooming. Hair and beard care, facial cleansing with a scrub, facial massage, hot towel, moisturizing mask and cream to restore your energy and leave you feeling fresh and well-groomed.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "SPA Hour"
+      },
+      {
+       "code": "ru",
+       "description": "Полный час релаксации и ухода. Уход за волосами и бородой, очищение кожи лица со скрабом, массаж лица, горячее полотенце, увлажняющая маска и крем, чтобы восстановить силы и почувствовать себя свежим и ухоженным.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Час SPA"
+      }
+     ]
+    },
+    {
+     "id": 39,
+     "imageUrl": null,
+     "price": 7,
+     "isMultiBarber": false,
+     "duration": 15,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      43,
+      44,
+      19
+     ],
+     "texts": [
+      {
+       "code": "lt",
+       "description": "Plaukelių šalinimas vašku nosies srityje, kad išvaizda būtų tvarkinga ir švari.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Nosies vaškavimas"
+      },
+      {
+       "code": "lv",
+       "description": "Matiņu noņemšana deguna zonā ar vasku koptam un tīram izskatam.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Deguna vaksācija"
+      },
+      {
+       "code": "en",
+       "description": "Wax removal of unwanted hair in the nose area for a cleaner, well-groomed look.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Nose Waxing"
+      },
+      {
+       "code": "ru",
+       "description": "Удаление волосков воском в зоне носа для чистого и ухоженного вида.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Ваксация носа"
+      }
+     ]
+    },
+    {
+     "id": 40,
+     "imageUrl": null,
+     "price": 7,
+     "isMultiBarber": false,
+     "duration": 15,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      43,
+      19,
+      44
+     ],
+     "texts": [
+      {
+       "code": "ru",
+       "description": "Коррекция формы бровей воском с удалением лишних волосков.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Ваксация бровей"
+      },
+      {
+       "code": "lt",
+       "description": "Antakių formos tvarkymas vašku, pašalinant nereikalingus plaukelius.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Antakių vaškavimas"
+      },
+      {
+       "code": "lv",
+       "description": "Uzacu formas sakopšana ar vasku, noņemot liekos matiņus.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Uzacu vaksācija"
+      },
+      {
+       "code": "en",
+       "description": "Eyebrow shaping with wax to remove excess hair and define the shape.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Eyebrow Waxing"
+      }
+     ]
+    },
+    {
+     "id": 41,
+     "imageUrl": null,
+     "price": 7,
+     "isMultiBarber": false,
+     "duration": 15,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      44,
+      43,
+      19
+     ],
+     "texts": [
+      {
+       "code": "en",
+       "description": "Wax removal of unwanted hair around the ears for a neat, well-groomed appearance.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Ear Waxing"
+      },
+      {
+       "code": "lv",
+       "description": "Matiņu noņemšana ausu zonā ar vasku sakoptam izskatam.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Ausu vaksācija"
+      },
+      {
+       "code": "lt",
+       "description": "Plaukelių šalinimas vašku ausų srityje tvarkingai išvaizdai.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Ausų vaškavimas"
+      },
+      {
+       "code": "ru",
+       "description": "Удаление волосков воском в зоне ушей для более аккуратного внешнего вида.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Ваксация ушей"
+      }
+     ]
+    },
+    {
+     "id": 42,
+     "imageUrl": null,
+     "price": 16,
+     "isMultiBarber": false,
+     "duration": 30,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      19,
+      44
+     ],
+     "texts": [
+      {
+       "code": "lv",
+       "description": "Matiņu noņemšana vaigu un kakla zonā ar vasku, lai āda izskatītos gludāka un sakoptāka.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Sejas zonu vaksācija / vaigi un kakls"
+      },
+      {
+       "code": "lt",
+       "description": "Plaukelių šalinimas vašku skruostų ir kaklo srityse, kad oda atrodytų lygesnė ir tvarkingesnė.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Veido zonų vaškavimas / skruostai ir kaklas"
+      },
+      {
+       "code": "ru",
+       "description": "Удаление волосков воском в зоне щёк и шеи, чтобы кожа выглядела более гладкой и ухоженной.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Ваксация зон лица / щёки и шея"
+      },
+      {
+       "code": "en",
+       "description": "Waxing of the cheek and neck areas to remove unwanted hair and leave the skin looking smoother and cleaner.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Facial Area Waxing / cheeks and neck"
+      }
+     ]
+    },
+    {
+     "id": 43,
+     "imageUrl": null,
+     "price": 17,
+     "isMultiBarber": false,
+     "duration": 30,
+     "secondDuration": null,
+     "excludedServiceIds": [
+      44,
+      40,
+      41,
+      19,
+      39
+     ],
+     "texts": [
+      {
+       "code": "lv",
+       "description": "Matiņu noņemšana deguna un ausu zonā, kā arī uzacu formas sakopšana ar vasku. Ērts komplekts koptam un tīram izskatam.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Deguna, uzacu un ausu vaksācija"
+      },
+      {
+       "code": "lt",
+       "description": "Plaukelių šalinimas vašku nosies ir ausų srityse bei antakių formos tvarkymas. Patogus komplektas švariai ir tvarkingai išvaizdai.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Nosies, antakių ir ausų vaškavimas"
+      },
+      {
+       "code": "en",
+       "description": "Waxing of the nose and ear areas, plus eyebrow shaping to remove excess hair and keep the look neat and well-groomed.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Nose, Eyebrow & Ear Waxing"
+      },
+      {
+       "code": "ru",
+       "description": "Удаление волосков воском в зоне носа и ушей, а также аккуратная коррекция формы бровей. Удобный комплекс для чистого и ухоженного вида.",
+       "firstRoleLabel": "",
+       "secondRoleLabel": "",
+       "title": "Ваксация носа, бровей и ушей"
+      }
+     ]
+    }
+   ],
+   "teamMembers": [
+    {
+     "id": 7,
+     "firstName": "Jūlija",
+     "lastName": "Bogdanova",
+     "descriptions": [
+      {
+       "code": "lv",
+       "data": "Kopts izskats sākas ar pārliecību, labu gaumi un meistaru, kurš saprot detaļu nozīmi."
+      },
+      {
+       "code": "ru",
+       "data": "Ухоженный внешний вид начинается с уверенности, хорошего вкуса и мастера, который понимает значение деталей."
+      },
+      {
+       "code": "en",
+       "data": "A polished look begins with confidence, good taste, and a barber who understands the power of details."
+      }
+     ],
+     "profilePicUrl": "Barbers/ad69d2b9-4726-484a-a85c-58a19cb66c4c",
+     "services": [
+      15,
+      17,
+      18,
+      19,
+      44,
+      20,
+      21,
+      22,
+      23,
+      25,
+      39,
+      40,
+      41,
+      42,
+      43
+     ],
+     "serviceDurations": [
+      {
+       "serviceId": 15,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 17,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 18,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 19,
+       "duration": 45,
+       "secondDuration": 45
+      },
+      {
+       "serviceId": 44,
+       "duration": 60,
+       "secondDuration": 45
+      },
+      {
+       "serviceId": 20,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 21,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 22,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 23,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 25,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 39,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 40,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 41,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 42,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 43,
+       "duration": 30,
+       "secondDuration": null
+      }
+     ]
+    },
+    {
+     "id": 8,
+     "firstName": "Zita",
+     "lastName": "Sauka",
+     "descriptions": [
+      {
+       "code": "ru",
+       "data": "Стиль, который подчёркивает характер, и работа мастера, основанная на опыте, вкусе и внимании к деталям."
+      },
+      {
+       "code": "lv",
+       "data": "Stils, kas izceļ raksturu, un meistara pieeja, kas balstīta pieredzē, gaumē un detaļās."
+      },
+      {
+       "code": "en",
+       "data": "Style that highlights character, shaped by expertise, taste, and attention to detail."
+      }
+     ],
+     "profilePicUrl": "Barbers/e7de766c-d4e8-45f7-97b6-4c09ef90965d",
+     "services": [
+      15,
+      17,
+      18,
+      19,
+      44,
+      20,
+      21,
+      22,
+      23,
+      25,
+      39,
+      40,
+      41,
+      42,
+      43
+     ],
+     "serviceDurations": [
+      {
+       "serviceId": 15,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 17,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 18,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 19,
+       "duration": 30,
+       "secondDuration": 30
+      },
+      {
+       "serviceId": 44,
+       "duration": 60,
+       "secondDuration": 30
+      },
+      {
+       "serviceId": 20,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 21,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 22,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 23,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 25,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 39,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 40,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 41,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 42,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 43,
+       "duration": 30,
+       "secondDuration": null
+      }
+     ]
+    },
+    {
+     "id": 9,
+     "firstName": "Ksenija",
+     "lastName": "Jefimova",
+     "descriptions": [
+      {
+       "code": "lv",
+       "data": "Mūsdienīgas tehnikas, radoši risinājumi un uzmanība katram klientam."
+      },
+      {
+       "code": "ru",
+       "data": " Современные техники, креативные решения и внимание к каждому клиенту."
+      },
+      {
+       "code": "en",
+       "data": "Modern techniques, creative solutions, and attention to every client."
+      }
+     ],
+     "profilePicUrl": "Barbers/afbe8d7d-a216-4be2-aac7-3e2e88506168",
+     "services": [
+      15,
+      17,
+      18,
+      19,
+      44,
+      20,
+      21,
+      22,
+      23,
+      25,
+      39,
+      40,
+      41,
+      42,
+      43
+     ],
+     "serviceDurations": [
+      {
+       "serviceId": 15,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 17,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 18,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 19,
+       "duration": 45,
+       "secondDuration": 45
+      },
+      {
+       "serviceId": 44,
+       "duration": 60,
+       "secondDuration": 45
+      },
+      {
+       "serviceId": 20,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 21,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 22,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 23,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 25,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 39,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 40,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 41,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 42,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 43,
+       "duration": 30,
+       "secondDuration": null
+      }
+     ]
+    },
+    {
+     "id": 14,
+     "firstName": "Tatjana",
+     "lastName": "Zavadska",
+     "descriptions": [
+      {
+       "code": "ru",
+       "data": "Точные стрижки, безупречное оформление бороды, индивидуальный подход, лёгкое общение, опыт и свежий взгляд на стиль."
+      },
+      {
+       "code": "lv",
+       "data": "Precīzi matu griezumi, nevainojama bārdas sakopšana, individuāla pieeja, viegla komunikācija, pieredze un svaigs skatījums uz stilu."
+      },
+      {
+       "code": "en",
+       "data": "Precise haircuts, flawless beard styling, a personal approach, easy communication, experience, and a fresh eye for style."
+      }
+     ],
+     "profilePicUrl": "Barbers/5a675118-0b95-49b6-8f67-98fbb712ee42",
+     "services": [
+      15,
+      17,
+      18,
+      19,
+      44,
+      20,
+      21,
+      22,
+      23,
+      25,
+      39,
+      40,
+      41,
+      42,
+      43
+     ],
+     "serviceDurations": [
+      {
+       "serviceId": 15,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 17,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 18,
+       "duration": 75,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 19,
+       "duration": 60,
+       "secondDuration": 60
+      },
+      {
+       "serviceId": 44,
+       "duration": 75,
+       "secondDuration": 45
+      },
+      {
+       "serviceId": 20,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 21,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 22,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 23,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 25,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 39,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 40,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 41,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 42,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 43,
+       "duration": 30,
+       "secondDuration": null
+      }
+     ]
+    },
+    {
+     "id": 15,
+     "firstName": "Artjoms",
+     "lastName": "Matvejevs",
+     "descriptions": [
+      {
+       "code": "lv",
+       "data": "Pārliecināta meistara roka, stila izjūta, uzmanība detaļām un spēja izcelt katra klienta individualitāti."
+      },
+      {
+       "code": "en",
+       "data": "A confident touch, a strong sense of style, attention to detail, and the ability to highlight each client’s individuality."
+      },
+      {
+       "code": "ru",
+       "data": "Уверенная рука мастера, чувство стиля, внимание к деталям и умение подчеркнуть индивидуальность каждого клиента."
+      }
+     ],
+     "profilePicUrl": "Barbers/bdf231d2-1308-46f2-84da-e06718ff1f66",
+     "services": [
+      15,
+      17,
+      18,
+      19,
+      44,
+      20,
+      21,
+      22,
+      23,
+      25,
+      39,
+      40,
+      41,
+      42,
+      43
+     ],
+     "serviceDurations": [
+      {
+       "serviceId": 15,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 17,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 18,
+       "duration": 90,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 19,
+       "duration": 60,
+       "secondDuration": 45
+      },
+      {
+       "serviceId": 44,
+       "duration": 75,
+       "secondDuration": 60
+      },
+      {
+       "serviceId": 20,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 21,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 22,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 23,
+       "duration": 25,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 25,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 39,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 40,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 41,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 42,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 43,
+       "duration": 30,
+       "secondDuration": null
+      }
+     ]
+    },
+    {
+     "id": 16,
+     "firstName": "Rita",
+     "lastName": "Semjonova",
+     "descriptions": [
+      {
+       "code": "lv",
+       "data": "Smalks estētikas izjūtas, rūpība katrā detaļā, viegla komunikācija un spēja radīt stilīgu, harmonisku tēlu."
+      },
+      {
+       "code": "ru",
+       "data": "Тонкое чувство эстетики, аккуратность в каждой детали, лёгкость в общении и умение создать стильный, гармоничный образ."
+      },
+      {
+       "code": "en",
+       "data": "A refined sense of aesthetics, care in every detail, easy communication, and the ability to create a stylish, balanced look."
+      }
+     ],
+     "profilePicUrl": "Barbers/a3e53b86-de8c-43b9-9821-4ad21ec5de56",
+     "services": [
+      15,
+      17,
+      18,
+      19,
+      44,
+      20,
+      21,
+      22,
+      23,
+      25,
+      39,
+      40,
+      41,
+      42,
+      43
+     ],
+     "serviceDurations": [
+      {
+       "serviceId": 15,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 17,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 18,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 19,
+       "duration": 45,
+       "secondDuration": 45
+      },
+      {
+       "serviceId": 44,
+       "duration": 60,
+       "secondDuration": 45
+      },
+      {
+       "serviceId": 20,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 21,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 22,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 23,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 25,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 39,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 40,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 41,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 42,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 43,
+       "duration": 30,
+       "secondDuration": null
+      }
+     ]
+    },
+    {
+     "id": 17,
+     "firstName": "Jekaterina",
+     "lastName": "Harina",
+     "descriptions": [
+      {
+       "code": "lv",
+       "data": "Precīzi matu griezumi, nevainojama bārdas sakopšana, individuāla pieeja, viegla komunikācija, pieredze un svaigs skatījums uz stilu."
+      },
+      {
+       "code": "en",
+       "data": "Precise haircuts, flawless beard styling, a personal approach, easy communication, experience, and a fresh eye for style."
+      },
+      {
+       "code": "ru",
+       "data": "Точные стрижки, безупречное оформление бороды, индивидуальный подход, лёгкое общение, опыт и свежий взгляд на стиль."
+      }
+     ],
+     "profilePicUrl": "Barbers/1639fe3d-fea0-4b8b-b631-b1eee3d284c7",
+     "services": [
+      15,
+      17,
+      18,
+      19,
+      44,
+      20,
+      21,
+      22,
+      23,
+      25,
+      39,
+      40,
+      41,
+      42,
+      43
+     ],
+     "serviceDurations": [
+      {
+       "serviceId": 15,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 17,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 18,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 19,
+       "duration": 45,
+       "secondDuration": 45
+      },
+      {
+       "serviceId": 44,
+       "duration": 60,
+       "secondDuration": 45
+      },
+      {
+       "serviceId": 20,
+       "duration": 45,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 21,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 22,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 23,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 25,
+       "duration": 60,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 39,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 40,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 41,
+       "duration": 15,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 42,
+       "duration": 30,
+       "secondDuration": null
+      },
+      {
+       "serviceId": 43,
+       "duration": 30,
+       "secondDuration": null
+      }
+     ]
+    }
+   ],
+   "allowedBookingEnd": 15,
+   "isBookingEnabled": true,
+   "maxClientBookingServices": 3
+  }
+ },
+ "feeds": {
+  "dpils-alejas": [
+   {
+    "id": "499816983205370_122202205838590309",
+    "message": "💥✂️☠️👻‼️",
+    "created_time": "2026-10-26T18:32:05+0000",
+    "permalink_url": "https://www.facebook.com/122186026178590309/posts/122202205838590309",
+    "type": "event",
+    "image": "https://scontent-hel3-1.xx.fbcdn.net/v/t39.30808-6/862898757_122202206804590309_5822502269587981654_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=106&ccb=1-7&_nc_sid=1abd25&_nc_ohc=B04IDtRcDSEQ7kNvwHvLI3n&_nc_oc=Ado9Qwv8UsRvSThLTzW8kseXaMCDUCu4YBFOfu5WbUuhSAdUwOkOc8zpOHwB2atPiVY&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQI2MryMeAHT23VuXjsAeat7vn-tTP6Izx6UEMoSwYSCoPsUy7xn7ZWrdvlbMy0GwOuwNcUMKW7q&oh=00_AQRSRoekMZlcb96i135zOygbvo2p8-PYJifV9V_m7CLSdA&oe=6AE9A326"
+   },
+   {
+    "id": "499816983205370_122202204542590309",
+    "message": "Jau šo sesdien!pieraksts uz matiem un bārdu jau atvērts‼️💥gaidīsim tevi 💥👻☠️",
+    "created_time": "2026-10-26T18:17:48+0000",
+    "permalink_url": "https://www.facebook.com/122186026178590309/posts/122202204542590309",
+    "type": "video_inline",
+    "image": "https://scontent-hel3-1.xx.fbcdn.net/v/t51.82787-10/852355929_17947855461349164_1874868004657304386_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=105&ccb=1-7&_nc_sid=5fad0e&_nc_ohc=gHx3JvxM2LcQ7kNvwGagzy3&_nc_oc=AdouiDAak1Pwo5KyemNrUIr_1bpK74DVOHve-H5AV-_LORGdIlaEj8RIRYtTi1HzbuU&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQL4FHWbMibkt8q8bHthEBYjd8LK-RY5E2d3d8pRnMCbhNjhzfJuLq6a8rrQXNPY8vQS_oARZXis&oh=00_AQRyQZ7O4-DqWc5O-cTjZ5ttzHk2PnkBEtbktLtk7WDXew&oe=6AE98E0E"
+   },
+   {
+    "id": "499816983205370_122202048506590309",
+    "message": "Joki ir joki, bet realitāte ir vienkāršāka: mums ir lielisks darba grafiks, pateicoties kuram mēs vienmēr esam moži, enerģijas pilni un gatavi sasniegt vislabāko rezultātu tieši tev💇\nRezervē piemērotāko laiku tieši tev💈\n\n——\n\nШутки шутками, а реальность проще: у нас есть классный график, благодаря которому мы всегда свежие, полные сил и заряжены на лучший результат для вас💇Занимай свое окошко для записи!💈\n\n📍Alejas iela 75, Daugavpils\n📞 +371 24 400 021\n\n📲 Online pieraksts mājaslapā, saite profila galvenē / Онлайн-запись через сайт по ссылке в шапке профиля",
+    "created_time": "2026-10-25T11:29:10+0000",
+    "permalink_url": "https://www.facebook.com/reel/1120811900809649/",
+    "type": "video_inline",
+    "image": "https://scontent-hel3-1.xx.fbcdn.net/v/t51.82787-10/867618931_17949020493349164_838796173664877202_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=101&ccb=1-7&_nc_sid=5fad0e&_nc_ohc=vmuNVjOp1DYQ7kNvwENRd5z&_nc_oc=Adpoy1H9WZSuPRYq13pWqGlIuvdCTM1wQzVn1snNXGanPvxkok2LxII2q83GDjKyDys&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQJrOanELJc6h9Y_UazQrq2g7oNeyoDiiYxu4xhP8YaT-Nx2eFNVOrTI-gE6sHOhKQaOjEUJuhne&oh=00_AQRAaWcYFibeJmdEacLi3hiMa6UxYgnsstRhW52vcqt1pw&oe=6AE99E2B"
+   },
+   {
+    "id": "499816983205370_122201950310590309",
+    "message": "Jau nākošās brīvdienas ‼️🔥🎊",
+    "created_time": "2026-10-24T15:05:03+0000",
+    "permalink_url": "https://www.facebook.com/122186026178590309/posts/122201950310590309",
+    "type": "video_inline",
+    "image": "https://scontent-hel3-1.xx.fbcdn.net/v/t51.82787-10/852355929_17947855461349164_1874868004657304386_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=105&ccb=1-7&_nc_sid=5fad0e&_nc_ohc=gHx3JvxM2LcQ7kNvwGagzy3&_nc_oc=AdouiDAak1Pwo5KyemNrUIr_1bpK74DVOHve-H5AV-_LORGdIlaEj8RIRYtTi1HzbuU&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQL4FHWbMibkt8q8bHthEBYjd8LK-RY5E2d3d8pRnMCbhNjhzfJuLq6a8rrQXNPY8vQS_oARZXis&oh=00_AQRyQZ7O4-DqWc5O-cTjZ5ttzHk2PnkBEtbktLtk7WDXew&oe=6AE98E0E"
+   },
+   {
+    "id": "499816983205370_122201744420590309",
+    "message": "💥",
+    "created_time": "2026-10-22T16:00:25+0000",
+    "permalink_url": "https://www.facebook.com/122186026178590309/posts/122201744420590309",
+    "type": "native_templates",
+    "image": null
+   },
+   {
+    "id": "499816983205370_122201479604590309",
+    "message": "",
+    "created_time": "2026-10-20T10:04:14+0000",
+    "permalink_url": "https://www.facebook.com/122186026178590309/posts/122201479604590309",
+    "type": "photo",
+    "image": "https://scontent-hel3-1.xx.fbcdn.net/v/t39.30808-6/855294469_122201479580590309_4250301286671588100_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=kmuGBc8ju_gQ7kNvwHTsTA1&_nc_oc=Adody8xMN8NAcXZEiUSI4Cc4fyGtVqt8VsVvsk6RhIDt6LVcD65x_n7Cb9iqltSz2Ls&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQIA08YcI8INK8rW0Cv__6V5NgE0OaNGlj8lji8JmbV8rImXFmkttZXY528cAEACxenCe2hmoT_k&oh=00_AQQ57yFOFtZUrvnsbRLCWFO7M-SdJNi7seq5EO0Wvod5oA&oe=6AE996E0"
+   },
+   {
+    "id": "499816983205370_122201479220590309",
+    "message": "Izvēlies savu stilu kopā ar mums 💇‍♂️\nJZ cuts&shave barvershop\n\n📞 Pieraksts pa tālruni: 24400021\n🌐 Tiešsaistes pieraksts: jzbarbershop.com\n📍 Alejas iela 75, Daugavpils",
+    "created_time": "2026-10-20T10:03:19+0000",
+    "permalink_url": "https://www.facebook.com/122186026178590309/posts/122201479220590309",
+    "type": "album",
+    "image": "https://scontent-hel3-1.xx.fbcdn.net/v/t39.30808-6/855834243_122201478926590309_7709041543439327127_n.jpg?stp=cp1_dst-jpegr_p720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=6Pr6QX-XC_QQ7kNvwFK0e6h&_nc_oc=AdpuxNoiJsquxRI8QQCqG52T1Q829qFhNNOnUm-qjmrIgYdC6teTrZxdtV6sM2lSDNk&_nc_zt=23&se=-1&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQIGDFytv3ca5loa5mxXmijKSf9vOpZiLxas0B-NIADVmTbOLBfi7_j1UwV_SGXW6LVqhaG9FnrO&oh=00_AQQMKB0QYUQ17iw3E0IcP1g2qDH_snohT9cveF0xp1xEzw&oe=6AE9B1FC"
+   },
+   {
+    "id": "499816983205370_122201309006590309",
+    "message": "🎃JZ CUTS AND SHAVE BARBERSOP PRESENTS 🩸\n\n🖤 HALLOWEEN NIGHT CUT\n‼️3️⃣1️⃣.1️⃣0️⃣.2️⃣0️⃣2️⃣6️⃣\n⏰ 20:00 - 02:00\n\nŠausmīgi labs vakars tuvojas… 👻🔥\n\n💈 JZ Barbersop pārvēršas par īstu Halloween nakts ballīti!\n🥃 Būs dzērieni\n🎧 DJ GATIS parūpēsies par mūziku un atmosfēru!\n🕷️ Tumša atmosfēra, skaļa mūzika un neaizmirstama nakts!\n🎃 Saģērbies, nāc ar savu kompāniju un esi gatavs nakts piedzīvojumam!\n\n📲 Pieraksties jau iepriekš tiešsaistē mūsu mājaslapā:\n🌐 https://www.jzbarbershop.com\n📞 +371 24 400 021\n\n🩸 HALLOWEEN NIGHT CUT — IZVĒLIES SAVU STILU\n📍 Tiekamies JZ BARBERSOP!\nAlejas iela 75, Daugavpils,\n\n———\n\n🎃JZ CUTS AND SHAVE BARBERSOP PRESENTS 🩸\n\n🖤 HALLOWEEN NIGHT CUT\n‼️3️⃣1️⃣.1️⃣0️⃣.2️⃣0️⃣2️⃣6️⃣\n⏰ 20:00 - 02:00\n\nУжасно хороший вечер приближается…👻🔥\n💈 JZ Barbersop превращается в настоящую хэллоуинскую ночную вечеринку!\n🥃 Будут напитки\n🎧 DJ GATIS позаботится о музыке и атмосфере!\n🕷️ Тёмная атмосфера, громкая музыка и незабываемая ночь!\n🎃 Наряжайся, приходи со своей компанией и будь готов к ночному приключению!\n\n📲 Записывайся заранее онлайн на нашем сайте:\n🌐 https://www.jzbarbershop.com\n📞 +371 24 400 021\n\n🩸 HALLOWEEN NIGHT CUT — ВЫБЕРИ СВОЙ СТИЛЬ\n📍 Встретимся в JZ BARBERSOP!\nAlejas iela 75, Daugavpils,\n\n#JZBarbersop #HalloweenNightCut #DJGatis #Halloween2026 🖤🎃",
+    "created_time": "2026-10-18T16:11:41+0000",
+    "permalink_url": "https://www.facebook.com/reel/2107046963339436/",
+    "type": "video_inline",
+    "image": "https://scontent-hel3-1.xx.fbcdn.net/v/t51.82787-10/852355929_17947855461349164_1874868004657304386_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=105&ccb=1-7&_nc_sid=5fad0e&_nc_ohc=gHx3JvxM2LcQ7kNvwGagzy3&_nc_oc=AdouiDAak1Pwo5KyemNrUIr_1bpK74DVOHve-H5AV-_LORGdIlaEj8RIRYtTi1HzbuU&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQL4FHWbMibkt8q8bHthEBYjd8LK-RY5E2d3d8pRnMCbhNjhzfJuLq6a8rrQXNPY8vQS_oARZXis&oh=00_AQRyQZ7O4-DqWc5O-cTjZ5ttzHk2PnkBEtbktLtk7WDXew&oe=6AE98E0E"
+   },
+   {
+    "id": "499816983205370_122200796444590309",
+    "message": "🧛‍♂️🎊",
+    "created_time": "2026-10-13T07:00:41+0000",
+    "permalink_url": "https://www.facebook.com/122186026178590309/posts/122200796444590309",
+    "type": "photo",
+    "image": "https://scontent-hel3-1.xx.fbcdn.net/v/t51.82787-15/830540598_17944809765349164_301264498136341382_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_ohc=peOdZcpMWNgQ7kNvwEZwzU-&_nc_oc=Adq-89GTU-Sub8rIZglHjfvk4SD2Ay-DFSlw4tCYbtOE2RpYNiKnYg-bPe_w7TDguik&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQICKYN36wwveboOln53e9AE-WB1um3H_cq2k106KMVTSATrnlx0YNuekyk-AWT9n4B9qW_TS3di&oh=00_AQQw8j6kHceRdgheUSBSBZpi3sMVfHhj_Vf30w19Hq3Fuw&oe=6AE99AF7"
+   },
+   {
+    "id": "499816983205370_122200575968590309",
+    "message": "💈JZ Barbershop Jūs precīzi zināt, par ko maksājat: kvalitatīvs serviss, profesionāla pieeja un pārliecības sajūta ,skatoties spogulī.🧔‍♂️✂️\n\n———\n\n💈В JZ Barbershop вы точно знаете, за что платите: качественный сервис, профессиональный подход и ощущение уверенности от своего отражения в зеркале. 🧔‍♂️✂️\n\n📍Alejas iela 75, Daugavpils\n📞 +371 24 400 021\n\n📲 Online pieraksts mājaslapā, saite profila galvenē / Онлайн-запись через сайт по ссылке в шапке профиля",
+    "created_time": "2026-10-11T07:55:53+0000",
+    "permalink_url": "https://www.facebook.com/reel/1818294966149145/",
+    "type": "video_inline",
+    "image": "https://scontent-hel3-1.xx.fbcdn.net/v/t51.82787-10/844003478_17946586512349164_7451598225694865658_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=110&ccb=1-7&_nc_sid=5fad0e&_nc_ohc=FFivcwsAXwoQ7kNvwG6jHGv&_nc_oc=Adq5XTggk_drmFUC8A256FU8qcrMuCetQhG2PJBwM640P1TSGcI-I7129F6HO4fQLqs&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQJJ0SdInMRpeL3jFLGy5YWHPHmdymbrN4XmyRislkIC6VB3ZhnYee1ceXYhETngWdRJHzXyQVls&oh=00_AQQfzrmpoyrJqpaDWf3cx9dqYH-f8z62S79m2rkEsAMHKA&oe=6AE9A095"
+   }
+  ]
+ },
+ "media": {
+  "Departments/90f85f79-f9c0-4474-a25c-e2fc58076ca8": {
+   "src": "/media/departments-90f85f79-f9c0-4474-a25c-e2fc58076ca8.webp",
+   "w": 600,
+   "h": 600
+  },
+  "Departments/3fd64c54-4ea0-430c-ac36-8b6103f9a641": {
+   "src": "/media/departments-3fd64c54-4ea0-430c-ac36-8b6103f9a641.webp",
+   "w": 900,
+   "h": 500
+  },
+  "Gallery/5a391974-42e2-4648-8f78-a7794aa3b137": {
+   "src": "/media/gallery-5a391974-42e2-4648-8f78-a7794aa3b137.webp",
+   "w": 900,
+   "h": 900
+  },
+  "Gallery/2587bdf0-eacd-44dd-a223-58103609647a": {
+   "src": "/media/gallery-2587bdf0-eacd-44dd-a223-58103609647a.webp",
+   "w": 900,
+   "h": 900
+  },
+  "Gallery/07232913-f99a-4dcf-927c-c6fd5d34f70c": {
+   "src": "/media/gallery-07232913-f99a-4dcf-927c-c6fd5d34f70c.webp",
+   "w": 900,
+   "h": 900
+  },
+  "Services/4cf58380-9651-44b0-8c34-0a7d9d3faf29": {
+   "src": "/media/services-4cf58380-9651-44b0-8c34-0a7d9d3faf29.webp",
+   "w": 500,
+   "h": 500
+  },
+  "Services/a607dfe4-2379-4c51-a875-2eb820b5c36a": {
+   "src": "/media/services-a607dfe4-2379-4c51-a875-2eb820b5c36a.webp",
+   "w": 500,
+   "h": 500
+  },
+  "Services/31498d62-4696-48ea-95c3-81c84313951b": {
+   "src": "/media/services-31498d62-4696-48ea-95c3-81c84313951b.webp",
+   "w": 500,
+   "h": 500
+  },
+  "Services/2f944093-2787-4604-b458-9cef3c15974b": {
+   "src": "/media/services-2f944093-2787-4604-b458-9cef3c15974b.webp",
+   "w": 500,
+   "h": 500
+  },
+  "Services/c14f098a-299c-49bb-abea-b53052cc06c9": {
+   "src": "/media/services-c14f098a-299c-49bb-abea-b53052cc06c9.webp",
+   "w": 500,
+   "h": 500
+  },
+  "Services/ccd3452d-4845-4c26-9dfc-79c09a0b4647": {
+   "src": "/media/services-ccd3452d-4845-4c26-9dfc-79c09a0b4647.webp",
+   "w": 500,
+   "h": 500
+  },
+  "Services/222e5381-790d-425e-9c92-d6f372cb8cd7": {
+   "src": "/media/services-222e5381-790d-425e-9c92-d6f372cb8cd7.webp",
+   "w": 500,
+   "h": 500
+  },
+  "Services/3b0246c8-9b3b-4511-a247-042493f6fff5": {
+   "src": "/media/services-3b0246c8-9b3b-4511-a247-042493f6fff5.webp",
+   "w": 500,
+   "h": 500
+  },
+  "Services/1b0206fd-37ff-405c-a33e-d02743fee787": {
+   "src": "/media/services-1b0206fd-37ff-405c-a33e-d02743fee787.webp",
+   "w": 500,
+   "h": 500
+  },
+  "Services/aee2f361-781f-450e-b283-d67335ef1084": {
+   "src": "/media/services-aee2f361-781f-450e-b283-d67335ef1084.webp",
+   "w": 500,
+   "h": 500
+  },
+  "Barbers/ad69d2b9-4726-484a-a85c-58a19cb66c4c": {
+   "src": "/media/barbers-ad69d2b9-4726-484a-a85c-58a19cb66c4c.webp",
+   "w": 500,
+   "h": 600
+  },
+  "Barbers/e7de766c-d4e8-45f7-97b6-4c09ef90965d": {
+   "src": "/media/barbers-e7de766c-d4e8-45f7-97b6-4c09ef90965d.webp",
+   "w": 500,
+   "h": 600
+  },
+  "Barbers/afbe8d7d-a216-4be2-aac7-3e2e88506168": {
+   "src": "/media/barbers-afbe8d7d-a216-4be2-aac7-3e2e88506168.webp",
+   "w": 500,
+   "h": 600
+  },
+  "Barbers/5a675118-0b95-49b6-8f67-98fbb712ee42": {
+   "src": "/media/barbers-5a675118-0b95-49b6-8f67-98fbb712ee42.webp",
+   "w": 500,
+   "h": 600
+  },
+  "Barbers/bdf231d2-1308-46f2-84da-e06718ff1f66": {
+   "src": "/media/barbers-bdf231d2-1308-46f2-84da-e06718ff1f66.webp",
+   "w": 500,
+   "h": 600
+  },
+  "Barbers/a3e53b86-de8c-43b9-9821-4ad21ec5de56": {
+   "src": "/media/barbers-a3e53b86-de8c-43b9-9821-4ad21ec5de56.webp",
+   "w": 500,
+   "h": 600
+  },
+  "Barbers/1639fe3d-fea0-4b8b-b631-b1eee3d284c7": {
+   "src": "/media/barbers-1639fe3d-fea0-4b8b-b631-b1eee3d284c7.webp",
+   "w": 500,
+   "h": 600
+  },
+  "https://scontent-hel3-1.xx.fbcdn.net/v/t39.30808-6/862898757_122202206804590309_5822502269587981654_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=106&ccb=1-7&_nc_sid=1abd25&_nc_ohc=B04IDtRcDSEQ7kNvwHvLI3n&_nc_oc=Ado9Qwv8UsRvSThLTzW8kseXaMCDUCu4YBFOfu5WbUuhSAdUwOkOc8zpOHwB2atPiVY&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQI2MryMeAHT23VuXjsAeat7vn-tTP6Izx6UEMoSwYSCoPsUy7xn7ZWrdvlbMy0GwOuwNcUMKW7q&oh=00_AQRSRoekMZlcb96i135zOygbvo2p8-PYJifV9V_m7CLSdA&oe=6AE9A326": {
+   "src": "/media/post-237ec9371068.webp",
+   "w": 720,
+   "h": 720
+  },
+  "https://scontent-hel3-1.xx.fbcdn.net/v/t51.82787-10/852355929_17947855461349164_1874868004657304386_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=105&ccb=1-7&_nc_sid=5fad0e&_nc_ohc=gHx3JvxM2LcQ7kNvwGagzy3&_nc_oc=AdouiDAak1Pwo5KyemNrUIr_1bpK74DVOHve-H5AV-_LORGdIlaEj8RIRYtTi1HzbuU&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQL4FHWbMibkt8q8bHthEBYjd8LK-RY5E2d3d8pRnMCbhNjhzfJuLq6a8rrQXNPY8vQS_oARZXis&oh=00_AQRyQZ7O4-DqWc5O-cTjZ5ttzHk2PnkBEtbktLtk7WDXew&oe=6AE98E0E": {
+   "src": "/media/post-7046eb736948.webp",
+   "w": 405,
+   "h": 720
+  },
+  "https://scontent-hel3-1.xx.fbcdn.net/v/t51.82787-10/867618931_17949020493349164_838796173664877202_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=101&ccb=1-7&_nc_sid=5fad0e&_nc_ohc=vmuNVjOp1DYQ7kNvwENRd5z&_nc_oc=Adpoy1H9WZSuPRYq13pWqGlIuvdCTM1wQzVn1snNXGanPvxkok2LxII2q83GDjKyDys&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQJrOanELJc6h9Y_UazQrq2g7oNeyoDiiYxu4xhP8YaT-Nx2eFNVOrTI-gE6sHOhKQaOjEUJuhne&oh=00_AQRAaWcYFibeJmdEacLi3hiMa6UxYgnsstRhW52vcqt1pw&oe=6AE99E2B": {
+   "src": "/media/post-dd6f8146a149.webp",
+   "w": 405,
+   "h": 720
+  },
+  "https://scontent-hel3-1.xx.fbcdn.net/v/t39.30808-6/855294469_122201479580590309_4250301286671588100_n.jpg?stp=dst-jpg_p720x720_tt6&_nc_cat=105&ccb=1-7&_nc_sid=833d8c&_nc_ohc=kmuGBc8ju_gQ7kNvwHTsTA1&_nc_oc=Adody8xMN8NAcXZEiUSI4Cc4fyGtVqt8VsVvsk6RhIDt6LVcD65x_n7Cb9iqltSz2Ls&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQIA08YcI8INK8rW0Cv__6V5NgE0OaNGlj8lji8JmbV8rImXFmkttZXY528cAEACxenCe2hmoT_k&oh=00_AQQ57yFOFtZUrvnsbRLCWFO7M-SdJNi7seq5EO0Wvod5oA&oe=6AE996E0": {
+   "src": "/media/post-acfdc295d81a.webp",
+   "w": 720,
+   "h": 1280
+  },
+  "https://scontent-hel3-1.xx.fbcdn.net/v/t39.30808-6/855834243_122201478926590309_7709041543439327127_n.jpg?stp=cp1_dst-jpegr_p720x720_tt6&_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=6Pr6QX-XC_QQ7kNvwFK0e6h&_nc_oc=AdpuxNoiJsquxRI8QQCqG52T1Q829qFhNNOnUm-qjmrIgYdC6teTrZxdtV6sM2lSDNk&_nc_zt=23&se=-1&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQIGDFytv3ca5loa5mxXmijKSf9vOpZiLxas0B-NIADVmTbOLBfi7_j1UwV_SGXW6LVqhaG9FnrO&oh=00_AQQMKB0QYUQ17iw3E0IcP1g2qDH_snohT9cveF0xp1xEzw&oe=6AE9B1FC": {
+   "src": "/media/post-66fdde354cc5.webp",
+   "w": 720,
+   "h": 1038
+  },
+  "https://scontent-hel3-1.xx.fbcdn.net/v/t51.82787-15/830540598_17944809765349164_301264498136341382_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=100&ccb=1-7&_nc_sid=127cfc&_nc_ohc=peOdZcpMWNgQ7kNvwEZwzU-&_nc_oc=Adq-89GTU-Sub8rIZglHjfvk4SD2Ay-DFSlw4tCYbtOE2RpYNiKnYg-bPe_w7TDguik&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQICKYN36wwveboOln53e9AE-WB1um3H_cq2k106KMVTSATrnlx0YNuekyk-AWT9n4B9qW_TS3di&oh=00_AQQw8j6kHceRdgheUSBSBZpi3sMVfHhj_Vf30w19Hq3Fuw&oe=6AE99AF7": {
+   "src": "/media/post-7e2b1916f448.webp",
+   "w": 720,
+   "h": 960
+  },
+  "https://scontent-hel3-1.xx.fbcdn.net/v/t51.82787-10/844003478_17946586512349164_7451598225694865658_n.jpg?stp=dst-jpg_s720x720_tt6&_nc_cat=110&ccb=1-7&_nc_sid=5fad0e&_nc_ohc=FFivcwsAXwoQ7kNvwG6jHGv&_nc_oc=Adq5XTggk_drmFUC8A256FU8qcrMuCetQhG2PJBwM640P1TSGcI-I7129F6HO4fQLqs&_nc_zt=23&_nc_ht=scontent-hel3-1.xx&edm=AKIiGfEEAAAA&_nc_gid=sAVw49MN9uoKE7HpVHyJjA&_nc_tpa=Q5bMBQJJ0SdInMRpeL3jFLGy5YWHPHmdymbrN4XmyRislkIC6VB3ZhnYee1ceXYhETngWdRJHzXyQVls&oh=00_AQQfzrmpoyrJqpaDWf3cx9dqYH-f8z62S79m2rkEsAMHKA&oe=6AE9A095": {
+   "src": "/media/post-583b8ebc307a.webp",
+   "w": 406,
+   "h": 720
+  }
+ }
+}
