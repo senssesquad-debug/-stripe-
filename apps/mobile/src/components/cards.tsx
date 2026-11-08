@@ -7,7 +7,9 @@ import { View } from 'react-native';
 import { useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { isSignedIn } from '@/lib/auth';
+import { useState } from 'react';
 import { distanceLabel } from '@/lib/format';
+import { sizedImage } from '@/lib/images';
 import { iconFor } from '@/lib/icons';
 import { toggleSaved, useAppState } from '@/lib/store';
 import { useTheme } from '@/theme';
@@ -40,15 +42,22 @@ export function SaveButton({ entity, size = 20, onDark }: { entity: EntityDTO; s
   );
 }
 
-/** Image if the source licence allows one; otherwise a calm branded tile with the category icon. */
-export function Cover({ entity, height, radius }: { entity: EntityDTO; height: number; radius: number }) {
+/**
+ * Image if the source licence allows one; otherwise (or if loading fails) a calm branded tile with the category icon —
+ * never a broken image and never a photo of some other place. `photoUrl` overrides (e.g. a live Google photo).
+ */
+export function Cover({ entity, height, radius, width = 400, photoUrl }: { entity: EntityDTO; height: number; radius: number; width?: number; photoUrl?: string | null }) {
   const t = useTheme();
-  const img = entity.images[0];
+  const own = entity.images.find((i) => i.kind !== 'historical') ?? null;
+  const url = photoUrl ?? (own ? sizedImage(own.url, width) : null);
+  const [failed, setFailed] = useState<string | null>(null);
   const accent = groupAccent[entity.category.group] ?? t.c.primary;
+  const show = url && failed !== url;
   return (
     <View style={{ height, borderRadius: radius, overflow: 'hidden', backgroundColor: t.dark ? t.c.surfaceAlt : `${accent}14` }}>
-      {img ? (
-        <Image source={{ uri: img.url }} style={{ flex: 1 }} contentFit="cover" transition={200} accessibilityIgnoresInvertColors />
+      {show ? (
+        <Image source={{ uri: url }} style={{ flex: 1 }} contentFit="cover" transition={200} cachePolicy="memory-disk" recyclingKey={url}
+          onError={() => setFailed(url)} accessibilityIgnoresInvertColors />
       ) : (
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
           <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: t.c.background, alignItems: 'center', justifyContent: 'center' }}>
@@ -83,7 +92,7 @@ export function EntityCard({ entity, width = 248, reason }: { entity: EntityDTO;
   return (
     <Tap onPress={() => openEntity(entity)} accessibilityRole="button" accessibilityLabel={`${title}. ${isEvent ? e.time.label : p.category.label}`} style={{ width }}>
       <View>
-        <Cover entity={entity} height={Math.round(width * 0.62)} radius={t.radius.lg} />
+        <Cover entity={entity} height={Math.round(width * 0.62)} radius={t.radius.lg} width={width} />
         <View style={{ position: 'absolute', top: 10, left: 10, right: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
           <View style={{ gap: 4, flexShrink: 1 }}>
             {entity.isDemo ? <Badge label={tr('common.demo')} tone="dark" /> : null}
@@ -114,7 +123,7 @@ export function EntityRow({ entity, reason }: { entity: EntityDTO; reason?: stri
   const badges = isEvent ? eventBadges(e, tr) : [];
   return (
     <Tap onPress={() => openEntity(entity)} accessibilityRole="button" style={{ flexDirection: 'row', gap: 12, paddingVertical: 10, alignItems: 'center' }}>
-      <View style={{ width: 72 }}><Cover entity={entity} height={72} radius={t.radius.md} /></View>
+      <View style={{ width: 72 }}><Cover entity={entity} height={72} radius={t.radius.md} width={72} /></View>
       <View style={{ flex: 1, gap: 2 }}>
         <Txt v="caption" tone="primary" numberOfLines={1}>{line1}</Txt>
         <Txt v="bodyStrong" numberOfLines={2}>{isEvent ? e.title : p.name}</Txt>

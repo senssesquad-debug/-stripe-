@@ -113,6 +113,7 @@ export const api = {
   places: (p: LocationParams & { category?: string; group?: string; open_now?: boolean; free?: boolean; q?: string; limit?: number }) => request<{ items: PlaceDTO[] }>('/v1/places', { query: { ...p } }),
   event: (id: string, p: LocationParams = {}) => request<{ event: EventDTO; navigation: { google: string; apple: string } | null }>(`/v1/events/${id}`, { query: { ...p } }),
   place: (id: string, p: LocationParams = {}) => request<{ place: PlaceDTO; upcomingEvents: EventDTO[]; navigation: { google: string; apple: string } }>(`/v1/places/${id}`, { query: { ...p } }),
+  placePhotos: (id: string) => request<{ photos: Array<{ url: string; width: number; height: number; authors: Array<{ name: string; uri: string | null }> }>; source: 'google' | null; reason: string | null }>(`/v1/places/${id}/photos`),
   placeLive: (id: string) => request<{ google: { rating: number | null; ratingCount: number | null; openNow: boolean | null; weekdayText: string[] | null; mapsUrl: string | null; fetchedAt: string } | null; reason?: string }>(`/v1/places/${id}/live`),
   map: (bbox: [number, number, number, number], p: { layers?: string; category?: string; open_now?: boolean; free?: boolean }) => request<{ markers: MapMarker[]; truncated: boolean }>('/v1/map', { query: { bbox: bbox.join(','), ...p } }),
   suggest: (q: string, p: { lat?: number; lng?: number }) => request<{ suggestions: Suggestion[]; didYouMean: string | null }>('/v1/search/suggest', { query: { q, ...p }, timeoutMs: 6_000 }),

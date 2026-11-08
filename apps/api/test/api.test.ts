@@ -3,6 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import type pg from 'pg';
 import type { EventDTO, FeedResponse, PlaceDTO, SearchResponse } from '@passtra/core';
 import { buildApp } from '../src/app';
+import type { AppConfig } from '../src/config';
 import { runSource } from '../src/engine/pipeline';
 import { HttpClient } from '../src/lib/http';
 import { ADMIN_ID, addSource, engineDeps, fakeFetch, fixture, freshDb, source, token } from './helpers';
@@ -11,6 +12,7 @@ const NOW = new Date('2026-11-08T12:00:00Z'); // Sunday 14:00 Cyprus
 const USER = '11111111-1111-4111-8111-111111111111';
 let app: FastifyInstance;
 let pool: pg.Pool;
+let testConfig: AppConfig;
 let userToken: string;
 let adminToken: string;
 
@@ -19,6 +21,7 @@ const auth = (t: string) => ({ authorization: `Bearer ${t}` });
 beforeAll(async () => {
   const db = await freshDb('api');
   pool = db.pool;
+  testConfig = db.config;
   const tribe = fixture<{ events: unknown[] }>('tribe-visitcyprus-2026-11-08.json');
   const osm = fixture('osm-limassol-center-2026-11-08.json');
   const f = fakeFetch([
@@ -125,6 +128,35 @@ describe('public API', () => {
     expect(el?.text).toBe('A weekly open-air market.'); // no Greek text: English, with the English article
     expect(el?.url).toBe('https://en.wikipedia.org/wiki/X');
     await pool.query(`UPDATE places SET description_i18n = '{}', about_source = NULL WHERE id = $1`, [id]);
+  });
+
+  it('place photos: official Google Places flow, key stays on the server, authors attributed, honest without a key', async () => {
+    const id = (await pool.query(`SELECT id FROM places WHERE primary_category = 'restaurant' AND merged_into IS NULL ORDER BY name LIMIT 1`)).rows[0].id;
+    expect((await app.inject(`/v1/places/${id}/photos`)).json()).toEqual({ photos: [], source: null, reason: 'not_configured' });
+    const calls: Array<{ url: string; key: string | null }> = [];
+    const real = globalThis.fetch;
+    globalThis.fetch = (async (input: string | URL | Request, init?: RequestInit) => {
+      const url = String(input);
+      calls.push({ url, key: new Headers(init?.headers).get('x-goog-api-key') });
+      if (url.includes('places:searchText')) {
+        const row = (await pool.query(`SELECT name, ST_Y(location::geometry) AS lat, ST_X(location::geometry) AS lng FROM places WHERE id = $1`, [id])).rows[0];
+        return Response.json({ places: [{ id: 'gp-1', displayName: { text: row.name }, location: { latitude: row.lat, longitude: row.lng } }] });
+      }
+      if (url.endsWith('/places/gp-1')) return Response.json({ photos: [{ name: 'places/gp-1/photos/AAA', widthPx: 4000, heightPx: 3000, authorAttributions: [{ displayName: 'Maria K.', uri: 'https://maps.google.com/maps/contrib/1' }] }] });
+      if (url.includes('/places/gp-1/photos/AAA/media')) return Response.json({ photoUri: 'https://lh3.googleusercontent.com/places/photo-1=w1200' });
+      return new Response('unexpected', { status: 500 });
+    }) as typeof fetch;
+    try {
+      const built = await buildApp({ ...testConfig, GOOGLE_MAPS_API_KEY: 'server-secret' }, pool, { now: () => NOW });
+      const r = (await built.app.inject(`/v1/places/${id}/photos`)).json();
+      await built.app.close();
+      expect(r).toMatchObject({ source: 'google', photos: [{ url: 'https://lh3.googleusercontent.com/places/photo-1=w1200', width: 1200, height: 900, authors: [{ name: 'Maria K.' }] }] });
+      expect(JSON.stringify(r)).not.toContain('server-secret');
+      expect(calls.find((c) => c.url.includes('/media'))!.url).toContain('skipHttpRedirect=true');
+      expect(calls.every((c) => c.key === 'server-secret')).toBe(true);
+    } finally {
+      globalThis.fetch = real;
+    }
   });
 
   it('unknown ids → 404, bad input → 400', async () => {

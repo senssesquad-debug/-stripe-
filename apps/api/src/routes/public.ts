@@ -6,7 +6,7 @@ import {
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { integrationStatus } from '../config';
-import { googleLive, resolveGooglePlaceId } from '../lib/google';
+import { googleLive, googlePhotos, resolveGooglePlaceId } from '../lib/google';
 import { getWeather } from '../lib/weather';
 import { ApiError, LocationQuery, csv, localeOf, parse } from '../http';
 import {
@@ -123,6 +123,22 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
     } catch (e) {
       req.log.warn({ err: (e as Error).message }, 'google live failed');
       return { google: null, reason: 'unavailable' };
+    }
+  });
+
+  // Photos of a place from Google (official Places Photos API), fetched on demand and never stored.
+  app.get('/v1/places/:id/photos', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (req) => {
+    const { id } = parse(z.object({ id: Uuid }), req.params);
+    if (!config.GOOGLE_MAPS_API_KEY) return { photos: [], source: null, reason: 'not_configured' };
+    const row = await getPlaceRow(db, id, null);
+    if (!row) throw new ApiError(404, 'not_found', 'Place not found');
+    try {
+      const placeId = await resolveGooglePlaceId(db, config.GOOGLE_MAPS_API_KEY, { id, name: row.name, lat: row.lat, lng: row.lng, externalIds: row.external_ids });
+      if (!placeId) return { photos: [], source: null, reason: 'no_match' };
+      return { photos: await googlePhotos(config.GOOGLE_MAPS_API_KEY, placeId), source: 'google', reason: null };
+    } catch (e) {
+      req.log.warn({ err: (e as Error).message }, 'google photos failed');
+      return { photos: [], source: null, reason: 'unavailable' };
     }
   });
 

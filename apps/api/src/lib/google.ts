@@ -25,7 +25,7 @@ const BASE = 'https://places.googleapis.com/v1';
 async function g<T>(apiKey: string, path: string, init: { method?: string; body?: unknown; fieldMask: string; languageCode?: string }): Promise<T> {
   const res = await fetch(`${BASE}${path}${init.languageCode ? `${path.includes('?') ? '&' : '?'}languageCode=${init.languageCode}` : ''}`, {
     method: init.method ?? 'GET',
-    headers: { 'x-goog-api-key': apiKey, 'x-goog-fieldmask': init.fieldMask, 'content-type': 'application/json' },
+    headers: { 'x-goog-api-key': apiKey, ...(init.fieldMask ? { 'x-goog-fieldmask': init.fieldMask } : {}), 'content-type': 'application/json' },
     body: init.body ? JSON.stringify(init.body) : undefined,
     signal: AbortSignal.timeout(6000),
   });
@@ -63,4 +63,31 @@ export async function googleLive(apiKey: string, placeId: string, languageCode: 
     attribution: 'Google',
     fetchedAt: new Date().toISOString(),
   };
+}
+
+export interface GooglePhoto { url: string; width: number; height: number; authors: Array<{ name: string; uri: string | null }> }
+
+/**
+ * Place photos via the official Places API (New): the photo list from Place Details, then a short-lived
+ * photoUri per photo from the Place Photos endpoint (skipHttpRedirect=true), so the API key never reaches the app.
+ * Nothing is stored (terms: photos and photo names must not be cached); author attributions must be shown.
+ */
+export async function googlePhotos(apiKey: string, placeId: string, max = 6, maxWidthPx = 1200): Promise<GooglePhoto[]> {
+  const p = await g<{ photos?: Array<{ name: string; widthPx: number; heightPx: number; authorAttributions?: Array<{ displayName?: string; uri?: string }> }> }>(
+    apiKey, `/places/${encodeURIComponent(placeId)}`, { fieldMask: 'photos' });
+  const list = (p.photos ?? []).slice(0, max);
+  const out = await Promise.all(list.map(async (ph) => {
+    try {
+      const m = await g<{ photoUri?: string }>(apiKey, `/${ph.name}/media?maxWidthPx=${maxWidthPx}&skipHttpRedirect=true`, { fieldMask: '' });
+      if (!m.photoUri) return null;
+      const scale = Math.min(1, maxWidthPx / ph.widthPx);
+      return {
+        url: m.photoUri, width: Math.round(ph.widthPx * scale), height: Math.round(ph.heightPx * scale),
+        authors: (ph.authorAttributions ?? []).map((a) => ({ name: a.displayName ?? 'Google user', uri: a.uri ?? null })),
+      };
+    } catch {
+      return null;
+    }
+  }));
+  return out.filter((x): x is GooglePhoto => !!x);
 }
