@@ -98,6 +98,7 @@ describe('public API', () => {
     expect(event.verification.status).toBe('conflicting');
     expect(event.time.unconfirmed).toBe(true);
     expect(event.verification.sources.map((s) => s.key).sort()).toEqual(['test_ticketing', 'visitcyprus_events']);
+    expect(event.verification.conflicts[0]!.candidates.flatMap((c) => c.sources)).toContain('Visit Cyprus — Deputy Ministry of Tourism');
     expect(event.verification.lastVerifiedAt).toBeTruthy();
     const c = event.verification.conflicts.find((x) => x.field === 'starts_at')!;
     expect(c.candidates).toHaveLength(2);

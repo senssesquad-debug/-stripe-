@@ -222,9 +222,11 @@ export async function provenance(db: Queryable, type: 'event' | 'place', id: str
     `SELECT field, status, candidates FROM data_conflicts WHERE entity_type = $1 AND entity_id = $2 AND status IN ('open','auto_resolved') ORDER BY critical DESC, field`,
     [type, id],
   );
+  const names = new Map((await db.query<{ key: string; name: string }>('SELECT key, name FROM sources')).rows.map((r) => [r.key, r.name]));
+  names.set('geocoder', 'OpenStreetMap Nominatim (geocoder)');
   return {
     sources: s.rows.map((r) => ({ key: r.key, name: r.name, url: r.url ?? r.homepage_url, isOfficial: r.is_official, attribution: r.attribution, lastSeenAt: r.last_seen_at.toISOString() })),
-    conflicts: c.rows.map((r) => ({ field: r.field, status: r.status, candidates: r.candidates.map((x) => ({ value: x.value, display: x.display, sources: x.sources })) })),
+    conflicts: c.rows.map((r) => ({ field: r.field, status: r.status, candidates: r.candidates.map((x) => ({ value: x.value, display: x.display, sources: x.sources.map((k) => names.get(k) ?? k) })) })),
   };
 }
 

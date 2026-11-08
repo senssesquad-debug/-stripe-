@@ -1,18 +1,77 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
+import '@/i18n';
+import { Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold, useFonts } from '@expo-google-fonts/manrope';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect, useState } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import i18n, { deviceLocale } from '@/i18n';
+import { store, useAppState } from '@/lib/store';
+import { ThemeProvider, useTheme } from '@/theme';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+void SplashScreen.preventAutoHideAsync();
 
-SplashScreen.preventAutoHideAsync();
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: (n, e) => n < 2 && (e as { status?: number })?.status !== 404, refetchOnWindowFocus: false } },
+});
 
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
+function Navigator() {
+  const t = useTheme();
+  const header = { headerShadowVisible: false, headerStyle: { backgroundColor: t.c.background }, headerTintColor: t.c.text, headerTitleStyle: { fontFamily: t.font.bold }, headerBackButtonDisplayMode: 'minimal' as const, contentStyle: { backgroundColor: t.c.background } };
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <>
+      <StatusBar style={t.dark ? 'light' : 'dark'} />
+      <Stack screenOptions={header}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false }} />
+        <Stack.Screen name="event/[id]" options={{ title: '', headerTransparent: false }} />
+        <Stack.Screen name="place/[id]" options={{ title: '' }} />
+        <Stack.Screen name="search" options={{ presentation: 'modal', headerShown: false }} />
+        <Stack.Screen name="surprise" options={{ presentation: 'modal', title: '' }} />
+        <Stack.Screen name="plan" options={{ title: '' }} />
+        <Stack.Screen name="city" options={{ presentation: 'modal', title: '' }} />
+        <Stack.Screen name="report" options={{ presentation: 'modal', title: '' }} />
+        <Stack.Screen name="signin" options={{ presentation: 'modal', title: '' }} />
+        <Stack.Screen name="about" options={{ title: '' }} />
+        <Stack.Screen name="notifications" options={{ title: '' }} />
+        <Stack.Screen name="privacy" options={{ title: '' }} />
+        <Stack.Screen name="submit" options={{ title: '' }} />
+      </Stack>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  const [fontsLoaded] = useFonts({ Manrope_400Regular, Manrope_500Medium, Manrope_600SemiBold, Manrope_700Bold, Manrope_800ExtraBold });
+  const hydrated = useAppState((s) => s.hydrated);
+  const locale = useAppState((s) => s.locale);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    void store.hydrate();
+  }, []);
+  useEffect(() => {
+    if (hydrated) void i18n.changeLanguage(locale ?? deviceLocale());
+  }, [hydrated, locale]);
+  useEffect(() => {
+    if (fontsLoaded && hydrated) {
+      setReady(true);
+      void SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, hydrated]);
+
+  if (!ready) return null;
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <Navigator />
+          </ThemeProvider>
+        </QueryClientProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

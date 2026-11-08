@@ -60,7 +60,8 @@ export interface DayPlan {
 }
 
 const MEAL_CATEGORIES = new Set(['restaurant', 'cafe', 'bakery', 'fast-food']);
-const OUTDOOR_HOURS_OK = new Set(['beach', 'viewpoint', 'park', 'hiking', 'marina', 'historic-site', 'playground']);
+// Only always-accessible outdoor spots may be planned without listed hours (castles and archaeological sites have hours).
+const OUTDOOR_HOURS_OK = new Set(['beach', 'viewpoint', 'park', 'hiking', 'marina', 'playground']);
 const MIN_GAP = 20;
 
 interface Meal {

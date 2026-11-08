@@ -208,7 +208,12 @@ export async function adminRoutes(app: FastifyInstance, deps: AppDeps) {
     if (!chosen) throw new ApiError(400, 'invalid_choice', 'No such candidate');
     await tx(db, async (client) => {
       await client.query(`UPDATE data_conflicts SET status = 'resolved', resolution = $2, resolved_by = $3, resolved_at = now(), updated_at = now() WHERE id = $1`, [id, JSON.stringify({ value: chosen.value, note: b.note ?? null }), user.id]);
-      if (c.field !== 'city') await applyManualFields(client, c.entity_type, c.entity_id, { [c.field]: chosen.value }, new Date());
+      if (c.field === 'city') {
+        // City conflicts: choosing the geocoded venue position locks it as the event location.
+        const v = chosen.value as { lat?: number; lng?: number } | string;
+        if (typeof v === 'object' && v && typeof v.lat === 'number') await applyManualFields(client, c.entity_type, c.entity_id, { location: v, location_precision: 'approximate' }, new Date());
+        else await applyManualFields(client, c.entity_type, c.entity_id, {}, new Date());
+      } else await applyManualFields(client, c.entity_type, c.entity_id, { [c.field]: chosen.value }, new Date());
     });
     await audit(user.id, 'conflict.resolve', c.entity_type, c.entity_id, c.candidates, chosen);
     return { ok: true };

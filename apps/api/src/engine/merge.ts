@@ -44,6 +44,7 @@ interface EventEnrichment {
   citySlug: string | null;
   placeId: string | null;
   notes: string[];
+  geocodeConflict: { hint: string; found: { lat: number; lng: number }; label: string } | null;
 }
 
 async function matchVenue(client: pg.PoolClient, venue: string, citySlug: string | null): Promise<{ id: string; lat: number; lng: number } | null> {
@@ -70,6 +71,7 @@ async function enrichEvent(d: MergeDeps, n: NormalizedEvent): Promise<EventEnric
   let location = n.location;
   let precision: EventEnrichment['precision'] = location ? 'exact' : 'unknown';
   let placeId: string | null = null;
+  let geocodeConflict: EventEnrichment['geocodeConflict'] = null;
 
   if (n.venueName) {
     const venue = await matchVenue(d.client, n.venueName, hintCity?.slug ?? null);
@@ -90,6 +92,12 @@ async function enrichEvent(d: MergeDeps, n: NormalizedEvent): Promise<EventEnric
     for (const q of [...new Set(queries)]) {
       const g = await d.geocoder.geocode(q, country?.code ?? 'CY');
       if (g && (!country || isInsideBbox(country, g.lat, g.lng))) {
+        // A geocode far from the city the source states is contradictory evidence (e.g. a club named after
+        // another town). Never pick one side automatically: keep the source's city and flag it for review.
+        if (hintCity && haversineKm(g, hintCity) > Math.max(15, hintCity.radiusKm * 2)) {
+          geocodeConflict = { hint: hintCity.slug, found: { lat: g.lat, lng: g.lng }, label: g.label };
+          break;
+        }
         location = { lat: g.lat, lng: g.lng };
         precision = 'approximate';
         notes.push(`geocoded:${q}`);
@@ -105,7 +113,7 @@ async function enrichEvent(d: MergeDeps, n: NormalizedEvent): Promise<EventEnric
     location = { lat: hintCity.lat, lng: hintCity.lng };
     precision = 'city';
   }
-  return { primary, categories, location, precision, citySlug: (precision === 'city' ? hintCity?.slug : locCity?.slug ?? hintCity?.slug) ?? null, placeId, notes };
+  return { primary, categories, location, precision, citySlug: (precision === 'city' ? hintCity?.slug : locCity?.slug ?? hintCity?.slug) ?? null, placeId, notes, geocodeConflict };
 }
 
 // ── Observations ────────────────────────────────────────────────────────────
@@ -281,6 +289,11 @@ export async function recomputeEvent(client: pg.PoolClient, id: string, now: Dat
   const externalIds = unionObjects(obs.get('external_ids'));
 
   const openConflicts = await syncConflicts(client, 'event', id, res, sourceKeys, CRITICAL_EVENT_FIELDS);
+  const external = await client.query<{ field: string; critical: boolean }>(
+    `SELECT field, critical FROM data_conflicts WHERE entity_type = 'event' AND entity_id = $1 AND status = 'open' AND NOT (field = ANY($2::text[]))`,
+    [id, [...EVENT_CONFLICT_FIELDS]],
+  );
+  openConflicts.push(...external.rows);
   const ev = await client.query<{ organizer_confirmed: boolean }>('SELECT organizer_confirmed FROM events WHERE id = $1', [id]);
   const bySource = new Map<number, { authority: number; isOfficial: boolean; lastSeenAt: Date }>();
   for (const r of obs.rows) {
@@ -568,6 +581,18 @@ export async function ingestEvent(d: MergeDeps, raw: { url?: string | null; payl
       [entityId, JSON.stringify([
         { value: hint, display: `${cityBySlug(hint!)?.name.en ?? hint} (source text)`, sources: [d.source.key] },
         { value: actual, display: `${cityBySlug(actual!)?.name.en ?? actual} (venue location)`, sources: ['geocoder'] },
+      ])],
+    );
+  }
+
+  if (e.geocodeConflict) {
+    const gc = e.geocodeConflict;
+    await d.client.query(
+      `INSERT INTO data_conflicts (entity_type, entity_id, field, critical, candidates, status) VALUES ('event', $1, 'city', true, $2, 'open')
+       ON CONFLICT (entity_type, entity_id, field) WHERE status IN ('open','auto_resolved') DO UPDATE SET candidates = EXCLUDED.candidates, critical = true, status = 'open', updated_at = now()`,
+      [entityId, JSON.stringify([
+        { value: gc.hint, display: `${cityBySlug(gc.hint)?.name.en ?? gc.hint} (source)`, sources: [d.source.key] },
+        { value: gc.found, display: `${gc.label.split(',').slice(0, 3).join(',')} (geocoded venue name)`, sources: ['geocoder'] },
       ])],
     );
   }

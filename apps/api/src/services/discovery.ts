@@ -94,7 +94,10 @@ export function placeCandidate(r: PlaceRow, dto: PlaceDTO): Candidate {
 }
 
 const PRACTICAL = CATEGORIES.filter((c) => c.group === 'practical').map((c) => c.slug);
+/** Errands are searchable but don't belong in "things to do" sections of the Today feed. */
+const ERRANDS = new Set(['supermarket', 'clothing-store', 'sports-store', 'electronics-store', 'beauty-salon', 'barbershop', 'gym', 'coworking', 'cycling']);
 const LEISURE_PLACE_CATS = CATEGORIES.filter((c) => c.kind !== 'event' && c.group !== 'practical').map((c) => c.slug);
+const FEED_PLACE_CATS = LEISURE_PLACE_CATS.filter((s) => !ERRANDS.has(s));
 
 async function upcomingEvents(db: pg.Pool, ctx: DiscoveryContext, opts: { window?: ReturnType<typeof timeWindow>; excludeMultiDay?: boolean; categories?: string[]; free?: boolean; keywords?: string[]; radiusKm?: number; limit?: number; order?: string }): Promise<EventRow[]> {
   const q = new Sql();
@@ -170,7 +173,7 @@ export async function buildFeed(deps: FeedDeps, ctx: DiscoveryContext, profile: 
     upcomingEvents(db, ctx, { window: timeWindow('tonight', ctx.now, ctx.tz), excludeMultiDay: true, limit: 30 }),
     upcomingEvents(db, ctx, { window: timeWindow('weekend', ctx.now, ctx.tz), limit: 40 }),
     upcomingEvents(db, ctx, { window: timeWindow('next_7_days', ctx.now, ctx.tz), free: true, limit: 30 }),
-    nearbyPlaces(db, ctx, { categories: LEISURE_PLACE_CATS, limit: 600 }),
+    nearbyPlaces(db, ctx, { categories: FEED_PLACE_CATS, limit: 600 }),
     ctx.geo ? getWeather(db, deps.http, ctx.geo.lat, ctx.geo.lng, L, ctx.now).catch(() => null) : Promise.resolve(null),
   ]);
   const placeDTOs = new Map(places.map((r) => [r.id, placeToDTO(r, L, ctx.now)]));
@@ -188,7 +191,7 @@ export async function buildFeed(deps: FeedDeps, ctx: DiscoveryContext, profile: 
   // "Happening today": everything on today (incl. ongoing multi-day events).
   // "Right now": timed events in progress + places open now.
   const inProgress = today.filter((r) => r.time_precision === 'exact' && r.starts_at <= ctx.now);
-  const openPlaces = rank(placeCands.filter((c) => c.openNow === true), profile, rankCtx, 12).map((s) => placeDTOs.get(s.item.id)!);
+  const openPlaces = rank(placeCands.filter((c) => c.openNow === true), profile, rankCtx, 48).map((s) => placeDTOs.get(s.item.id)!);
   sections.push(section('happening_today', L, take(today.filter((r) => !inProgress.includes(r)).map(toE), 12)));
   sections.push(section('right_now', L, take([...inProgress.map(toE), ...openPlaces], 12)));
 
@@ -199,12 +202,12 @@ export async function buildFeed(deps: FeedDeps, ctx: DiscoveryContext, profile: 
     const ivs = openIntervals(r.opening_hours?.value, ctx.now > evening ? ctx.now : evening, new Date((ctx.now > evening ? ctx.now : evening).getTime() + 3 * 3_600_000), tz, r.lat, r.lng);
     return !!ivs?.length;
   });
-  sections.push(section('tonight', L, take([...tonight.map(toE), ...rank(openTonight.map((r) => placeCandidate(r, placeDTOs.get(r.id)!)), profile, rankCtx, 8).map((s) => placeDTOs.get(s.item.id)!)], 12)));
+  sections.push(section('tonight', L, take([...tonight.map(toE), ...rank(openTonight.map((r) => placeCandidate(r, placeDTOs.get(r.id)!)), profile, rankCtx, 40).map((s) => placeDTOs.get(s.item.id)!)].slice(0, 40), 12)));
   sections.push(section('this_weekend', L, take(weekend.map(toE), 12)));
 
   if (ctx.geo) {
     const near = places.filter((r) => (r.distance_km ?? 99) <= Math.min(ctx.radiusKm, 3) && !PRACTICAL.includes(r.primary_category));
-    sections.push(section('near_you', L, take(rank(near.map((r) => placeCandidate(r, placeDTOs.get(r.id)!)), profile, { ...rankCtx, radiusKm: 3 }, 12).map((s) => placeDTOs.get(s.item.id)!), 12)));
+    sections.push(section('near_you', L, take(rank(near.map((r) => placeCandidate(r, placeDTOs.get(r.id)!)), profile, { ...rankCtx, radiusKm: 3 }, 48).map((s) => placeDTOs.get(s.item.id)!), 12)));
   }
 
   const freePlaces = [...placeDTOs.values()].filter((p) => p.free.isFree === true && ['beach', 'park', 'viewpoint', 'hiking', 'historic-site', 'playground', 'marina'].includes(p.category.slug));
@@ -318,7 +321,7 @@ export async function search(db: pg.Pool, interpreter: QueryInterpreter, query: 
 async function recommendationPool(db: pg.Pool, ctx: DiscoveryContext): Promise<{ events: EventRow[]; places: PlaceRow[]; placeDTOs: Map<string, PlaceDTO> }> {
   const [events, places] = await Promise.all([
     upcomingEvents(db, ctx, { window: timeWindow('next_7_days', ctx.now, ctx.tz), limit: 200 }),
-    nearbyPlaces(db, ctx, { categories: LEISURE_PLACE_CATS, limit: 500 }),
+    nearbyPlaces(db, ctx, { categories: FEED_PLACE_CATS, limit: 500 }),
   ]);
   return { events, places, placeDTOs: new Map(places.map((r) => [r.id, placeToDTO(r, ctx.locale, ctx.now)])) };
 }

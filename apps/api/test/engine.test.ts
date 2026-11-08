@@ -165,6 +165,29 @@ describe('cross-source merge, agreement and conflicts', () => {
   });
 });
 
+describe('geocoding never overrides the source city on contradictory evidence (real case: Famagusta Nautical Club, Limassol)', () => {
+  it('keeps the stated city, marks the location as city-level and opens a critical conflict', async () => {
+    const venue = await addSource(pool, 'test_geo_site', 'jsonld_events', 0.9, { urls: ['https://geo.example/events'] });
+    const page = jsonLdPage([{ '@type': 'SportsEvent', '@id': 'geo-1', name: 'Autumn Optimist Regatta', startDate: '2026-11-21', location: { name: 'FAMAGUSTA NAUTICAL CLUB', address: { addressLocality: 'Limassol' } } }]);
+    const f = fakeFetch([
+      [/geo\.example\/events/, () => new Response(page, { headers: { 'content-type': 'text/html' } })],
+      // Nominatim finds the original club in Famagusta, ~60 km from Limassol.
+      [/nominatim.*FAMAGUSTA%20NAUTICAL%20CLUB%2C%20Limassol/, () => []],
+      [/nominatim.*FAMAGUSTA%20NAUTICAL%20CLUB/, () => [{ lat: '35.1225', lon: '33.9403', display_name: 'Famagusta Nautical Club, Gazimağusa, Cyprus', type: 'yes', category: 'leisure' }]],
+    ]);
+    const deps = engineDeps(pool, { ...config, GEOCODING_ENABLED: true }, f, NOW);
+    deps.geocoder = new (await import('../src/lib/geocode')).Geocoder(pool, deps.http, 'https://nominatim.openstreetmap.org', true);
+    await runSource(deps, venue, 'test');
+    const e = await event(`title = 'Autumn Optimist Regatta'`);
+    expect(e.location_precision).toBe('city');
+    expect(Math.abs(e.lat - 34.6786)).toBeLessThan(0.01); // Limassol centre, not Famagusta
+    expect(e.verification_status).toBe('conflicting');
+    const c = (await pool.query(`SELECT * FROM data_conflicts WHERE entity_id = $1 AND field = 'city'`, [e.id])).rows[0];
+    expect(c.status).toBe('open');
+    expect(c.candidates[1].display).toMatch(/Famagusta Nautical Club/);
+  });
+});
+
 describe('absence and expiry', () => {
   it('a future event missing from 2 complete snapshots is hidden, but never marked cancelled; it returns when listed again', async () => {
     const without = TRIBE.events.filter((e) => !e.title.startsWith('Kambos Mountain Race'));
