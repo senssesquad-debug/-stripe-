@@ -178,6 +178,12 @@ export interface SearchResponse {
   interpretation: SearchFilters & { engine: 'ai' | 'rules'; summary: string };
   results: EntityDTO[];
   total: number;
+  /** Radius actually searched (km). */
+  radiusKm: number;
+  /** Typo-corrected query used when the literal one found nothing. */
+  didYouMean: string | null;
+  /** How many results wider radii would give, when few were found nearby. */
+  widen: Array<{ radiusKm: number; count: number }>;
 }
 
 export interface PlanStopDTO {

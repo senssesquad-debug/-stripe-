@@ -2,6 +2,7 @@ process.env.TZ = 'UTC'; // opening-hours evaluation relies on wall-clock Dates w
 
 import { buildApp } from './app';
 import { startBackground } from './engine/background';
+import { reindexSearch } from './engine/maintenance';
 import { loadConfig } from './config';
 import { createPool } from './db';
 import { migrate } from './migrate';
@@ -25,3 +26,5 @@ process.on('SIGINT', () => void shutdown('SIGINT'));
 process.on('SIGTERM', () => void shutdown('SIGTERM'));
 
 await app.listen({ host: config.HOST, port: config.PORT });
+// One-off rebuild of search documents after their content changed (runs in the background, the API is already up).
+void reindexSearch(pool, app.log).catch((e) => app.log.error({ err: (e as Error).message }, 'search reindex failed'));

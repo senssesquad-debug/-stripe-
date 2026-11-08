@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import {
   CATEGORIES, CITIES, COUNTRIES, GROUP_LABELS, INTEREST_GROUPS, LOCALES, ONBOARDING_INTERESTS, canonicalKey, categoriesInGroup, expandCategories, getCategory,
-  navigationLinks, pickText, timeWindow, type EntityDTO, type InterestGroup,
+  correctQuery, navigationLinks, normalizeText, pickText, timeWindow, type EntityDTO, type InterestGroup,
 } from '@passtra/core';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
@@ -229,9 +229,46 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
   app.post('/v1/search', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (req) => {
     const b = parse(z.object({ q: z.string().trim().min(1).max(300), lat: z.number().optional(), lng: z.number().optional(), city: z.string().max(40).optional(), radius: z.number().min(0.5).max(100).optional(), locale: z.string().optional(), interests: z.array(z.enum(INTEREST_GROUPS)).max(13).optional() }), req.body);
     const locale = localeOf(req, b.locale);
-    const ctx = resolveContext({ lat: b.lat, lng: b.lng, city: b.city, radiusKm: b.radius, locale }, now());
+    // The chosen radius is respected (25 km by default near the user); wider radii are offered with their counts.
+    const ctx = resolveContext({ lat: b.lat, lng: b.lng, city: b.city, radiusKm: b.radius ?? (b.lat !== undefined ? 25 : undefined), locale }, now());
     const profile = await loadProfile(db, req.user?.id ?? null, { interests: b.interests });
     return search(db, deps.interpreter, b.q, ctx, profile);
+  });
+
+  // Autocomplete: categories, cities and real places/events matching what has been typed so far.
+  app.get('/v1/search/suggest', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (req) => {
+    const q = parse(z.object({ q: z.string().trim().min(1).max(80), locale: z.string().optional(), lat: z.coerce.number().optional(), lng: z.coerce.number().optional() }), req.query);
+    const locale = localeOf(req, q.locale);
+    const typed = normalizeText(q.q);
+    // Word-prefix matches only ("res" → Restaurants), in every language the label or synonyms exist in.
+    const hitWith = (probes: string[]) => (words: string[]) => words.some((w) => normalizeText(w).split(' ').some((_, i, all) => probes.some((p) => all.slice(i).join(' ').startsWith(p))));
+    const find = (probes: string[]) => ({
+      categories: CATEGORIES.filter((c) => hitWith(probes)([...Object.values(c.label), ...LOCALES.flatMap((l) => c.keywords[l] ?? [])]))
+        .slice(0, 4).map((c) => ({ type: 'category' as const, slug: c.slug, label: pickText(c.label, locale), icon: c.icon })),
+      cities: CITIES.filter((c) => hitWith(probes)([c.name.en, c.name.el ?? '', c.name.ru ?? '', ...c.aliases].filter(Boolean)))
+        .slice(0, 2).map((c) => ({ type: 'city' as const, slug: c.slug, label: pickText(c.name, locale) })),
+    });
+    let { categories, cities } = find([typed]);
+    // Typo correction only when what was typed matches nothing (a half-typed word is not a typo).
+    let corrected: string | null = null;
+    if (!categories.length && !cities.length && typed.length >= 5) {
+      corrected = correctQuery(q.q);
+      if (corrected) ({ categories, cities } = find([corrected]));
+      if (!categories.length && !cities.length) corrected = null;
+    }
+    const near = q.lat !== undefined && q.lng !== undefined ? `ST_Distance(location, ST_SetSRID(ST_MakePoint(${Number(q.lng)}, ${Number(q.lat)}), 4326)::geography)` : 'NULL::float8';
+    // Names (any language) starting with, or containing a word starting with, what was typed.
+    const nameHit = (col: string) => `(${col} ILIKE $1 || '%' OR ${col} ILIKE '% ' || $1 || '%')`;
+    const rows = q.q.length < 2 ? { rows: [] as Array<{ type: 'event' | 'place'; id: string; label: string; sub: string | null }> } : await db.query<{ type: 'event' | 'place'; id: string; label: string; sub: string | null }>(
+      `(SELECT 'place' AS type, id, name AS label, address AS sub FROM places
+          WHERE merged_into IS NULL AND status = 'active' AND (${nameHit('name')} OR EXISTS (SELECT 1 FROM jsonb_each_text(name_i18n) n WHERE ${nameHit('n.value')}))
+          ORDER BY (name ILIKE $1 || '%') DESC, confidence DESC, ${near} LIMIT 5)
+       UNION ALL
+       (SELECT 'event' AS type, id, title AS label, venue_name AS sub FROM events
+          WHERE merged_into IS NULL AND archived_at IS NULL AND status IN ('scheduled','rescheduled') AND COALESCE(ends_at, starts_at + interval '3 hours') > now()
+            AND ${nameHit('title')}
+          ORDER BY starts_at LIMIT 3)`, [q.q.replace(/[%_\\]/g, '')]);
+    return { suggestions: [...categories, ...cities, ...rows.rows.map((r) => ({ type: r.type, id: r.id, label: r.label, sublabel: r.sub }))], didYouMean: corrected };
   });
 
   // ── Recommendations ──

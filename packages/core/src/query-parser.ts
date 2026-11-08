@@ -67,6 +67,10 @@ const FILLER = new Set(
     'where', 'what', 'which', 'find', 'show', 'me', 'can', 'i', 'do', 'to', 'the', 'a', 'an', 'is', 'are', 'there', 'any', 'some', 'good', 'great', 'nice', 'interesting', 'things', 'thing', 'something', 'with', 'for', 'in', 'on', 'at', 'of', 'and', 'or', 'it', 'play', 'plays', 'playing', 'go', 'get', 'around', 'within', 'radius', 'my', 'near', 'open', 'now', 'will', 'be', 'from',
     'где', 'что', 'какие', 'какой', 'какая', 'найди', 'найти', 'покажи', 'можно', 'мне', 'есть', 'будут', 'будет', 'проходят', 'проходит', 'играет', 'интересного', 'интересное', 'интересные', 'в', 'на', 'с', 'со', 'и', 'или', 'по', 'для', 'радиусе', 'километров', 'происходит', 'поделать', 'сделать', 'заняться', 'чем', 'куда', 'сходить', 'пойти', 'открыты', 'сейчас', 'хочу',
     'που', 'τι', 'ποια', 'ποιες', 'βρες', 'δειξε', 'μπορω', 'να', 'κανω', 'σε', 'στο', 'στη', 'στην', 'με', 'και', 'για', 'υπαρχουν', 'παιζει', 'ενδιαφερον', 'κατι', 'μου', 'κοντα', 'αποψε', 'σημερα',
+    // Generic nouns that describe "something to do" rather than name it — never required words.
+    'activities', 'activity', 'stuff', 'ideas', 'idea', 'options', 'option', 'recommend', 'recommendations', 'suggestions', 'suggest', 'fun', 'cool', 'list', 'all', 'please', 'want', 'need', 'looking', 'local',
+    'активности', 'активность', 'занятия', 'идеи', 'варианты', 'вариант', 'посоветуй', 'подскажи', 'весь', 'все', 'всё', 'пожалуйста', 'нужен', 'нужна', 'нужно', 'ищу',
+    'δραστηριοτητες', 'δραστηριοτητα', 'ιδεες', 'επιλογες', 'προτεινε', 'ολα', 'θελω', 'ψαχνω',
   ].map(norm),
 );
 
@@ -86,6 +90,68 @@ function matchCity(nq: string, ck: string): string | null {
     }
   }
   return best?.slug ?? null;
+}
+
+// ── Typo correction ────────────────────────────────────────────────────────
+
+/** Optimal string alignment distance (Levenshtein + adjacent transpositions). */
+export function editDistance(a: string, b: string): number {
+  const d: number[][] = Array.from({ length: a.length + 1 }, (_, i) => [i, ...new Array(b.length).fill(0)]);
+  for (let j = 0; j <= b.length; j++) d[0]![j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      d[i]![j] = Math.min(d[i - 1]![j]! + 1, d[i]![j - 1]! + 1, d[i - 1]![j - 1]! + cost);
+      if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i]![j] = Math.min(d[i]![j]!, d[i - 2]![j - 2]! + 1);
+    }
+  }
+  return d[a.length]![b.length]!;
+}
+
+let VOCAB: string[] | null = null;
+function vocabulary(): string[] {
+  if (VOCAB) return VOCAB;
+  const words = new Set<string>();
+  for (const m of matchers()) for (const w of m.words) if (w.length >= 4) words.add(w);
+  for (const c of CITIES) for (const n of [c.name.en, c.name.el ?? '', c.name.ru ?? '', ...c.aliases]) for (const w of norm(n).split(' ')) if (w.length >= 4) words.add(w);
+  VOCAB = [...words];
+  return VOCAB;
+}
+
+/** Closest vocabulary word for a misspelt token (keywords are stems, so inflected endings are tolerated). */
+function correctToken(t: string): string | null {
+  if (t.length < 4 || /\d/.test(t) || FILLER.has(t)) return null;
+  let best: { v: string; d: number } | null = null;
+  for (const v of vocabulary()) {
+    if (Math.abs(t.length - v.length) > 4) continue;
+    const max = v.length <= 5 ? 1 : 2;
+    let d = editDistance(t, v);
+    for (let len = v.length - 1; len <= v.length + 1; len++) if (len > 2 && len < t.length) d = Math.min(d, editDistance(t.slice(0, len), v));
+    if (d > max || d === 0) continue;
+    // Only corrections that the parser then understands (a category, group or city) are useful.
+    const p = parseQuery(v);
+    if (!p.categories.length && !p.groups.length && !p.city) continue;
+    if (!best || d < best.d || (d === best.d && v.length > best.v.length)) best = { v, d };
+  }
+  return best?.v ?? null;
+}
+
+/**
+ * "Did you mean": the query with misspelt words replaced by the closest category, synonym or city word
+ * (e.g. "resturants" → "restaurant", "рестараны" → "ресторан"). Only words the parser could not place are
+ * corrected. Returns null when nothing needed fixing.
+ */
+export function correctQuery(query: string): string | null {
+  const leftovers = new Set(parseQuery(query).keywords);
+  if (!leftovers.size) return null;
+  let changed = false;
+  const out = norm(query).split(' ').filter(Boolean).map((t) => {
+    if (!leftovers.has(t)) return t;
+    const c = correctToken(t);
+    if (c) { changed = true; return c; }
+    return t;
+  });
+  return changed ? out.join(' ') : null;
 }
 
 /**

@@ -99,6 +99,11 @@ export interface RouteResult { mode: 'walk' | 'drive'; estimate: boolean; distan
 export interface GeocodeItem { label: string; sublabel: string | null; lat: number; lng: number; source: string }
 export interface DeliveryResult { webPush: { sent: number; failed: number }; expo: { sent: number; failed: number } }
 
+export type Suggestion =
+  | { type: 'category'; slug: string; label: string; icon: string }
+  | { type: 'city'; slug: string; label: string }
+  | { type: 'event' | 'place'; id: string; label: string; sublabel: string | null };
+
 export interface MapMarker { id: string; type: 'event' | 'place'; lat: number; lng: number; title: string; category: string; icon: string; subtitle: string | null; openNow?: boolean | null; isFree?: boolean | null }
 
 export const api = {
@@ -110,6 +115,7 @@ export const api = {
   place: (id: string, p: LocationParams = {}) => request<{ place: PlaceDTO; upcomingEvents: EventDTO[]; navigation: { google: string; apple: string } }>(`/v1/places/${id}`, { query: { ...p } }),
   placeLive: (id: string) => request<{ google: { rating: number | null; ratingCount: number | null; openNow: boolean | null; weekdayText: string[] | null; mapsUrl: string | null; fetchedAt: string } | null; reason?: string }>(`/v1/places/${id}/live`),
   map: (bbox: [number, number, number, number], p: { layers?: string; category?: string; open_now?: boolean; free?: boolean }) => request<{ markers: MapMarker[]; truncated: boolean }>('/v1/map', { query: { bbox: bbox.join(','), ...p } }),
+  suggest: (q: string, p: { lat?: number; lng?: number }) => request<{ suggestions: Suggestion[]; didYouMean: string | null }>('/v1/search/suggest', { query: { q, ...p }, timeoutMs: 6_000 }),
   search: (q: string, p: LocationParams & { interests?: string[] }) => request<SearchResponse>('/v1/search', { method: 'POST', body: { q, ...p, locale: i18n.language }, timeoutMs: 20_000 }),
   recommendations: (p: LocationParams & { interests?: string[] }) => request<{ items: RecommendationDTO[] }>('/v1/recommendations', { query: { ...p } }),
   surprise: (p: LocationParams & { interests?: string[] }) => request<{ items: RecommendationDTO[] }>('/v1/surprise', { method: 'POST', body: { ...p, locale: i18n.language } }),

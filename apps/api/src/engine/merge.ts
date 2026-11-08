@@ -336,7 +336,7 @@ export async function recomputeEvent(client: pg.PoolClient, id: string, now: Dat
       localStart, localEnd, v('is_free'), v('price_min'), v('price_max'), v('currency'), v('price_text'),
       v('ticket_url'), v('website'), v('organizer_name'), v('organizer_url'), v('age_min') ?? getCategory(primary)?.ageMin ?? null,
       JSON.stringify(images), status, conf.status, conf.score, JSON.stringify(fieldSources), bySource.size, JSON.stringify(externalIds),
-      lastVerified, searchDocument(v('title') as string, v('venue_name') as string, v('organizer_name') as string, city?.name.en, city?.name.el, city?.name.ru, ...catLabels),
+      lastVerified, searchDocument(v('title') as string, v('venue_name') as string, v('organizer_name') as string, city?.name.en, city?.name.el, city?.name.ru, ...catLabels, excerpt(v('description') as string | null)),
     ],
   );
 }
@@ -360,6 +360,7 @@ export async function recomputePlace(client: pg.PoolClient, id: string, now: Dat
   const externalIds = unionObjects(obs.get('external_ids'));
   const city = cityFromLocation(loc.lat, loc.lng);
   // Long-form text comes as one block from one source, so the language map and its attribution stay together.
+  const placeTags = (unionArrays(obs.get('tags')) as string[]).slice(0, 16);
   const aboutObs = [...(obs.get('description_i18n') ?? [])].filter((o) => o.value && typeof o.value === 'object').sort((a, b) => b.authority - a.authority)[0];
   const aboutSource = aboutObs ? (obs.get('about_source') ?? []).find((o) => o.sourceId === aboutObs.sourceId)?.value ?? null : null;
   const openConflicts = await syncConflicts(client, 'place', id, res, sourceKeys, ['location', 'status']);
@@ -384,19 +385,27 @@ export async function recomputePlace(client: pg.PoolClient, id: string, now: Dat
        location=ST_SetSRID(ST_MakePoint($8, $7), 4326)::geography, address=$9, city_id=(SELECT id FROM cities WHERE slug=$10),
        phone=$11, website=$12, opening_hours=$13, wheelchair=$14, status=$15, images=$16, external_ids=$17,
        confidence=$18, verification_status=$19, field_sources=$20, source_count=$21, last_verified_at=$22, search_doc=$23,
-       age_min=$24, is_free=$25, description_i18n=$26, about_source=$27, updated_at=now()
+       age_min=$24, is_free=$25, description_i18n=$26, about_source=$27, tags=$28, updated_at=now()
      WHERE id=$1`,
     [
       id, v('name'), JSON.stringify(nameI18n), v('description'), primary, categories, loc.lat, loc.lng, v('address'), city?.slug ?? null,
       v('phone'), v('website'), v('opening_hours') ? JSON.stringify(v('opening_hours')) : null, v('wheelchair'), (v('status') as string) ?? 'active',
       JSON.stringify(images), JSON.stringify(externalIds), conf.score, conf.status, JSON.stringify(fieldSources), bySource.size,
       new Date(Math.max(...obs.rows.map((r) => r.last_seen_at.getTime()))),
-      searchDocument(v('name') as string, ...Object.values(nameI18n).map(String), v('address') as string, city?.name.en, ...catLabels),
+      placeSearchDocument({ name: v('name') as string, names: Object.values(nameI18n).map(String), address: v('address') as string | null, city, catLabels, tags: placeTags, description: v('description') as string | null }),
       Math.max(0, ...categories.map((s) => getCategory(s)?.ageMin ?? 0)) || null,
       v('is_free'),
-      JSON.stringify(aboutObs?.value ?? {}), aboutSource ? JSON.stringify(aboutSource) : null,
+      JSON.stringify(aboutObs?.value ?? {}), aboutSource ? JSON.stringify(aboutSource) : null, placeTags,
     ],
   );
+}
+
+/** First ~300 characters of a description: enough for "ancient", "jazz", "wine" to be searchable, without the index ballooning. */
+export const excerpt = (d: string | null | undefined) => (d ? d.slice(0, 300) : null);
+
+/** Text a place is found by: names in all languages, address, city (en/el/ru), category labels, cuisine/diet tags, description start. */
+export function placeSearchDocument(p: { name: string; names: string[]; address: string | null; city: { name: { en: string; el?: string; ru?: string } } | null | undefined; catLabels: string[]; tags: string[]; description: string | null }): string {
+  return searchDocument(p.name, ...p.names, p.address, p.city?.name.en, p.city?.name.el, p.city?.name.ru, ...p.catLabels, ...p.tags, excerpt(p.description));
 }
 
 /** Current photos first (the first one is the cover), historical photos after them in their own small group. */
@@ -679,6 +688,7 @@ export async function ingestPlace(d: MergeDeps, raw: { url?: string | null; payl
     name_i18n: n.nameI18n,
     description: n.description,
     description_i18n: n.descriptionI18n && Object.keys(n.descriptionI18n).length ? n.descriptionI18n : null,
+    tags: n.tags?.length ? n.tags : null,
     about_source: n.aboutSource ?? null,
     categories: n.categories,
     location: n.location,

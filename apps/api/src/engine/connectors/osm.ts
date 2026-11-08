@@ -184,6 +184,13 @@ export const osmConnector: Connector = {
     const nameI18n: Record<string, string> = {};
     for (const l of ['en', 'el', 'ru']) if (t[`name:${l}`]) nameI18n[l] = t[`name:${l}`]!;
 
+    // Searchable details people ask for: cuisine ("sushi", "pizza"), diets, brand, sport.
+    const tags = new Set<string>();
+    for (const c of (t.cuisine ?? '').split(';')) if (c.trim()) tags.add(c.trim().replace(/_/g, ' '));
+    for (const d of ['vegan', 'vegetarian', 'gluten_free', 'halal', 'kosher']) if (t[`diet:${d}`] === 'yes' || t[`diet:${d}`] === 'only') tags.add(d.replace('_', ' '));
+    for (const k of ['brand', 'sport']) for (const v of (t[k] ?? '').split(';')) if (v.trim()) tags.add(v.trim().replace(/_/g, ' '));
+    if (t.outdoor_seating === 'yes') tags.add('outdoor seating');
+
     const externalIds: Record<string, string> = { osm: raw.externalId };
     if (t.wikidata && /^Q\d+$/.test(t.wikidata)) externalIds.wikidata = t.wikidata;
 
@@ -206,6 +213,7 @@ export const osmConnector: Connector = {
       images: [],
       externalIds,
       sourceUrl: raw.url ?? null,
+      tags: [...tags].slice(0, 12),
     };
   },
 };

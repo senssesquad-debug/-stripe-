@@ -1,6 +1,7 @@
 import type pg from 'pg';
 import { tx } from '../db';
-import { recomputeEvent } from './merge';
+import { cityBySlug, getCategory, searchDocument } from '@passtra/core';
+import { excerpt, placeSearchDocument, recomputeEvent } from './merge';
 import type { Logger } from './types';
 
 /**
@@ -49,4 +50,33 @@ export async function runMaintenance(pool: pg.Pool, log: Logger, now = new Date(
   }
   log.info(stats, 'maintenance finished');
   return stats;
+}
+
+/** Bump when the content of search documents changes; existing rows are rebuilt once at start-up. */
+export const SEARCH_DOC_VERSION = 2;
+
+/** Rebuild places/events search documents in batches (after the indexed content changed). */
+export async function reindexSearch(pool: pg.Pool, log: Logger): Promise<number> {
+  const v = await pool.query<{ value: unknown }>(`SELECT value FROM app_settings WHERE key = 'search_doc_version'`);
+  if (Number(v.rows[0]?.value ?? 0) >= SEARCH_DOC_VERSION) return 0;
+  let n = 0;
+  const places = await pool.query<{ id: string; name: string; name_i18n: Record<string, string>; address: string | null; city: string | null; categories: string[]; tags: string[]; description: string | null }>(
+    `SELECT p.id, p.name, p.name_i18n, p.address, c.slug AS city, p.categories, p.tags, p.description FROM places p LEFT JOIN cities c ON c.id = p.city_id WHERE p.merged_into IS NULL`);
+  for (const r of places.rows) {
+    const doc = placeSearchDocument({ name: r.name, names: Object.values(r.name_i18n ?? {}), address: r.address, city: r.city ? cityBySlug(r.city) : null,
+      catLabels: r.categories.flatMap((s) => Object.values(getCategory(s)?.label ?? {})), tags: r.tags ?? [], description: r.description });
+    await pool.query('UPDATE places SET search_doc = $2 WHERE id = $1', [r.id, doc]);
+    n++;
+  }
+  const events = await pool.query<{ id: string; title: string; venue_name: string | null; organizer_name: string | null; city: string | null; categories: string[]; description: string | null }>(
+    `SELECT e.id, e.title, e.venue_name, e.organizer_name, c.slug AS city, e.categories, e.description FROM events e LEFT JOIN cities c ON c.id = e.city_id WHERE e.merged_into IS NULL`);
+  for (const r of events.rows) {
+    const city = r.city ? cityBySlug(r.city) : null;
+    const doc = searchDocument(r.title, r.venue_name, r.organizer_name, city?.name.en, city?.name.el, city?.name.ru, ...r.categories.flatMap((s) => Object.values(getCategory(s)?.label ?? {})), excerpt(r.description));
+    await pool.query('UPDATE events SET search_doc = $2 WHERE id = $1', [r.id, doc]);
+    n++;
+  }
+  await pool.query(`INSERT INTO app_settings (key, value) VALUES ('search_doc_version', $1) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`, [JSON.stringify(SEARCH_DOC_VERSION)]);
+  log.info({ rows: n }, 'search documents rebuilt');
+  return n;
 }

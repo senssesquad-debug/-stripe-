@@ -83,6 +83,8 @@ export interface NormalizedPlace {
   images: ImageDTO[];
   externalIds: Record<string, string>;
   sourceUrl: string | null;
+  /** Searchable details such as cuisine, diets, brand ("sushi", "vegan"). */
+  tags?: string[];
 }
 
 export type Normalized = NormalizedEvent | NormalizedPlace;

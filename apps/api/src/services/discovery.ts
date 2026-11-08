@@ -3,7 +3,7 @@ import {
   CATEGORIES, CITIES, GROUP_LABELS, buildAffinity, expandCategories, canonicalKey, categoriesInGroup, cityBySlug, explain, getCategory, haversineKm,
   isValidLatLng, localDate, pickText, planDay, rank, scoreCandidate, surprise, timeWindow, type AgeRange, type Budget, type Candidate, type CityDef,
   type EntityDTO, type EventDTO, type FeedResponse, type FeedSectionDTO, type FeedSectionKey, type InteractionKind, type InterestGroup,
-  type Locale, type PlaceDTO, type PlanCandidate, type PlanDayResponse, type RecommendationDTO, type SearchFilters, type SearchResponse, type UserProfile,
+  correctQuery, type Locale, type PlaceDTO, type PlanCandidate, type PlanDayResponse, type RecommendationDTO, type SearchFilters, type SearchResponse, type UserProfile,
 } from '@passtra/core';
 import { DateTime } from 'luxon';
 import type pg from 'pg';
@@ -263,13 +263,41 @@ function summarize(f: SearchFilters, locale: Locale): string {
   return parts.join(' · ');
 }
 
+/**
+ * Search = interpretation (AI or rules, filters only) + database query. Results always come from the database.
+ *  - the literal query is searched first; only if it finds nothing is a typo-corrected version tried ("did you mean")
+ *  - with few results nearby, the response lists how many there are within wider radii so the user can widen the search
+ */
 export async function search(db: pg.Pool, interpreter: QueryInterpreter, query: string, baseCtx: DiscoveryContext, profile: Profile, limit = 40): Promise<SearchResponse> {
-  const { filters, engine } = await interpreter.interpret(query, baseCtx.locale);
+  let { filters, engine } = await interpreter.interpret(query, baseCtx.locale);
+  let out = await searchWith(db, query, filters, engine, baseCtx, profile, limit);
+  let didYouMean: string | null = null;
+  if (out.total === 0) {
+    const corrected = correctQuery(query);
+    if (corrected) {
+      const again = await interpreter.interpret(corrected, baseCtx.locale);
+      const res = await searchWith(db, corrected, again.filters, again.engine, baseCtx, profile, limit);
+      if (res.total > 0) { out = res; didYouMean = corrected; filters = again.filters; engine = again.engine; }
+    }
+  }
+  const widen: Array<{ radiusKm: number; count: number }> = [];
+  const explicitPlace = filters.radiusKm !== null || (filters.city !== null && filters.city !== baseCtx.city?.slug);
+  if (out.total < 3 && baseCtx.geo && !explicitPlace) {
+    for (const km of [10, 25, 50, 100]) {
+      if (km <= out.radiusKm) continue;
+      const n = (await searchWith(db, didYouMean ?? query, filters, engine, baseCtx, profile, 1, km)).total;
+      if (n > out.total && !widen.some((w) => w.count === n)) widen.push({ radiusKm: km, count: n });
+    }
+  }
+  return { ...out, didYouMean, widen };
+}
+
+async function searchWith(db: pg.Pool, query: string, filters: SearchFilters, engine: 'ai' | 'rules', baseCtx: DiscoveryContext, profile: Profile, limit: number, radiusOverride?: number): Promise<SearchResponse & { radiusKm: number }> {
   let ctx = baseCtx;
   if (filters.city && (!baseCtx.usedLocation || filters.city !== baseCtx.city?.slug) && !(filters.nearMe && baseCtx.usedLocation)) {
     ctx = resolveContext({ city: filters.city, locale: baseCtx.locale, radiusKm: filters.radiusKm ?? undefined }, baseCtx.now);
   } else if (filters.radiusKm) ctx = { ...baseCtx, radiusKm: filters.radiusKm };
-  else if (!filters.nearMe && !filters.city && baseCtx.usedLocation) ctx = { ...baseCtx, radiusKm: Math.max(baseCtx.radiusKm, 25) };
+  if (radiusOverride) ctx = { ...ctx, radiusKm: radiusOverride };
 
   const groupCats = filters.groups.flatMap((g) => categoriesInGroup(g).map((c) => c.slug));
   const cats = expandCategories([...new Set([...filters.categories, ...groupCats])]);
@@ -314,6 +342,9 @@ export async function search(db: pg.Pool, interpreter: QueryInterpreter, query: 
     interpretation: { ...filters, engine, summary: summarize(filters, L) },
     results: ordered.slice(0, limit),
     total: ordered.length,
+    radiusKm: ctx.radiusKm,
+    didYouMean: null,
+    widen: [],
   };
 }
 

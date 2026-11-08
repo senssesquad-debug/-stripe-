@@ -43,7 +43,7 @@ const en = {
     closed: 'Permanently closed', duplicate: 'Duplicate', inappropriate: 'Inappropriate', other: 'Something else', messagePlaceholder: 'What’s wrong? A link to the source helps.', send: 'Send report',
   },
   search: {
-    placeholder: 'Try “live music tonight” or “pharmacy open now”', understood: 'We understood', ai: 'AI', results: '{{count}} results',
+    nearMe: 'Near me', wholeCity: 'All of {{city}}', searchFor: 'Search “{{q}}”', kind_category: 'Category', kind_city: 'City', kind_place: 'Place', kind_event: 'Event', didYouMean: 'Did you mean “{{q}}”?', showingFor: 'Showing results for “{{q}}” — nothing matched “{{original}}”.', resultsWithin: '{{count}} results within {{km}} km', widenTo: 'Within {{km}} km · {{count}}', nothingWithin: 'Nothing within {{km}} km.', recent: 'Recent searches', placeholder: 'Try “live music tonight” or “pharmacy open now”', understood: 'We understood', ai: 'AI', results: '{{count}} results',
     examples: 'Try asking', noResults: 'No matches. Try fewer words or a wider area.',
     ex1: 'Where is there live music tonight?', ex2: 'Best restaurants near me', ex3: 'Things to do with kids today', ex4: 'Concerts in Limassol this weekend', ex5: 'Free events', ex6: 'Which shops are open now?',
   },

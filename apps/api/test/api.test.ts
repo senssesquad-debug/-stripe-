@@ -142,6 +142,67 @@ describe('public API', () => {
     expect(r.results.every((e) => e.type === 'event')).toBe(true);
   });
 
+  describe('search (real fixture data: OSM Limassol centre + visitcyprus events)', () => {
+    const search = async (q: string, extra: Record<string, unknown> = {}) =>
+      (await app.inject({ method: 'POST', url: '/v1/search', payload: { q, ...extra } })).json<SearchResponse>();
+    const kinds = (r: SearchResponse) => new Set(r.results.map((e) => e.category.slug));
+
+    it.each([
+      ['restaurants', 'restaurant', 'en'], ['рестораны', 'restaurant', 'ru'], ['εστιατόρια', 'restaurant', 'el'],
+      ['cafes', 'cafe', 'en'], ['кафе', 'cafe', 'ru'], ['καφετέριες', 'cafe', 'el'],
+      ['bars', 'bar', 'en'], ['nightclubs', 'nightclub', 'en'], ['ночные клубы', 'nightclub', 'ru'],
+      ['pharmacy', 'pharmacy', 'en'], ['аптека', 'pharmacy', 'ru'], ['φαρμακείο', 'pharmacy', 'el'],
+    ])('“%s” finds %s (%s)', async (q, slug, locale) => {
+      const r = await search(q, { city: 'limassol', locale });
+      expect(r.total).toBeGreaterThan(0);
+      expect(kinds(r)).toContain(slug);
+      expect([...kinds(r)].every((k) => k === slug || r.interpretation.categories.includes(k) || k.includes(slug.split('-')[0]!))).toBe(true);
+    });
+
+    it('typos still find the right category (fuzzy match or "did you mean")', async () => {
+      const r = await search('nightclbs', { city: 'limassol' });
+      expect(kinds(r)).toContain('nightclub');
+      const c = await search('concrets', { city: 'limassol' });
+      expect(c.didYouMean).toBe('concert');
+      const ru = await search('рестараны', { city: 'limassol', locale: 'ru' });
+      expect(ru.total).toBeGreaterThan(0);
+    });
+
+    it('generic words do not empty the results', async () => {
+      expect((await search('bars and activities', { city: 'limassol' })).total).toBeGreaterThan(0);
+    });
+
+    it('finds by cuisine (OSM cuisine tag) and by name', async () => {
+      const greek = await search('greek', { city: 'limassol' });
+      expect(greek.total).toBeGreaterThan(0);
+      const one = (await pool.query(`SELECT id, name FROM places WHERE primary_category = 'restaurant' AND merged_into IS NULL ORDER BY name LIMIT 1`)).rows[0] as { id: string; name: string };
+      expect((await search(one.name, { city: 'limassol' })).results.map((e) => e.id)).toContain(one.id);
+    });
+
+    it('city scope: Limassol data is not returned for Paphos; the response offers wider radii', async () => {
+      const paphos = await search('restaurants', { city: 'paphos' });
+      expect(paphos.total).toBe(0);
+      const near = await search('restaurants', { lat: 34.70, lng: 32.95, radius: 5 });
+      expect(near.total).toBe(0);
+      expect(near.widen.length).toBeGreaterThan(0);
+      expect(near.widen[0]!.count).toBeGreaterThan(0);
+      const wider = await search('restaurants', { lat: 34.70, lng: 32.95, radius: near.widen[0]!.radiusKm });
+      expect(wider.total).toBe(near.widen[0]!.count);
+    });
+
+    it('autocomplete suggests categories (any language), cities and real places', async () => {
+      const s = async (q: string, locale = 'en') => (await app.inject({ url: `/v1/search/suggest?q=${encodeURIComponent(q)}&locale=${locale}` })).json<{ suggestions: Array<{ type: string; label: string; slug?: string }>; didYouMean: string | null }>();
+      expect((await s('rest')).suggestions[0]).toMatchObject({ type: 'category', slug: 'restaurant' });
+      expect((await s('рест', 'ru')).suggestions[0]).toMatchObject({ type: 'category', slug: 'restaurant', label: 'Рестораны' });
+      expect((await s('εστιατ', 'el')).suggestions.some((x) => x.slug === 'restaurant')).toBe(true);
+      expect((await s('lemes')).suggestions.some((x) => x.type === 'city' && x.slug === 'limassol')).toBe(true);
+      const typo = await s('resturants');
+      expect(typo.didYouMean).toBe('restaurant');
+      const one = (await pool.query(`SELECT name FROM places WHERE primary_category = 'cafe' AND merged_into IS NULL ORDER BY name LIMIT 1`)).rows[0].name as string;
+      expect((await s(one.slice(0, 5))).suggestions.some((x) => x.type === 'place' && x.label === one)).toBe(true);
+    });
+  });
+
   it('search "open now" pharmacy near me returns only places open now', async () => {
     const r = (await app.inject({ method: 'POST', url: '/v1/search', payload: { q: 'pharmacy open now near me', lat: 34.6755, lng: 33.0435 } })).json<SearchResponse>();
     expect(r.interpretation.categories).toEqual(['pharmacy']);
