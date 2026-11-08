@@ -281,6 +281,8 @@ export async function recomputeEvent(client: pg.PoolClient, id: string, now: Dat
     loc = { lat: c.lat, lng: c.lng };
     locPrecision = 'city';
   }
+  // With real coordinates the city follows the coordinates, not a source's free-text city.
+  const finalCity = (loc && locPrecision !== 'city' ? cityFromLocation(loc.lat, loc.lng)?.slug : null) ?? citySlug;
 
   const categories = unionArrays(obs.get('categories')) as string[];
   const primaryObs = resolveWithOverride('primary_category', obs.get('primary_category') ?? []);
@@ -313,7 +315,7 @@ export async function recomputeEvent(client: pg.PoolClient, id: string, now: Dat
   for (const [f, r] of res) fieldSources[f] = { source: r.sourceId !== null ? sourceKeys.get(r.sourceId) : null, decision: r.decision, agreeing: r.agreeingSources };
   const lastVerified = new Date(Math.max(...obs.rows.map((r) => r.last_seen_at.getTime())));
   const catLabels = categories.flatMap((s) => Object.values(getCategory(s)?.label ?? {}));
-  const city = citySlug ? cityBySlug(citySlug) : null;
+  const city = finalCity ? cityBySlug(finalCity) : null;
 
   await client.query(
     `UPDATE events SET
@@ -328,7 +330,7 @@ export async function recomputeEvent(client: pg.PoolClient, id: string, now: Dat
      WHERE id=$1`,
     [
       id, v('title'), v('description'), CATEGORY_BY_SLUG.has(primary) ? primary : 'community-event', categories.filter((s) => CATEGORY_BY_SLUG.has(s)),
-      v('place_id'), v('venue_name'), v('address'), citySlug, loc?.lat ?? null, loc?.lng ?? null,
+      v('place_id'), v('venue_name'), v('address'), finalCity, loc?.lat ?? null, loc?.lng ?? null,
       locPrecision, tz, startsAt, endsAt, timePrecision,
       res.get('starts_at')?.decision === 'conflict' || res.get('local_start_date')?.decision === 'conflict',
       localStart, localEnd, v('is_free'), v('price_min'), v('price_max'), v('currency'), v('price_text'),
