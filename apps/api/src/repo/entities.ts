@@ -38,7 +38,7 @@ export const PLACE_COLUMNS = (dist: string) => `
   ST_Y(p.location::geometry) AS lat, ST_X(p.location::geometry) AS lng, p.location_precision, p.address,
   c.slug AS city_slug, c.name AS city_name, c.timezone AS city_tz, p.phone, p.website, p.opening_hours, p.price_level, p.is_free,
   p.user_rating_avg, p.user_rating_count, p.age_min, p.status, p.images, p.verification_status, p.confidence,
-  p.last_verified_at, p.external_ids, p.is_demo, p.popularity, p.source_count,
+  p.last_verified_at, p.external_ids, p.is_demo, p.popularity, p.source_count, p.description_i18n, p.about_source,
   ${dist} AS distance_km`;
 
 export function distanceExpr(q: Sql, alias: 'e' | 'p', geo: { lat: number; lng: number } | null): string {
@@ -101,6 +101,7 @@ export interface PlaceRow extends pg.QueryResultRow {
   user_rating_avg: number | null; user_rating_count: number; age_min: number | null; status: PlaceDTO['status']; images: ImageDTO[];
   verification_status: PlaceDTO['verification']['status']; confidence: number; last_verified_at: Date | null;
   external_ids: Record<string, string>; is_demo: boolean; popularity: number; source_count: number; distance_km: number | null;
+  description_i18n: Record<string, string> | null; about_source: { name: string; url: string | null; license: string | null; urls?: Record<string, string> } | null;
 }
 
 // ── DTO mapping ────────────────────────────────────────────────────────────
@@ -191,7 +192,18 @@ export function placeToDTO(r: PlaceRow, locale: Locale, now: Date, extra?: { sou
     externalIds: r.external_ids ?? {},
     sponsored: false,
     isDemo: r.is_demo,
+    about: aboutOf(r, locale),
   };
+}
+
+/** Long-form text in the user's language when the source has it, else English — always with its source and licence. */
+function aboutOf(r: PlaceRow, locale: Locale): PlaceDTO['about'] {
+  const texts = r.description_i18n ?? {};
+  const lang = texts[locale] ? locale : texts.en ? 'en' : Object.keys(texts)[0];
+  if (!lang || !texts[lang]) return null;
+  const src = r.about_source;
+  const url = src?.urls?.[lang] ?? (lang === 'en' ? src?.url ?? null : null);
+  return { text: texts[lang]!, source: src?.name ?? 'Wikipedia', url, license: src?.license ?? null };
 }
 
 // ── Queries ────────────────────────────────────────────────────────────────

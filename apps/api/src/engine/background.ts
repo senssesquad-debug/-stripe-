@@ -3,6 +3,7 @@ import type { AppConfig } from '../config';
 import { Geocoder } from '../lib/geocode';
 import { HttpClient } from '../lib/http';
 import { runNotifications } from '../services/notifications';
+import { deliverDueReminders } from '../services/reminders';
 import { runMaintenance } from './maintenance';
 import { tick } from './scheduler';
 import type { Logger } from './types';
@@ -23,6 +24,7 @@ export function startBackground(pool: pg.Pool, config: AppConfig, log: Logger): 
   const done = (async () => {
     while (!stopping) {
       try {
+        await deliverDueReminders(pool, config, log); // first: reminders are time-critical
         await tick(deps);
         if (Date.now() - lastMaintenance > 30 * 60_000) {
           lastMaintenance = Date.now();

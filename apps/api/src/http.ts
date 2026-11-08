@@ -31,6 +31,8 @@ export interface AuthUser {
 declare module 'fastify' {
   interface FastifyRequest {
     user: AuthUser | null;
+    /** passtra-issued session id (absent for external IdP tokens). */
+    sessionId: string | null;
   }
 }
 
@@ -51,6 +53,7 @@ export function createAuth(config: AppConfig, db: Db) {
   /** onRequest hook: attaches req.user when a valid bearer token is present; invalid tokens → 401. */
   async function authenticate(req: FastifyRequest): Promise<void> {
     req.user = null;
+    req.sessionId = null;
     const h = req.headers.authorization;
     if (!h?.startsWith('Bearer ')) return;
     let payload: JWTPayload;
@@ -61,6 +64,14 @@ export function createAuth(config: AppConfig, db: Db) {
       throw new ApiError(401, 'invalid_token', 'Invalid or expired token');
     }
     if (!payload.sub || !UUID.test(payload.sub)) throw new ApiError(401, 'invalid_token', 'Token subject is not a user id');
+    // passtra sessions can be revoked (sign-out, password change).
+    const sid = typeof payload.sid === 'string' && UUID.test(payload.sid) ? payload.sid : null;
+    if (sid) {
+      const s = await db.query<{ ok: boolean }>(
+        `UPDATE auth_sessions SET last_used_at = now() WHERE id = $1 AND user_id = $2 AND revoked_at IS NULL AND expires_at > now() RETURNING true AS ok`, [sid, payload.sub]);
+      if (!s.rowCount) throw new ApiError(401, 'session_ended', 'Your session has ended. Please sign in again.');
+      req.sessionId = sid;
+    }
     // Lazily create the user row (no personal data stored beyond the auth subject id).
     const r = await db.query<{ role: AuthUser['role'] }>(
       `INSERT INTO users (id, role) VALUES ($1, $2)

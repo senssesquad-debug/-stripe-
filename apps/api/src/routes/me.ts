@@ -5,6 +5,7 @@ import type { AppDeps } from '../app';
 import { tx } from '../db';
 import { ApiError, localeOf, parse, requireUser } from '../http';
 import { eventToDTO, getEventRow, getPlaceRow, placeToDTO } from '../repo/entities';
+import { profileOf } from './auth';
 
 const Uuid = z.string().uuid();
 const EntityType = z.enum(['event', 'place']);
@@ -23,24 +24,14 @@ const NotificationPrefs = z.object({
 export async function meRoutes(app: FastifyInstance, deps: AppDeps) {
   const { db } = deps;
 
-  const profile = async (userId: string) => {
-    const r = await db.query(
-      `SELECT u.id, u.role, u.locale, u.interests, u.age_range, u.budget, c.slug AS home_city, u.personalization_enabled, u.notification_prefs, u.is_premium, u.created_at
-         FROM users u LEFT JOIN cities c ON c.id = u.home_city_id WHERE u.id = $1`,
-      [userId],
-    );
-    const u = r.rows[0];
-    return {
-      id: u.id, role: u.role, locale: u.locale, interests: u.interests, ageRange: u.age_range, budget: u.budget, homeCity: u.home_city,
-      personalizationEnabled: u.personalization_enabled, notificationPrefs: u.notification_prefs, isPremium: u.is_premium, createdAt: u.created_at,
-    };
-  };
+  const profile = (userId: string) => profileOf(db, userId);
 
   app.get('/v1/me', async (req) => profile(requireUser(req).id));
 
   app.patch('/v1/me', async (req) => {
     const user = requireUser(req);
     const b = parse(z.object({
+      name: z.string().trim().max(80).nullable().optional(),
       locale: z.enum(LOCALES).optional(),
       interests: z.array(z.enum([...INTEREST_GROUPS, 'other'] as [string, ...string[]])).max(13).optional(),
       ageRange: z.enum(['under_18', '18_24', '25_34', '35_44', '45_54', '55_plus']).nullable().optional(),
@@ -55,6 +46,7 @@ export async function meRoutes(app: FastifyInstance, deps: AppDeps) {
       params.push(v);
       sets.push(`${col} = $${params.length}${cast}`);
     };
+    if (b.name !== undefined) set('name', b.name || null);
     if (b.locale) set('locale', b.locale);
     if (b.interests) set('interests', b.interests.flatMap((i) => (i === 'other' ? ['wellness', 'practical'] : [i])));
     if (b.ageRange !== undefined) set('age_range', b.ageRange);

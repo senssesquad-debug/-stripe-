@@ -12,6 +12,12 @@ export interface ImageDTO {
   attribution?: string | null;
   license?: string | null;
   source?: string | null;
+  /** "current" photos show the place as it looks today; "historical" ones are kept in a separate gallery. */
+  kind?: 'current' | 'historical';
+  /** Year the photo was taken, when the file metadata states it. */
+  year?: number | null;
+  width?: number | null;
+  height?: number | null;
 }
 
 export interface SourceRefDTO {
@@ -128,6 +134,8 @@ export interface PlaceDTO {
   externalIds: Record<string, string>;
   sponsored: false;
   isDemo: boolean;
+  /** Longer text about the place (localized), with its source and licence. */
+  about: { text: string; source: string; url: string | null; license: string | null } | null;
 }
 
 export type EntityDTO = EventDTO | PlaceDTO;

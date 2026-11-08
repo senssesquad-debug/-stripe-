@@ -36,6 +36,26 @@ const Schema = z.object({
   GEOCODING_ENABLED: bool.default(true),
   BOT_USER_AGENT: z.string().default('passtra-bot/0.1 (+https://passtra.app/bot; data@passtra.app)'),
 
+  // Email (Resend) and SMS (Twilio) for confirming contact details. Without them, confirmation is unavailable
+  // and the API says so — nothing is ever marked as confirmed without a delivered code.
+  RESEND_API_KEY: optional,
+  EMAIL_FROM: z.string().default('passtra <no-reply@passtra.app>'),
+  TWILIO_ACCOUNT_SID: optional,
+  TWILIO_AUTH_TOKEN: optional,
+  TWILIO_FROM: optional,
+  /** DEV ONLY: return verification codes in API responses for local testing. Refused in production. */
+  DEV_SHOW_CODES: bool.default(false),
+  // Web Push (VAPID). If unset, a key pair is generated once and stored in app_settings.
+  WEB_PUSH_PUBLIC_KEY: optional,
+  WEB_PUSH_PRIVATE_KEY: optional,
+  WEB_PUSH_SUBJECT: z.string().default('mailto:support@passtra.app'),
+  // Routing (OSRM-compatible). Default: FOSSGIS public OSRM — fair use only; self-host or use a paid API at scale.
+  ROUTING_URL: z.string().default('https://routing.openstreetmap.de'),
+  /** Public base URL of the web app, used in share links and notifications (e.g. https://passtra.onrender.com). */
+  PUBLIC_WEB_URL: optional,
+  /** Universal/App Links: Apple Team ID and Android signing cert SHA-256 fingerprints (comma-separated). */
+  APPLE_TEAM_ID: optional,
+  ANDROID_CERT_SHA256: optional,
   REPORT_SALT: z.string().default('dev-only-salt-change-me'),
   DEMO_MODE: bool.default(false),
   FEATURE_PROMOTIONS: bool.default(false),
@@ -53,6 +73,7 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     if (cfg.DEMO_MODE) throw new Error('DEMO_MODE must never be enabled in production.');
     if (!cfg.AUTH_JWKS_URL && !cfg.AUTH_JWT_SECRET) throw new Error('Configure AUTH_JWKS_URL or AUTH_JWT_SECRET in production.');
     if (cfg.REPORT_SALT === 'dev-only-salt-change-me') throw new Error('Set REPORT_SALT in production.');
+    if (cfg.DEV_SHOW_CODES) throw new Error('DEV_SHOW_CODES must never be enabled in production.');
   }
   return cfg;
 }
@@ -67,5 +88,8 @@ export function integrationStatus(cfg: AppConfig): Record<string, boolean> {
     pushNotifications: true, // Expo push works without a token; the token only raises security
     auth: !!(cfg.AUTH_JWKS_URL || cfg.AUTH_JWT_SECRET),
     geocoding: cfg.GEOCODING_ENABLED,
+    emailDelivery: !!cfg.RESEND_API_KEY,
+    smsDelivery: !!(cfg.TWILIO_ACCOUNT_SID && cfg.TWILIO_AUTH_TOKEN && cfg.TWILIO_FROM),
+    webPush: true,
   };
 }

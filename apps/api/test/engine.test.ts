@@ -231,21 +231,43 @@ describe('places: OpenStreetMap + Wikidata', () => {
     expect(market.external_ids.osm).toMatch(/^node\//);
   });
 
-  it('merges a Wikidata item into the OSM place that carries the same wikidata id, with licensed image', async () => {
+  it('merges a Wikidata item into the OSM place with the same wikidata id: current photos first, historical separate, Wikipedia text', async () => {
     const wd = await source(pool, 'wikidata_cy');
     const before = (await pool.query(`SELECT id FROM places WHERE external_ids->>'wikidata' = 'Q109944949'`)).rows[0];
     expect(before).toBeTruthy();
+    const file = (title: string, w: number, h: number, license: string, date: string, extra: Record<string, string> = {}) => ({
+      title, imageinfo: [{ url: `https://upload.wikimedia.org/${encodeURIComponent(title)}`, thumburl: `https://upload.wikimedia.org/thumb/${encodeURIComponent(title)}`, width: w, height: h, mime: 'image/jpeg',
+        extmetadata: { LicenseShortName: { value: license }, Artist: { value: '<a href="#">Jane Doe</a>' }, DateTimeOriginal: { value: date }, ImageDescription: { value: extra.desc ?? '' } } }],
+    });
     const f = fakeFetch([
-      [/query\.wikidata\.org/, () => ({ results: { bindings: [{ item: { value: 'http://www.wikidata.org/entity/Q109944949' }, cls: { value: 'http://www.wikidata.org/entity/Q2977' }, coord: { value: 'Point(33.0427 34.6747)' }, label_en: { value: 'Agia Napa Cathedral' }, label_el: { value: 'Μητρόπολη Αγίας Νάπας' }, image: { value: 'http://commons.wikimedia.org/wiki/Special:FilePath/Ayia%20Napa%20Cathedral.jpg' } }] } })],
-      [/commons\.wikimedia\.org\/w\/api\.php/, () => ({ query: { pages: { '1': { title: 'File:Ayia Napa Cathedral.jpg', imageinfo: [{ url: 'https://upload.wikimedia.org/x.jpg', thumburl: 'https://upload.wikimedia.org/thumb/x.jpg', extmetadata: { LicenseShortName: { value: 'CC BY-SA 4.0' }, Artist: { value: '<a href="#">Jane Doe</a>' } } }] } } } })],
+      [/query\.wikidata\.org/, () => ({ results: { bindings: [{ item: { value: 'http://www.wikidata.org/entity/Q109944949' }, cls: { value: 'http://www.wikidata.org/entity/Q2977' }, coord: { value: 'Point(33.0427 34.6747)' },
+        label_en: { value: 'Agia Napa Cathedral' }, label_el: { value: 'Μητρόπολη Αγίας Νάπας' }, image: { value: 'http://commons.wikimedia.org/wiki/Special:FilePath/Old%20cathedral.jpg' },
+        commonscat: { value: 'Agia Napa Cathedral' }, wiki_en: { value: 'Agia Napa Cathedral' }, address: { value: 'Makariou III, Ayia Napa' } }] } })],
+      [/list=categorymembers/, () => ({ query: { categorymembers: [{ title: 'File:Cathedral 2024.jpg' }, { title: 'File:Cathedral map.png' }, { title: 'File:Cathedral 1935.jpg' }, { title: 'File:Cathedral nonfree.jpg' }, { title: 'File:Tiny.jpg' }] } })],
+      [/prop=imageinfo/, () => ({ query: { pages: {
+        '1': file('File:Old cathedral.jpg', 1024, 768, 'CC BY-SA 3.0', '2009-05-01'),
+        '2': file('File:Cathedral 2024.jpg', 4000, 2667, 'CC BY-SA 4.0', '2024-06-10 10:00'),
+        '3': file('File:Cathedral map.png', 2000, 1500, 'CC BY-SA 4.0', '2020'),
+        '4': file('File:Cathedral 1935.jpg', 1600, 1100, 'Public domain', '1935'),
+        '5': file('File:Cathedral nonfree.jpg', 3000, 2000, 'All rights reserved', '2023'),
+        '6': file('File:Tiny.jpg', 320, 240, 'CC0', '2025'),
+      } } })],
+      [/en\.wikipedia\.org/, () => ({ query: { pages: { '9': { title: 'Agia Napa Cathedral', extract: 'The Agia Napa Cathedral is a Greek Orthodox cathedral in Ayia Napa, Cyprus. It was completed in 1990s and is one of the largest churches on the island.' } } } })],
     ]);
     const s = await runSource(engineDeps(pool, config, f, NOW), wd, 'test');
     expect(s.merged).toBe(1);
     const p = (await pool.query(`SELECT * FROM places WHERE id = $1`, [before.id])).rows[0];
     expect(p.source_count).toBe(2);
     expect(p.external_ids).toMatchObject({ wikidata: 'Q109944949' });
-    expect(p.images[0].attribution).toBe('Jane Doe · CC BY-SA 4.0 · Wikimedia Commons');
+    const urls = p.images.map((i: { source: string }) => decodeURIComponent(i.source));
+    // Cover is the recent high-resolution photo, not Wikidata's older P18 image; maps, non-free and tiny files are dropped.
+    expect(p.images[0]).toMatchObject({ kind: 'current', year: 2024, license: 'CC BY-SA 4.0', attribution: 'Jane Doe · CC BY-SA 4.0 · Wikimedia Commons' });
+    expect(urls.some((u: string) => /map|nonfree|Tiny/.test(u))).toBe(false);
+    expect(p.images.at(-1)).toMatchObject({ kind: 'historical', year: 1935 });
+    expect(p.images.filter((i: { kind: string }) => i.kind === 'current')).toHaveLength(2);
     expect(p.name_i18n.el).toBe('Μητρόπολη Αγίας Νάπας');
+    expect(p.description_i18n.en).toMatch(/Greek Orthodox cathedral/);
+    expect(p.about_source).toMatchObject({ name: 'Wikipedia', license: 'CC BY-SA 4.0', urls: { en: 'https://en.wikipedia.org/wiki/Agia_Napa_Cathedral' } });
   });
 
   it('links an event to a known venue and uses its exact coordinates', async () => {

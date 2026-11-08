@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
@@ -11,6 +11,9 @@ import { Geocoder } from './lib/geocode';
 import { HttpClient } from './lib/http';
 import { ApiError, createAuth, sendError } from './http';
 import { adminRoutes } from './routes/admin';
+import { authRoutes } from './routes/auth';
+import { myEventsRoutes } from './routes/my-events';
+import { makeIndexHandler, webRoutes } from './routes/web';
 import { meRoutes } from './routes/me';
 import { publicRoutes } from './routes/public';
 import { QueryInterpreter } from './services/ai';
@@ -57,6 +60,7 @@ export async function buildApp(config: AppConfig, db: Db, overrides: Partial<App
 
   const auth = createAuth(config, db);
   app.decorateRequest('user', null);
+  app.decorateRequest('sessionId', null);
   app.addHook('onRequest', async (req) => {
     await auth.authenticate(req);
   });
@@ -71,21 +75,26 @@ export async function buildApp(config: AppConfig, db: Db, overrides: Partial<App
     return sendError(reply, new ApiError(500, 'internal', 'Something went wrong'));
   });
   const appDir = config.APP_STATIC_DIR && existsSync(config.APP_STATIC_DIR) ? config.APP_STATIC_DIR : null;
+  const indexHandler = appDir ? makeIndexHandler(deps, appDir) : null;
   app.setNotFoundHandler((req, reply) => {
-    // Client-side routes of the web app (e.g. /event/123) get index.html; API paths keep JSON 404s.
-    if (appDir && req.method === 'GET' && !req.url.startsWith('/v1/') && !req.url.startsWith('/admin')) {
-      return reply.type('text/html; charset=utf-8').send(readFileSync(`${appDir}/index.html`));
-    }
+    // Client-side routes of the web app (e.g. /event/123) get index.html with link-preview tags; API paths keep JSON 404s.
+    if (indexHandler && req.method === 'GET' && !req.url.startsWith('/v1/') && !req.url.startsWith('/admin')) return indexHandler(req, reply);
     return sendError(reply, new ApiError(404, 'not_found', 'Route not found'));
   });
 
   await app.register(async (r) => publicRoutes(r, deps));
   await app.register(async (r) => meRoutes(r, deps));
+  await app.register(async (r) => authRoutes(r, deps));
+  await app.register(async (r) => myEventsRoutes(r, deps));
+  await app.register(async (r) => webRoutes(r, deps));
   await app.register(async (r) => adminRoutes(r, deps));
 
   if (config.ADMIN_STATIC_DIR && existsSync(config.ADMIN_STATIC_DIR)) {
     await app.register(fastifyStatic, { root: config.ADMIN_STATIC_DIR, prefix: '/admin/', decorateReply: false });
   }
-  if (appDir) await app.register(fastifyStatic, { root: appDir, prefix: '/', decorateReply: false, wildcard: false, index: ['index.html'] });
+  if (appDir) {
+    app.get('/', (req, reply) => indexHandler!(req, reply));
+    await app.register(fastifyStatic, { root: appDir, prefix: '/', decorateReply: false, wildcard: false, index: false });
+  }
   return { app, deps };
 }

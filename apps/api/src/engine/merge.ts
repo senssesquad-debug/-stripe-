@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import {
   CATEGORY_BY_SLUG, CITIES, CRITICAL_EVENT_FIELDS, EVENT_AUTO_MERGE, EVENT_REVIEW, PLACE_AUTO_MERGE, PLACE_REVIEW,
   canonicalKey, cityBySlug, computeConfidence, countryByCode, eventMatchScore, getCategory, haversineKm, isInsideBbox,
-  localDate, localToUtc, nameSimilarity, placeMatchScore, resolveField, searchDocument, type FieldObservation, type FieldResolution,
+  localDate, localToUtc, nameSimilarity, placeMatchScore, resolveField, searchDocument, type FieldObservation, type FieldResolution, type ImageDTO,
 } from '@passtra/core';
 import type pg from 'pg';
 import type { Geocoder } from '../lib/geocode';
@@ -356,9 +356,12 @@ export async function recomputePlace(client: pg.PoolClient, id: string, now: Dat
   const primary = primaryPlaceCategory(categories) ?? categories[0]!;
   const loc = v('location') as { lat: number; lng: number };
   const nameI18n = unionObjects(obs.get('name_i18n'));
-  const images = unionArrays(obs.get('images')).slice(0, 6);
+  const images = orderPlaceImages(unionArrays(obs.get('images')) as ImageDTO[]);
   const externalIds = unionObjects(obs.get('external_ids'));
   const city = cityFromLocation(loc.lat, loc.lng);
+  // Long-form text comes as one block from one source, so the language map and its attribution stay together.
+  const aboutObs = [...(obs.get('description_i18n') ?? [])].filter((o) => o.value && typeof o.value === 'object').sort((a, b) => b.authority - a.authority)[0];
+  const aboutSource = aboutObs ? (obs.get('about_source') ?? []).find((o) => o.sourceId === aboutObs.sourceId)?.value ?? null : null;
   const openConflicts = await syncConflicts(client, 'place', id, res, sourceKeys, ['location', 'status']);
   const bySource = new Map<number, { authority: number; isOfficial: boolean; lastSeenAt: Date }>();
   for (const r of obs.rows) {
@@ -381,7 +384,7 @@ export async function recomputePlace(client: pg.PoolClient, id: string, now: Dat
        location=ST_SetSRID(ST_MakePoint($8, $7), 4326)::geography, address=$9, city_id=(SELECT id FROM cities WHERE slug=$10),
        phone=$11, website=$12, opening_hours=$13, wheelchair=$14, status=$15, images=$16, external_ids=$17,
        confidence=$18, verification_status=$19, field_sources=$20, source_count=$21, last_verified_at=$22, search_doc=$23,
-       age_min=$24, is_free=$25, updated_at=now()
+       age_min=$24, is_free=$25, description_i18n=$26, about_source=$27, updated_at=now()
      WHERE id=$1`,
     [
       id, v('name'), JSON.stringify(nameI18n), v('description'), primary, categories, loc.lat, loc.lng, v('address'), city?.slug ?? null,
@@ -391,8 +394,16 @@ export async function recomputePlace(client: pg.PoolClient, id: string, now: Dat
       searchDocument(v('name') as string, ...Object.values(nameI18n).map(String), v('address') as string, city?.name.en, ...catLabels),
       Math.max(0, ...categories.map((s) => getCategory(s)?.ageMin ?? 0)) || null,
       v('is_free'),
+      JSON.stringify(aboutObs?.value ?? {}), aboutSource ? JSON.stringify(aboutSource) : null,
     ],
   );
+}
+
+/** Current photos first (the first one is the cover), historical photos after them in their own small group. */
+export function orderPlaceImages(images: ImageDTO[]): ImageDTO[] {
+  const current = images.filter((i) => i.kind !== 'historical').slice(0, 6);
+  const historical = images.filter((i) => i.kind === 'historical').slice(0, 3);
+  return [...current, ...historical];
 }
 
 // ── Matching ────────────────────────────────────────────────────────────────
@@ -667,6 +678,8 @@ export async function ingestPlace(d: MergeDeps, raw: { url?: string | null; payl
     name: n.name,
     name_i18n: n.nameI18n,
     description: n.description,
+    description_i18n: n.descriptionI18n && Object.keys(n.descriptionI18n).length ? n.descriptionI18n : null,
+    about_source: n.aboutSource ?? null,
     categories: n.categories,
     location: n.location,
     address: n.address,

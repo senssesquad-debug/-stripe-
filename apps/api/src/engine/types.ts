@@ -67,6 +67,9 @@ export interface NormalizedPlace {
   name: string;
   nameI18n: Record<string, string>;
   description: string | null;
+  /** Longer localized text about the place (e.g. Wikipedia intro), with its source. */
+  descriptionI18n?: Record<string, string>;
+  aboutSource?: { name: string; url: string | null; license: string | null; urls?: Record<string, string> } | null;
   categories: string[];
   location: { lat: number; lng: number };
   address: string | null;
