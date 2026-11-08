@@ -1,0 +1,195 @@
+import type { VerificationStatus } from './confidence';
+import type { SearchFilters } from './query-parser';
+
+/** Shared API contract between apps/api and apps/mobile / apps/admin. */
+
+export type LocationPrecision = 'exact' | 'approximate' | 'city' | 'unknown';
+export type EventStatus = 'scheduled' | 'cancelled' | 'postponed' | 'rescheduled' | 'unlisted' | 'completed';
+export type PlaceStatus = 'active' | 'temporarily_closed' | 'permanently_closed' | 'unverified' | 'hidden';
+
+export interface ImageDTO {
+  url: string;
+  attribution?: string | null;
+  license?: string | null;
+  source?: string | null;
+}
+
+export interface SourceRefDTO {
+  key: string;
+  name: string;
+  url: string | null;
+  isOfficial: boolean;
+  attribution: string | null;
+  lastSeenAt: string;
+}
+
+export interface ConflictDTO {
+  field: string;
+  status: 'open' | 'auto_resolved';
+  candidates: Array<{ value: unknown; display: string; sources: string[] }>;
+}
+
+export interface VerificationDTO {
+  status: VerificationStatus;
+  confidence: number;
+  lastVerifiedAt: string | null;
+  sources: SourceRefDTO[];
+  conflicts: ConflictDTO[];
+}
+
+export interface CategoryRefDTO {
+  slug: string;
+  label: string;
+  group: string;
+  icon: string;
+}
+
+export interface CityRefDTO {
+  slug: string;
+  name: string;
+}
+
+export interface EventTimeDTO {
+  startsAt: string; // ISO with offset in the event zone
+  endsAt: string | null;
+  timezone: string;
+  precision: 'exact' | 'date_only';
+  localStartDate: string;
+  localEndDate: string | null;
+  label: string; // e.g. "Today · 20:30–22:00"
+  happeningNow: boolean;
+  /** Present when sources disagree on the time — the UI must say "time unconfirmed". */
+  unconfirmed: boolean;
+}
+
+export interface PriceDTO {
+  isFree: boolean | null;
+  min: number | null;
+  max: number | null;
+  currency: string | null;
+  text: string | null;
+  label: string | null;
+}
+
+export interface EventDTO {
+  type: 'event';
+  id: string;
+  title: string;
+  description: string | null;
+  category: CategoryRefDTO;
+  categories: string[];
+  venue: { name: string | null; address: string | null; placeId: string | null };
+  location: { lat: number; lng: number; precision: LocationPrecision } | null;
+  city: CityRefDTO | null;
+  time: EventTimeDTO;
+  price: PriceDTO;
+  ticketUrl: string | null;
+  website: string | null;
+  organizer: string | null;
+  ageMin: number | null;
+  status: EventStatus;
+  images: ImageDTO[];
+  distanceKm: number | null;
+  verification: VerificationDTO;
+  sponsored: false;
+  isDemo: boolean;
+}
+
+export interface OpeningHoursDTO {
+  openNow: boolean | null;
+  /** e.g. "Closes 23:00", "Opens 09:00", "Open 24 hours" */
+  label: string | null;
+  raw: string | null;
+  weekText: string[] | null;
+}
+
+export interface PlaceDTO {
+  type: 'place';
+  id: string;
+  name: string;
+  description: string | null;
+  category: CategoryRefDTO;
+  categories: string[];
+  location: { lat: number; lng: number; precision: LocationPrecision };
+  address: string | null;
+  city: CityRefDTO | null;
+  phone: string | null;
+  website: string | null;
+  hours: OpeningHoursDTO;
+  priceLevel: number | null;
+  rating: { average: number; count: number; source: 'passtra' } | null;
+  ageMin: number | null;
+  status: PlaceStatus;
+  images: ImageDTO[];
+  distanceKm: number | null;
+  verification: VerificationDTO;
+  externalIds: Record<string, string>;
+  sponsored: false;
+  isDemo: boolean;
+}
+
+export type EntityDTO = EventDTO | PlaceDTO;
+
+export interface RecommendationDTO {
+  entity: EntityDTO;
+  score: number;
+  reason: string; // built from real ranking reasons, never generated
+}
+
+export type FeedSectionKey =
+  | 'happening_today' | 'right_now' | 'tonight' | 'this_weekend' | 'near_you' | 'free' | 'hidden_gems' | 'popular' | 'for_you';
+
+export interface FeedSectionDTO {
+  key: FeedSectionKey;
+  title: string;
+  subtitle: string | null;
+  items: EntityDTO[];
+}
+
+export interface WeatherDTO {
+  temperatureC: number;
+  symbol: string; // MET Norway symbol code
+  summary: string;
+  updatedAt: string;
+  attribution: string;
+}
+
+export interface FeedResponse {
+  generatedAt: string;
+  timezone: string;
+  context: { city: CityRefDTO | null; lat: number | null; lng: number | null; radiusKm: number; usedLocation: boolean };
+  weather: WeatherDTO | null;
+  sections: FeedSectionDTO[];
+  dataNotice: string | null;
+}
+
+export interface SearchResponse {
+  query: string;
+  interpretation: SearchFilters & { engine: 'ai' | 'rules'; summary: string };
+  results: EntityDTO[];
+  total: number;
+}
+
+export interface PlanStopDTO {
+  entity: EntityDTO;
+  arrive: string;
+  depart: string;
+  arriveLabel: string;
+  departLabel: string;
+  travelMinFromPrev: number;
+  travelMode: 'walk' | 'drive';
+  notes: Array<'meal' | 'hours_unknown' | 'price_unknown' | 'fixed_time'>;
+}
+
+export interface PlanDayResponse {
+  stops: PlanStopDTO[];
+  totalKnownCost: number;
+  stopsWithUnknownPrice: number;
+  totalTravelMin: number;
+  freeMinutes: number;
+  disclaimer: string;
+}
+
+export interface ApiErrorBody {
+  error: { code: string; message: string; details?: unknown };
+}
