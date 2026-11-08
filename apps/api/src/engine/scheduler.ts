@@ -32,13 +32,13 @@ export async function completeSchedule(pool: pg.Pool, source: SourceRow, summary
   const interval = nextInterval(source, summary);
   const failed = summary.status === 'failed';
   await pool.query(
-    `UPDATE sources SET locked_until = NULL, current_interval_s = $2, next_run_at = now() + make_interval(secs => $2),
+    `UPDATE sources SET locked_until = NULL, current_interval_s = $2::int, next_run_at = now() + make_interval(secs => $2::int),
        consecutive_failures = CASE WHEN $3 THEN consecutive_failures + 1 ELSE 0 END,
        last_success_at = CASE WHEN $4 THEN now() ELSE last_success_at END, updated_at = now()
      WHERE id = $1`,
     [source.id, failed ? source.current_interval_s : interval, failed, summary.status === 'success' || summary.status === 'partial'],
   );
-  if (failed) await pool.query(`UPDATE sources SET next_run_at = now() + make_interval(secs => $2) WHERE id = $1`, [source.id, interval]);
+  if (failed) await pool.query(`UPDATE sources SET next_run_at = now() + make_interval(secs => $2::int) WHERE id = $1`, [source.id, interval]);
 }
 
 /** Process due sources until none are left. Returns the summaries. */

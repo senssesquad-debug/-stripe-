@@ -259,6 +259,22 @@ describe('places: OpenStreetMap + Wikidata', () => {
   });
 });
 
+describe('scheduler cycle (claim → run → complete)', () => {
+  it('claims due sources, records runs, unlocks them and adapts intervals', async () => {
+    await pool.query(`UPDATE sources SET enabled = (key IN ('visitcyprus_events','ticketmaster_cy')), next_run_at = now() - interval '1 minute', locked_until = NULL`);
+    const { tick } = await import('../src/engine/scheduler');
+    const summaries = await tick(engineDeps(pool, config, tribeFetch(), NOW));
+    expect(summaries.map((s) => s.status).sort()).toEqual(['skipped', 'success']); // ticketmaster has no key → skipped
+    const rows = (await pool.query(`SELECT key, locked_until, current_interval_s, next_run_at > now() AS scheduled FROM sources WHERE key IN ('visitcyprus_events','ticketmaster_cy') ORDER BY key`)).rows;
+    for (const r of rows) {
+      expect(r.locked_until).toBeNull();
+      expect(r.scheduled).toBe(true);
+    }
+    expect(rows.find((r) => r.key === 'ticketmaster_cy')!.current_interval_s).toBe(6 * 3600);
+    expect(await tick(engineDeps(pool, config, tribeFetch(), NOW))).toHaveLength(0); // nothing due any more
+  });
+});
+
 describe('adaptive scheduling', () => {
   const src = { min_interval_s: 900, max_interval_s: 1800, current_interval_s: 1200, consecutive_failures: 0 };
   it('speeds up on changes, backs off when quiet, backs off hard on failure', () => {

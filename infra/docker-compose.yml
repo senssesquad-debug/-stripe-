@@ -1,0 +1,22 @@
+# Local stack: PostGIS + API + worker. `docker compose -f infra/docker-compose.yml up --build`
+services:
+  db:
+    image: postgis/postgis:16-3.5
+    environment: { POSTGRES_USER: passtra, POSTGRES_PASSWORD: passtra, POSTGRES_DB: passtra }
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck: { test: ["CMD-SHELL", "pg_isready -U passtra"], interval: 5s, retries: 10 }
+  api:
+    build: { context: .., dockerfile: infra/Dockerfile }
+    env_file: [../apps/api/.env]
+    environment: { DATABASE_URL: postgres://passtra:passtra@db:5432/passtra }
+    ports: ["8080:8080"]
+    depends_on: { db: { condition: service_healthy } }
+  worker:
+    build: { context: .., dockerfile: infra/Dockerfile }
+    command: ["node", "dist/worker.js"]
+    env_file: [../apps/api/.env]
+    environment: { DATABASE_URL: postgres://passtra:passtra@db:5432/passtra }
+    depends_on: { db: { condition: service_healthy } }
+volumes:
+  pgdata:

@@ -24,6 +24,8 @@ const http = new HttpClient(config.BOT_USER_AGENT, 1100);
 const deps = { pool, config, http, geocoder: new Geocoder(pool, http, config.NOMINATIM_URL, config.GEOCODING_ENABLED), log };
 
 let stopping = false;
+let wake: (() => void) | null = null;
+const sleep = (ms: number) => new Promise<void>((r) => { const t = setTimeout(r, ms); wake = () => { clearTimeout(t); r(); }; });
 let lastMaintenance = 0;
 let lastNotifications = 0;
 const MAINTENANCE_EVERY = 30 * 60_000;
@@ -44,17 +46,21 @@ async function loop() {
     } catch (e) {
       log.error({ err: (e as Error).message }, 'worker loop error');
     }
-    await new Promise((r) => setTimeout(r, config.WORKER_POLL_MS));
+    if (!stopping) await sleep(config.WORKER_POLL_MS);
   }
 }
 
+// Graceful shutdown: finish the run in progress (sources stay locked otherwise), then close the pool.
 for (const sig of ['SIGINT', 'SIGTERM'] as const) {
-  process.on(sig, async () => {
+  process.on(sig, () => {
+    if (stopping) return;
     stopping = true;
-    log.info({ sig }, 'worker stopping');
-    setTimeout(() => process.exit(0), 5000).unref();
-    await pool.end().catch(() => undefined);
+    log.info({ sig }, 'worker stopping after the current run');
+    wake?.();
+    setTimeout(() => process.exit(1), 120_000).unref();
   });
 }
 log.info('worker started');
 await loop();
+await pool.end();
+log.info('worker stopped');

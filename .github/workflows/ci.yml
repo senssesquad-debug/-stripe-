@@ -1,0 +1,35 @@
+name: CI
+on:
+  push: { branches: [main, "claude/**"] }
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.5
+        env: { POSTGRES_USER: passtra, POSTGRES_PASSWORD: passtra, POSTGRES_DB: postgres }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U passtra" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_ADMIN_URL: postgres://passtra:passtra@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Typecheck (core, brand, api, admin, mobile)
+        run: pnpm -r typecheck
+      - name: Core unit tests
+        run: pnpm --filter @passtra/core test
+      - name: API integration tests (Postgres + PostGIS)
+        run: pnpm --filter @passtra/api test
+      - name: Icon set covers every category
+        run: node apps/mobile/scripts/check-icons.mjs
+      - name: Build API bundle and admin
+        run: pnpm --filter @passtra/api build && pnpm --filter @passtra/admin build
+      - name: Mobile web export (smoke build)
+        run: cd apps/mobile && npx expo export --platform web --output-dir dist
