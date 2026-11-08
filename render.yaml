@@ -1,0 +1,41 @@
+# Render Blueprint: free web service (app + API + admin + background updates) and free Postgres (PostGIS).
+# Render → New → Blueprint → this repository → branch claude/fervent-maxwell-r7hhj0 → Apply.
+# Free tier limits: the service sleeps after 15 min idle (~1 min to wake); the free database expires after 30 days.
+services:
+  - type: web
+    name: passtra
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: claude/fervent-maxwell-r7hhj0
+    dockerfilePath: ./infra/Dockerfile
+    dockerContext: .
+    healthCheckPath: /v1/health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: passtra-db
+          property: connectionString
+      - key: AUTH_JWT_SECRET
+        generateValue: true
+      - key: REPORT_SALT
+        generateValue: true
+      - key: RUN_WORKER
+        value: "true"
+      - key: TRUST_PROXY
+        value: "true"
+      - key: DATABASE_POOL_MAX
+        value: "5"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: TICKETMASTER_API_KEY
+        sync: false
+databases:
+  - name: passtra-db
+    plan: free
+    region: frankfurt
+    databaseName: passtra
+    user: passtra
+    postgresMajorVersion: "17"

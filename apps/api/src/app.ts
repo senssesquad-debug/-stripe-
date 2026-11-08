@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
@@ -70,7 +70,14 @@ export async function buildApp(config: AppConfig, db: Db, overrides: Partial<App
     req.log.error({ err }, 'unhandled error');
     return sendError(reply, new ApiError(500, 'internal', 'Something went wrong'));
   });
-  app.setNotFoundHandler((_req, reply) => sendError(reply, new ApiError(404, 'not_found', 'Route not found')));
+  const appDir = config.APP_STATIC_DIR && existsSync(config.APP_STATIC_DIR) ? config.APP_STATIC_DIR : null;
+  app.setNotFoundHandler((req, reply) => {
+    // Client-side routes of the web app (e.g. /event/123) get index.html; API paths keep JSON 404s.
+    if (appDir && req.method === 'GET' && !req.url.startsWith('/v1/') && !req.url.startsWith('/admin')) {
+      return reply.type('text/html; charset=utf-8').send(readFileSync(`${appDir}/index.html`));
+    }
+    return sendError(reply, new ApiError(404, 'not_found', 'Route not found'));
+  });
 
   await app.register(async (r) => publicRoutes(r, deps));
   await app.register(async (r) => meRoutes(r, deps));
@@ -79,5 +86,6 @@ export async function buildApp(config: AppConfig, db: Db, overrides: Partial<App
   if (config.ADMIN_STATIC_DIR && existsSync(config.ADMIN_STATIC_DIR)) {
     await app.register(fastifyStatic, { root: config.ADMIN_STATIC_DIR, prefix: '/admin/', decorateReply: false });
   }
+  if (appDir) await app.register(fastifyStatic, { root: appDir, prefix: '/', decorateReply: false, wildcard: false, index: ['index.html'] });
   return { app, deps };
 }

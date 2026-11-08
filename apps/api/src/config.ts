@@ -40,6 +40,8 @@ const Schema = z.object({
   DEMO_MODE: bool.default(false),
   FEATURE_PROMOTIONS: bool.default(false),
   ADMIN_STATIC_DIR: optional,
+  APP_STATIC_DIR: optional, // web build of the app (served at /, SPA fallback)
+  RUN_WORKER: bool.default(false), // run the background loop inside the API process (single-instance hosting)
   WORKER_POLL_MS: z.coerce.number().int().default(15000),
 });
 
