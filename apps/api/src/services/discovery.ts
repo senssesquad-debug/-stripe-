@@ -1,3 +1,4 @@
+import { ApiError } from '../http';
 import {
   CATEGORIES, CITIES, GROUP_LABELS, buildAffinity, expandCategories, canonicalKey, categoriesInGroup, cityBySlug, explain, getCategory, haversineKm,
   isValidLatLng, localDate, pickText, planDay, rank, scoreCandidate, surprise, timeWindow, type AgeRange, type Budget, type Candidate, type CityDef,
@@ -378,14 +379,22 @@ export async function planMyDay(db: pg.Pool, ctx: DiscoveryContext, profile: Pro
   const [eh, em] = input.end.split(':').map(Number);
   let start = day.set({ hour: sh!, minute: sm! });
   let end = day.set({ hour: eh!, minute: em! });
-  if (end <= start) end = end.plus({ days: 1 });
+  // An end at or before the start means "after midnight" — only for a night out (until 04:00).
+  if (end <= start) {
+    if (eh! > 4 || (eh === 4 && em! > 0) || end.equals(start)) throw new ApiError(400, 'invalid_window', 'The end must be after the start.');
+    end = end.plus({ days: 1 });
+  }
   const nowLocal = DateTime.fromJSDate(ctx.now, { zone });
   if (start < nowLocal) start = nowLocal.plus({ minutes: 5 - (nowLocal.minute % 5) }).set({ second: 0, millisecond: 0 });
-  if (end <= start) return { stops: [], totalKnownCost: 0, stopsWithUnknownPrice: 0, totalTravelMin: 0, freeMinutes: 0, disclaimer: DISCLAIMER[ctx.locale] };
+  const windowOut = { date: day.toISODate()!, start: start.toFormat('HH:mm'), end: end.toFormat('HH:mm'), endsNextDay: end.toISODate() !== day.toISODate() };
+  const empty = (reason: 'window_passed' | 'nothing_fits') => ({ stops: [], totalKnownCost: 0, stopsWithUnknownPrice: 0, totalTravelMin: 0, freeMinutes: 0, disclaimer: DISCLAIMER[ctx.locale], window: windowOut, reason });
+  if (end.diff(start, 'minutes').minutes < 45) return empty('window_passed');
 
   const interests = input.interests?.length ? input.interests : profile.interests;
   const interestCats = interests.flatMap((g) => categoriesInGroup(g).map((c) => c.slug));
-  const placeCats = [...new Set([...interestCats.filter((s) => getCategory(s)?.kind !== 'event'), 'restaurant', 'cafe', 'bakery', ...(interestCats.length ? [] : LEISURE_PLACE_CATS)])].filter((s) => !PRACTICAL.includes(s));
+  // Errands (supermarkets, gyms, bike docks…) are not stops in a day out.
+  const placeCats = [...new Set([...interestCats.filter((s) => getCategory(s)?.kind !== 'event'), 'restaurant', 'cafe', 'bakery', ...(interestCats.length ? [] : LEISURE_PLACE_CATS)])]
+    .filter((s) => !PRACTICAL.includes(s) && !ERRANDS.has(s));
   const window = { kind: 'custom' as const, start: start.toJSDate(), end: end.toJSDate(), startDate: start.toISODate()!, endDate: end.minus({ milliseconds: 1 }).toISODate()! };
   const [events, places] = await Promise.all([
     upcomingEvents(db, ctx, { window, excludeMultiDay: true, categories: interestCats.filter((s) => getCategory(s)?.kind !== 'place'), limit: 60 }),
@@ -421,6 +430,8 @@ export async function planMyDay(db: pg.Pool, ctx: DiscoveryContext, profile: Pro
     totalTravelMin: plan.totalTravelMin,
     freeMinutes: plan.freeMinutes,
     disclaimer: DISCLAIMER[ctx.locale],
+    window: windowOut,
+    reason: plan.stops.length ? null : 'nothing_fits',
   };
 }
 

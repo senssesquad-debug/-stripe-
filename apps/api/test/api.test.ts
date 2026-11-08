@@ -167,6 +167,19 @@ describe('public API', () => {
     expect(r.disclaimer).toMatch(/estimates/);
   });
 
+  it('plan my day: rejects an empty window, explains a window that has already passed', async () => {
+    const same = await app.inject({ method: 'POST', url: '/v1/plan-day', payload: { city: 'limassol', start: '22:00', end: '22:00' } });
+    expect(same.statusCode).toBe(400);
+    expect(same.json().error.code).toBe('invalid_window');
+    expect((await app.inject({ method: 'POST', url: '/v1/plan-day', payload: { city: 'limassol', start: '18:00', end: '10:00' } })).statusCode).toBe(400);
+    // Now is 14:00 in Cyprus: today 09:00–14:30 leaves less than 45 minutes.
+    const passed = (await app.inject({ method: 'POST', url: '/v1/plan-day', payload: { city: 'limassol', start: '09:00', end: '14:30' } })).json();
+    expect(passed).toMatchObject({ stops: [], reason: 'window_passed', window: { date: '2026-11-08', end: '14:30' } });
+    // A night out until 02:00 is allowed and marked as ending the next day.
+    const night = (await app.inject({ method: 'POST', url: '/v1/plan-day', payload: { city: 'limassol', date: '2026-11-09', start: '21:00', end: '02:00' } })).json();
+    expect(night.window).toEqual({ date: '2026-11-09', start: '21:00', end: '02:00', endsNextDay: true });
+  });
+
   it('anonymous report is accepted', async () => {
     const id = (await pool.query(`SELECT id FROM events LIMIT 1`)).rows[0].id;
     const r = await app.inject({ method: 'POST', url: '/v1/reports', payload: { entityType: 'event', entityId: id, kind: 'cancelled', message: 'Organiser posted that it is cancelled' } });

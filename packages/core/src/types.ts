@@ -198,6 +198,10 @@ export interface PlanDayResponse {
   totalTravelMin: number;
   freeMinutes: number;
   disclaimer: string;
+  /** The window actually planned (start moves to "now" for today), local date and HH:mm in the city's zone. */
+  window: { date: string; start: string; end: string; endsNextDay: boolean };
+  /** Why the plan is empty: today's window is (almost) over, or nothing suitable is listed for it. */
+  reason: 'window_passed' | 'nothing_fits' | null;
 }
 
 export interface ApiErrorBody {

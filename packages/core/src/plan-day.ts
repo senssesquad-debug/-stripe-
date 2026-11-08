@@ -60,8 +60,17 @@ export interface DayPlan {
 }
 
 const MEAL_CATEGORIES = new Set(['restaurant', 'cafe', 'bakery', 'fast-food']);
-// Only always-accessible outdoor spots may be planned without listed hours (castles and archaeological sites have hours).
+/**
+ * Places without listed hours are planned only inside conservative daytime slots and always carry the
+ * "hours not listed" note: outdoor spots in daylight, sights (museums, churches, ruins) in core visiting hours.
+ * Nothing else is planned without hours.
+ */
 const OUTDOOR_HOURS_OK = new Set(['beach', 'viewpoint', 'park', 'hiking', 'marina', 'playground']);
+const SIGHTS_HOURS_UNKNOWN_OK = new Set(['museum', 'historic-site', 'religious-site', 'art-gallery']);
+const UNKNOWN_HOURS_SLOT: Record<'outdoor' | 'sight', [number, number]> = { outdoor: [8 * 60, 19 * 60], sight: [10 * 60, 16 * 60 + 30] };
+/** Only nightlife is planned late; everything else stays between 07:00 and 23:00. */
+const NIGHT_GROUPS = new Set(['nightlife']);
+const DAY_LIMITS: [number, number] = [7 * 60, 23 * 60];
 const MIN_GAP = 20;
 
 interface Meal {
@@ -90,6 +99,11 @@ function travel(from: LatLng, to: LatLng, mode: PlanRequest['mode']): { min: num
   const km = haversineKm(from, to);
   const m: TravelMode = !mode || mode === 'auto' ? suggestMode(km) : mode;
   return { min: estimateTravelMinutes(km, m), mode: m };
+}
+
+/** Minutes since local midnight of `d` (depart times after midnight count as 24h+). */
+function localMinutes(d: Date, dayStart: DateTime, zone: string): number {
+  return Math.round(DateTime.fromJSDate(d, { zone }).diff(dayStart, 'minutes').minutes);
 }
 
 function isOpenThrough(c: PlanCandidate, from: Date, to: Date): boolean | 'unknown' {
@@ -129,6 +143,10 @@ export function planDay(req: PlanRequest): DayPlan {
     used.add(e.id);
   }
   fixed.sort((a, b) => a.startsAt!.getTime() - b.startsAt!.getTime());
+
+  const zone = normalizeZone(req.tz);
+  const dayStart = DateTime.fromJSDate(req.start, { zone }).startOf('day');
+  const within = (from: Date, to: Date, [a, b]: [number, number]) => localMinutes(from, dayStart, zone) >= a && localMinutes(to, dayStart, zone) <= b;
 
   const meals = mealsFor(req);
   const mealsDone = new Set<Meal['kind']>();
@@ -174,17 +192,21 @@ export function planDay(req: PlanRequest): DayPlan {
       const depart = addMin(arrive, dur);
       const backToFixed = nextFixed ? travel(c.location, nextFixed.location, req.mode).min : 0;
       if (addMin(depart, backToFixed) > horizon) continue;
+      if (!NIGHT_GROUPS.has(getCategory(c.category)?.group ?? '') && !within(arrive, depart, DAY_LIMITS)) continue;
       const open = isOpenThrough(c, arrive, depart);
       const notes: StopNote[] = [];
+      let penalty = 0;
       if (open === false) continue;
       if (open === 'unknown') {
-        if (!OUTDOOR_HOURS_OK.has(c.category)) continue;
+        const slot = OUTDOOR_HOURS_OK.has(c.category) ? UNKNOWN_HOURS_SLOT.outdoor : SIGHTS_HOURS_UNKNOWN_OK.has(c.category) ? UNKNOWN_HOURS_SLOT.sight : null;
+        if (!slot || !within(arrive, depart, slot)) continue;
         notes.push('hours_unknown');
+        penalty = 0.15; // prefer places with confirmed hours
       }
       if (c.price === null || c.price === undefined) notes.push('price_unknown');
       else if (spent + c.price > budget) continue;
       if (activeMeal) notes.push('meal');
-      const value = c.score - tr.min / 120;
+      const value = c.score - tr.min / 120 - penalty;
       if (!best || value > best.value) best = { c, arrive, depart, tr, value, notes };
     }
 

@@ -31,7 +31,8 @@ const Schema = z.object({
   TICKETMASTER_API_KEY: optional,
   EVENTBRITE_TOKEN: optional,
   EXPO_ACCESS_TOKEN: optional,
-  OVERPASS_URL: z.string().default('https://overpass-api.de/api/interpreter'),
+  // Comma-separated Overpass instances, tried in order.
+  OVERPASS_URL: z.string().default('https://overpass-api.de/api/interpreter,https://overpass.private.coffee/api/interpreter'),
   NOMINATIM_URL: z.string().default('https://nominatim.openstreetmap.org'),
   GEOCODING_ENABLED: bool.default(true),
   BOT_USER_AGENT: z.string().default('passtra-bot/0.1 (+https://passtra.app/bot; data@passtra.app)'),

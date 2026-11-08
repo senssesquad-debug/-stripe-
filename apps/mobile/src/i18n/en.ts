@@ -53,7 +53,7 @@ const en = {
   saved: { title: 'Saved', empty: 'Save events and places to find them here.', localNote: 'Saved on this device. Sign in to sync across devices.', places: 'Places', events: 'Events', past: 'Past' },
   surprise: { title: 'Surprise me', again: 'Shuffle again', empty: 'Nothing open or on soon nearby. Try again later or widen your area.' },
   plan: {
-    title: 'Plan my day', from: 'From', to: 'Until', budget: 'Budget per person', noLimit: 'No limit', interests: 'Interests', transport: 'Getting around',
+    day: 'Day', cyprusTime: 'Times are Cyprus time.', windowPassed: 'Today’s time window is almost over. Plan for tomorrow instead?', planTomorrow: 'Plan tomorrow', fromNow: 'Planned from now ({{time}}).', title: 'Plan my day', from: 'From', to: 'Until', budget: 'Budget per person', noLimit: 'No limit', interests: 'Interests', transport: 'Getting around',
     walk: 'Walk', drive: 'Drive', auto: 'Auto', build: 'Build my plan', total: 'Known costs {{amount}}', unknownPrices: '{{count}} with unknown price',
     travel: '≈ {{min}} min {{mode}}', walking: 'walking', driving: 'by car', meal: 'Meal', hoursUnknown: 'Hours not listed', fixedTime: 'Fixed time',
     empty: 'We couldn’t build a plan for this time window. Try a longer window or other interests.',

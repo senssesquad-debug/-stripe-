@@ -203,6 +203,25 @@ describe('planDay', () => {
     const lunch = plan.stops.find((s) => s.candidateId === 'lunch')!;
     expect(lunch.notes).toContain('meal');
   });
+  it('never plans daytime places at night, even when they are open 24/7', () => {
+    const night: PlanCandidate[] = [
+      { id: 'park247', type: 'place', title: 'Park', category: 'park', location: { lat: 34.676, lng: 33.046 }, score: 0.9, openIntervals: [{ start: day('00:00'), end: new Date(day('00:00').getTime() + 48 * 3600_000) }], price: 0 },
+      { id: 'bar', type: 'place', title: 'Bar', category: 'bar', location: { lat: 34.677, lng: 33.045 }, score: 0.5, openIntervals: [{ start: day('18:00'), end: new Date(day('00:00').getTime() + 26 * 3600_000) }], price: null },
+    ];
+    const plan = planDay({ start: day('22:30'), end: new Date(day('00:00').getTime() + 26 * 3600_000), tz, origin, candidates: night });
+    expect(plan.stops.map((s) => s.candidateId)).toEqual(['bar']);
+  });
+  it('plans sights without listed hours only in core visiting hours, flagged as unknown', () => {
+    const sights: PlanCandidate[] = [
+      { id: 'church', type: 'place', title: 'Church', category: 'religious-site', location: { lat: 34.676, lng: 33.046 }, score: 0.8, price: null },
+      { id: 'ruins', type: 'place', title: 'Ruins', category: 'historic-site', location: { lat: 34.674, lng: 33.044 }, score: 0.7, price: null },
+    ];
+    const morning = planDay({ start: day('10:00'), end: day('16:00'), tz, origin, candidates: sights });
+    expect(morning.stops.length).toBe(2);
+    for (const st of morning.stops) expect(st.notes).toContain('hours_unknown');
+    const evening = planDay({ start: day('18:00'), end: day('22:00'), tz, origin, candidates: sights });
+    expect(evening.stops).toHaveLength(0);
+  });
   it('drops paid items over budget', () => {
     const plan = planDay({ start: day('18:00'), end: day('23:00'), tz, origin, candidates: cands, budget: 20 });
     expect(plan.stops.map((s) => s.candidateId)).not.toContain('concert');

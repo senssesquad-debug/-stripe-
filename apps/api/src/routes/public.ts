@@ -318,8 +318,21 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
 
   // Integration status (no secrets) — useful for the app's "about data" screen.
   app.get('/v1/status', async () => {
-    const r = await db.query<{ key: string; name: string; last_success_at: Date | null; enabled: boolean }>('SELECT key, name, last_success_at, enabled FROM sources WHERE enabled ORDER BY name');
-    return { integrations: integrationStatus(config), sources: r.rows.map((x) => ({ key: x.key, name: x.name, lastSuccessAt: x.last_success_at?.toISOString() ?? null })) };
+    // Public sources only: the last run's outcome lets anyone see whether data is fresh and why an import failed.
+    const r = await db.query<{ key: string; name: string; last_success_at: Date | null; next_run_at: Date | null; run_status: string | null; run_started: Date | null; run_finished: Date | null; fetched: number | null; created: number | null; error_message: string | null; places: number }>(
+      `SELECT s.key, s.name, s.last_success_at, s.next_run_at, r.status AS run_status, r.started_at AS run_started, r.finished_at AS run_finished,
+              r.fetched, r.created, r.error_message,
+              (SELECT count(*)::int FROM source_records sr WHERE sr.source_id = s.id) AS places
+         FROM sources s
+         LEFT JOIN LATERAL (SELECT * FROM ingestion_runs ir WHERE ir.source_id = s.id ORDER BY ir.started_at DESC LIMIT 1) r ON true
+        WHERE s.enabled ORDER BY s.name`);
+    return {
+      integrations: integrationStatus(config),
+      sources: r.rows.map((x) => ({
+        key: x.key, name: x.name, lastSuccessAt: x.last_success_at?.toISOString() ?? null, nextRunAt: x.next_run_at?.toISOString() ?? null, records: x.places,
+        lastRun: x.run_status ? { status: x.run_status, startedAt: x.run_started?.toISOString() ?? null, finishedAt: x.run_finished?.toISOString() ?? null, fetched: x.fetched, created: x.created, error: x.error_message?.slice(0, 300) ?? null } : null,
+      })),
+    };
   });
 }
 

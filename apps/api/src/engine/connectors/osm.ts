@@ -1,10 +1,13 @@
-import { CATEGORIES, categoriesForOsmTags, getCategory, INTEREST_GROUPS, type InterestGroup } from '@passtra/core';
+import { CATEGORIES, categoriesForOsmTags, COUNTRIES, getCategory, INTEREST_GROUPS, type InterestGroup } from '@passtra/core';
+import { HttpError } from '../../lib/http';
 import type { Connector, ConnectorContext, NormalizedPlace, RawRecord } from '../types';
 
 /**
  * OpenStreetMap places (ODbL — attribution "© OpenStreetMap contributors" is shown in the app).
  *
- * mode "overpass" (production): one Overpass query per interest group over the country area.
+ * mode "overpass" (production): one Overpass query per interest group and bounding-box tile of the country
+ *   (small, independent requests: one failure doesn't stop the rest, and memory stays low on small hosts).
+ *   OVERPASS_URL may list several instances separated by commas; each request tries them in turn.
  * mode "osm_api_tiles" (development only): small bbox tiles from api.openstreetmap.org — the same
  *   element format; used where Overpass is unreachable. Not for production (OSM API usage policy).
  *
@@ -26,14 +29,50 @@ function matcherQl(m: Record<string, string | true>, requireAny: string[] | unde
   return req.map((r) => `nwr${filt}${r ? `["${r}"]` : ''}(${area});`);
 }
 
-export function buildOverpassQuery(group: InterestGroup, countryIso: string): string | null {
+/** Overpass query for one interest group inside a bbox [south, west, north, east]. */
+export function buildOverpassQuery(group: InterestGroup, bbox: [number, number, number, number]): string | null {
   const parts: string[] = [];
+  const area = bbox.join(',');
   for (const c of CATEGORIES) {
     if (c.group !== group || !c.osm) continue;
-    for (const m of c.osm) parts.push(...matcherQl(m, c.osmRequireAny, 'area.a'));
+    for (const m of c.osm) parts.push(...matcherQl(m, c.osmRequireAny, area));
   }
   if (!parts.length) return null;
-  return `[out:json][timeout:180];area["ISO3166-1"="${countryIso}"][admin_level=2]->.a;(${parts.join('')});out center tags;`;
+  return `[out:json][timeout:120];(${parts.join('')});out center tags;`;
+}
+
+/** Country bbox split into a 2×2 grid of [south, west, north, east] tiles. */
+export function countryTiles(iso: string): Array<[number, number, number, number]> {
+  const c = COUNTRIES.find((x) => x.code === iso);
+  if (!c) throw new Error(`Unknown country ${iso}`);
+  const [w, s, e, n] = c.bbox;
+  const mx = (w + e) / 2;
+  const my = (s + n) / 2;
+  return [[s, w, my, mx], [s, mx, my, e], [my, w, n, mx], [my, mx, n, e]].map((t) => t.map((v) => Math.round(v * 1000) / 1000) as [number, number, number, number]);
+}
+
+async function overpass(ctx: ConnectorContext, query: string): Promise<OsmElement[]> {
+  const endpoints = ctx.config.OVERPASS_URL.split(',').map((u) => u.trim()).filter(Boolean);
+  let last: Error = new Error('no Overpass endpoint configured');
+  for (const url of endpoints) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const res = await ctx.http.json<{ elements: OsmElement[]; remark?: string }>(url, {
+          method: 'POST', body: `data=${encodeURIComponent(query)}`, headers: { 'content-type': 'application/x-www-form-urlencoded' }, timeoutMs: 150_000,
+        });
+        // Overpass reports server-side timeouts/limits as a "remark" with partial or no data — treat as a failure.
+        if (res.data?.remark && /error|timed out|out of memory/i.test(res.data.remark)) throw new Error(`Overpass: ${res.data.remark.slice(0, 160)}`);
+        return res.data?.elements ?? [];
+      } catch (e) {
+        last = e as Error;
+        const busy = e instanceof HttpError && (e.status === 429 || e.status === 504 || e.status === 503);
+        ctx.log.warn({ url, attempt, err: last.message }, 'overpass request failed');
+        if (busy && attempt === 0) { await new Promise((r) => setTimeout(r, 20_000)); continue; }
+        break; // try the next instance
+      }
+    }
+  }
+  throw last;
 }
 
 const PRACTICAL_UNNAMED_OK = new Set(['atm', 'fuel', 'ev-charging', 'pharmacy', 'post-office', 'police', 'car-wash', 'hospital']);
@@ -72,19 +111,31 @@ export const osmConnector: Connector = {
       return;
     }
     const iso = cfg.countryIso ?? ctx.source.country_code ?? 'CY';
+    const seen = new Set<string>();
+    const failures: string[] = [];
+    let units = 0;
     for (const group of cfg.groups ?? [...INTEREST_GROUPS]) {
-      const q = buildOverpassQuery(group, iso);
-      if (!q) continue;
-      const res = await ctx.http.json<{ elements: OsmElement[] }>(ctx.config.OVERPASS_URL, {
-        method: 'POST',
-        body: `data=${encodeURIComponent(q)}`,
-        headers: { 'content-type': 'application/x-www-form-urlencoded' },
-        timeoutMs: 200_000,
-      });
-      for (const el of res.data?.elements ?? []) {
-        yield { externalId: `${el.type}/${el.id}`, url: `https://www.openstreetmap.org/${el.type}/${el.id}`, payload: el };
+      for (const tile of cfg.tiles ?? countryTiles(iso)) {
+        const q = buildOverpassQuery(group, tile);
+        if (!q) continue;
+        units++;
+        let elements: OsmElement[];
+        try {
+          elements = await overpass(ctx, q);
+        } catch (e) {
+          failures.push(`${group}@${tile.join(',')}: ${(e as Error).message}`);
+          continue; // keep going: other groups/tiles still import
+        }
+        for (const el of elements) {
+          const id = `${el.type}/${el.id}`;
+          if (seen.has(id)) continue; // objects on tile borders come twice
+          seen.add(id);
+          yield { externalId: id, url: `https://www.openstreetmap.org/${id}`, payload: el };
+        }
       }
     }
+    // Any failed part makes the run incomplete (no "missing" marking), but everything fetched is kept.
+    if (failures.length) throw new Error(`Overpass: ${failures.length}/${units} requests failed — ${failures[0]}`);
   },
 
   normalize(raw): NormalizedPlace | null {

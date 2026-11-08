@@ -231,6 +231,24 @@ describe('places: OpenStreetMap + Wikidata', () => {
     expect(market.external_ids.osm).toMatch(/^node\//);
   });
 
+  it('OSM via Overpass: per-tile requests, falls back to the next instance, keeps what arrived when a tile fails', async () => {
+    const src = await addSource(pool, 'osm_tiles_test', 'osm', 0.6, { mode: 'overpass', countryIso: 'CY', groups: ['food'], tiles: [[34.66, 33.03, 34.69, 33.06], [34.90, 33.60, 34.95, 33.65]] }, 'place');
+    const f = fakeFetch([
+      [/primary\.example/, () => new Response('server error', { status: 500 })],
+      [/backup\.example/, (_u, init) => {
+        const q = decodeURIComponent(String(init?.body ?? ''));
+        if (q.includes('34.9,33.6')) return new Response('gateway', { status: 500 });
+        return { elements: [{ type: 'node', id: 990001, lat: 34.675, lon: 33.045, tags: { amenity: 'cafe', name: 'Tile Test Café', opening_hours: 'Mo-Su 08:00-20:00' } }] };
+      }],
+    ]);
+    const s = await runSource(engineDeps(pool, { ...config, OVERPASS_URL: 'https://primary.example/api/interpreter, https://backup.example/api/interpreter' }, f, NOW), src, 'test');
+    expect(s.status).toBe('partial');
+    expect(s.created).toBe(1);
+    expect(s.error).toMatch(/1\/2 requests failed/);
+    expect(f.calls.filter((u) => u.includes('primary.example/api')).length).toBe(2); // tried first for each tile
+    expect((await pool.query(`SELECT 1 FROM places WHERE name = 'Tile Test Café'`)).rowCount).toBe(1);
+  });
+
   it('merges a Wikidata item into the OSM place with the same wikidata id: current photos first, historical separate, Wikipedia text', async () => {
     const wd = await source(pool, 'wikidata_cy');
     const before = (await pool.query(`SELECT id FROM places WHERE external_ids->>'wikidata' = 'Q109944949'`)).rows[0];
