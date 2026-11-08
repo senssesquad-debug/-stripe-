@@ -11,8 +11,9 @@ MET Norway, Nominatim, детерминированный умный поиск)
 | Что | Где взять | Куда положить | Стоимость |
 |---|---|---|---|
 | **PostgreSQL 15+ с PostGIS** | Supabase (Database → Extensions → включить `postgis`, `pg_trgm`), Neon, AWS RDS, свой сервер | `DATABASE_URL` (сервер) | Supabase Pro от $25/мес |
-| **Supabase Auth** (вход по коду на e-mail; Apple/Google опционально) | supabase.com → проект → Settings → API | Сервер: `AUTH_JWKS_URL` = `https://<project>.supabase.co/auth/v1/.well-known/jwks.json`, `AUTH_ISSUER` = `https://<project>.supabase.co/auth/v1`. Приложение: `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY` (anon-ключ публичен по дизайну; приложение не обращается к БД напрямую) | Бесплатно до 50k MAU |
-| **Администраторы** | id пользователя из Supabase → Authentication → Users | `ADMIN_USER_IDS` (через запятую) | — |
+| **Аккаунты passtra** (email + пароль, отзываемые сессии) | встроено в API | `AUTH_JWT_SECRET` — случайная строка ≥ 32 символов (на Render генерируется автоматически). Смена секрета разлогинивает всех | — |
+| **Отправка email-кодов** (подтверждение email, сброс пароля) | resend.com → API Keys; домен отправителя подтвердить (DNS: SPF/DKIM) | `RESEND_API_KEY`, `EMAIL_FROM` (например `passtra <no-reply@ваш-домен>`). Без ключа регистрация работает, но email остаётся «не подтверждён», а сброс пароля недоступен — интерфейс так и говорит | 3000 писем/мес бесплатно, далее от $20/мес |
+| **Администраторы** | id пользователя из таблицы `users` (виден в админке и в `GET /v1/me`) | `ADMIN_USER_IDS` (через запятую) | — |
 | **REPORT_SALT** | любая случайная строка (`openssl rand -hex 32`) | сервер | — |
 | **Хостинг API + worker** | Fly.io / Render / Railway / AWS ECS — образ `infra/Dockerfile`, два процесса | env хостинга | от ~$10–20/мес |
 | **Apple Developer Program** | developer.apple.com | EAS (`eas credentials`) | $99/год |
@@ -20,6 +21,25 @@ MET Norway, Nominatim, детерминированный умный поиск)
 | **Expo / EAS** | expo.dev → `eas init` | `EAS_PROJECT_ID` (app.config.ts) | бесплатный план для старта |
 
 ## 2. Рекомендуется
+
+### Уведомления, телефон, карты, ссылки
+
+| Что | Зачем / ограничения | Куда |
+|---|---|---|
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM` | SMS-код для привязки телефона. Без них номер нельзя подтвердить: интерфейс показывает «отправка SMS не подключена», номер **не** привязывается. Twilio: ~$0.05–0.10 за SMS на Кипр; `TWILIO_FROM` — купленный номер или одобренный Sender ID | сервер |
+| `WEB_PUSH_PUBLIC_KEY`, `WEB_PUSH_PRIVATE_KEY` (VAPID) | Web Push в браузере. Если не заданы — пара создаётся и хранится в БД (`app_settings`). Задайте явно (`npx web-push generate-vapid-keys`), иначе при пересоздании БД все подписки браузеров перестанут работать. `WEB_PUSH_SUBJECT` — `mailto:` контакт | сервер |
+| `EXPO_ACCESS_TOKEN` + `EAS_PROJECT_ID` | Push в iOS/Android-приложениях (Expo Push → APNs/FCM). Без `EAS_PROJECT_ID` в сборке экран уведомлений честно пишет «Push не настроен в этой сборке» | сервер / EAS |
+| `PUBLIC_WEB_URL` | Адрес сайта в ссылках «Поделиться» и превью (Open Graph) | сервер |
+| `APPLE_TEAM_ID`, `ANDROID_CERT_SHA256` + `APP_LINK_HOST` | Universal Links / App Links: ссылка `/event/…`, `/place/…` открывает установленное приложение, иначе — сайт. Сервер отдаёт `/.well-known/apple-app-site-association` и `assetlinks.json` только когда значения заданы. SHA-256 — из `eas credentials` (Android) | сервер + env сборки |
+| `ROUTING_URL` | Маршруты внутри приложения. По умолчанию публичный OSRM FOSSGIS (`routing.openstreetmap.de`, пешком/авто): бесплатно, без ключа, «разумное использование», без SLA. Для нагрузки — свой OSRM/Valhalla или платный сервис (GraphHopper, Mapbox Directions). Если сервис недоступен, приложение показывает оценку по прямой с явной пометкой | сервер |
+| Тайлы карты (веб) | OpenFreeMap (`tiles.openfreemap.org`): без ключа и лимитов, атрибуция OpenStreetMap на карте. Альтернатива для SLA — MapTiler/Stadia (ключ) | — |
+| Карты iOS/Android | Apple Maps — без ключа; Android — `GOOGLE_MAPS_ANDROID_KEY` (ниже) | — |
+
+**Ограничения веб-версии уведомлений.** Push приходят, пока запущен браузер (вкладка passtra может быть закрыта).
+iPhone/iPad: только если сайт добавлен на экран «Домой» (iOS 16.4+). Напоминания отправляет сервер — он должен
+работать в момент напоминания. **Render Free засыпает через 15 минут без запросов**, и напоминания будут приходить
+с опозданием до пробуждения. Для точных напоминаний: платный инстанс (Starter, $7/мес) или внешний пинг
+`/v1/health` раз в 10 минут (например, cron-job.org / UptimeRobot).
 
 | Ключ | Что даёт | Где взять / ограничения | Куда |
 |---|---|---|---|

@@ -1,53 +1,57 @@
 import { groupAccent } from '@passtra/brand';
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import MapView, { Marker, type Region } from 'react-native-maps';
+import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
 import { api, type MapMarker } from '@/lib/api';
 import { useTheme } from '@/theme';
-import { Button, Icon, Tap, Txt } from './ui';
+import { MarkerCard, type MapPanelProps } from './map-shared';
+import { Button } from './ui';
 
 /**
  * Native map (Apple Maps on iOS, Google Maps SDK on Android) showing passtra's own markers
- * (OpenStreetMap places + events). No Google Places content is placed on the map (EEA terms).
+ * (OpenStreetMap places + events), a focused object and an in-app route. No Google Places content is placed on the map (EEA terms).
  */
-export function MapPanel({ center, filters }: { center: { lat: number; lng: number }; filters: { layers: string; category?: string; open_now?: boolean; free?: boolean } }) {
+export function MapPanel({ center, filters, focus, route, bottomInset = 0 }: MapPanelProps) {
   const th = useTheme();
   const { t } = useTranslation();
-  const initial: Region = { latitude: center.lat, longitude: center.lng, latitudeDelta: 0.05, longitudeDelta: 0.05 };
+  const start = focus ?? center;
+  const initial: Region = { latitude: start.lat, longitude: start.lng, latitudeDelta: focus ? 0.012 : 0.05, longitudeDelta: focus ? 0.012 : 0.05 };
   const [region, setRegion] = useState<Region>(initial);
   const [query, setQuery] = useState<Region>(initial);
   const [selected, setSelected] = useState<MapMarker | null>(null);
   const moved = useRef(false);
+  const ref = useRef<MapView>(null);
   const bbox = useMemo(() => [query.longitude - query.longitudeDelta / 2, query.latitude - query.latitudeDelta / 2, query.longitude + query.longitudeDelta / 2, query.latitude + query.latitudeDelta / 2] as [number, number, number, number], [query]);
-  const markers = useQuery({ queryKey: ['map', bbox, filters], queryFn: () => api.map(bbox, filters), enabled: query.latitudeDelta < 3 });
+  const markers = useQuery({ queryKey: ['map', bbox, filters], queryFn: () => api.map(bbox, filters!), enabled: !!filters && query.latitudeDelta < 3 });
+
+  useEffect(() => {
+    if (!focus) { const r = { ...initial, latitude: center.lat, longitude: center.lng }; ref.current?.animateToRegion(r, 300); setQuery(r); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [center.lat, center.lng]);
+  useEffect(() => {
+    if (route) ref.current?.fitToCoordinates(route.geometry.map(([lng, lat]) => ({ latitude: lat, longitude: lng })), { edgePadding: { top: 60, left: 40, right: 40, bottom: 40 + bottomInset }, animated: true });
+  }, [route, bottomInset]);
 
   return (
     <View style={{ flex: 1 }}>
-      <MapView style={{ flex: 1 }} initialRegion={initial} showsUserLocation showsMyLocationButton onRegionChangeComplete={(r) => { moved.current = true; setRegion(r); }} onPress={() => setSelected(null)}>
-        {(markers.data?.markers ?? []).map((m) => (
+      <MapView ref={ref} style={{ flex: 1 }} initialRegion={initial} showsUserLocation showsMyLocationButton mapPadding={{ top: 0, left: 0, right: 0, bottom: bottomInset }}
+        onRegionChangeComplete={(r) => { moved.current = true; setRegion(r); }} onPress={() => setSelected(null)}>
+        {(filters ? markers.data?.markers ?? [] : []).map((m) => (
           <Marker key={`${m.type}:${m.id}`} coordinate={{ latitude: m.lat, longitude: m.lng }} onPress={() => setSelected(m)} tracksViewChanges={false}
             pinColor={m.type === 'event' ? th.c.primary : groupAccent.practical} accessibilityLabel={m.title} />
         ))}
+        {focus ? <Marker coordinate={{ latitude: focus.lat, longitude: focus.lng }} title={focus.title} description={focus.subtitle ?? undefined} pinColor={th.c.primary} /> : null}
+        {route ? <Polyline coordinates={route.geometry.map(([lng, lat]) => ({ latitude: lat, longitude: lng }))} strokeColor={th.c.primary} strokeWidth={5} /> : null}
+        {route ? <Marker coordinate={{ latitude: route.origin.lat, longitude: route.origin.lng }} pinColor="#0D47A1" /> : null}
       </MapView>
-      {moved.current && Math.abs(region.latitude - query.latitude) + Math.abs(region.longitude - query.longitude) > region.latitudeDelta * 0.25 ? (
+      {filters && moved.current && Math.abs(region.latitude - query.latitude) + Math.abs(region.longitude - query.longitude) > region.latitudeDelta * 0.25 ? (
         <View style={{ position: 'absolute', top: 12, alignSelf: 'center' }}>
           <Button title={t('map.searchArea')} icon="refresh" compact onPress={() => setQuery(region)} />
         </View>
       ) : null}
-      {selected ? (
-        <Tap onPress={() => router.push(selected.type === 'event' ? { pathname: '/event/[id]', params: { id: selected.id } } : { pathname: '/place/[id]', params: { id: selected.id } })}
-          style={{ position: 'absolute', left: 16, right: 16, bottom: 16, padding: 16, borderRadius: th.radius.lg, backgroundColor: th.c.background, flexDirection: 'row', alignItems: 'center', gap: 12, ...th.shadow.floating }}>
-          <Icon name={selected.type === 'event' ? 'calendar-star' : 'map-marker'} size={26} color={th.c.primaryText} />
-          <View style={{ flex: 1 }}>
-            <Txt v="bodyStrong" numberOfLines={1}>{selected.title}</Txt>
-            {selected.subtitle ? <Txt v="caption" tone="secondary" numberOfLines={1}>{selected.subtitle}</Txt> : null}
-          </View>
-          <Icon name="chevron-right" size={22} color={th.c.textTertiary} />
-        </Tap>
-      ) : null}
+      {selected ? <MarkerCard marker={selected} onClose={() => setSelected(null)} /> : null}
     </View>
   );
 }

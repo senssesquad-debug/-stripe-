@@ -29,8 +29,9 @@ flowchart LR
   end
   UI -->|HTTPS + JWT| R
   AUI -->|HTTPS + admin JWT| R
-  AUTH[Supabase Auth] -.JWKS.-> R
-  UI -.sign-in.-> AUTH
+  R --> MAIL[Resend email / Twilio SMS]
+  R --> WP[Web Push VAPID]
+  R --> OSRM[OSRM routing]
 ```
 
 **Монорепозиторий (pnpm workspaces):**
@@ -46,9 +47,13 @@ flowchart LR
 - *Собственный Fastify-API поверх Postgres, а не прямой доступ клиента к Supabase.*
   Все ключи (Google, Anthropic, Ticketmaster) остаются на сервере; правила достоверности
   и выдачи — в одном месте; можно сменить хостинг БД без изменения клиента.
-- *Supabase используется как Auth-провайдер (и опционально как хостинг Postgres).*
-  API проверяет JWT через JWKS (или HS256-секрет). Привязки к Supabase в коде нет —
-  подойдёт любой OIDC-провайдер с JWT.
+- *Собственные аккаунты в API* (email + пароль scrypt, JWT HS256 с идентификатором сессии в таблице
+  `auth_sessions` — выход отзывает сессию на сервере). Email и телефон считаются привязанными только после
+  ввода одноразового кода (хранится хэш, 10 минут, 5 попыток). Проверка внешних OIDC-токенов через JWKS
+  оставлена для совместимости.
+- *Напоминания «Моих событий»* — отдельный цикл каждые 30 с в фоновом процессе, независимо от загрузки
+  источников: выбор `FOR UPDATE SKIP LOCKED`, доставка Web Push (VAPID) и Expo Push, статус
+  `sent / failed / no_channel / skipped_stale` хранится в событии и показывается пользователю.
 - *Очередь заданий на Postgres* (`sources.next_run_at` + `FOR UPDATE SKIP LOCKED`), а не Redis:
   меньше инфраструктуры; несколько worker'ов безопасно делят задания. Redis — опционально
   для распределённого rate limiting при горизонтальном масштабировании API.

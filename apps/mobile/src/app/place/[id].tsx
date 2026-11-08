@@ -2,11 +2,14 @@ import type { PlaceDTO } from '@passtra/core';
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Linking, Platform, ScrollView, Share, View } from 'react-native';
+import { Linking, ScrollView, View } from 'react-native';
 import { Cover, EntityRow, SaveButton } from '@/components/cards';
-import { Badge, Button, ErrorState, InfoLine, Skeleton, Txt } from '@/components/ui';
+import { EntityActions } from '@/components/entity-actions';
+import { PlaceGallery } from '@/components/gallery';
+import { headerLeftForDirectOpen } from '@/components/home-button';
+import { Badge, Button, ErrorState, InfoLine, Skeleton, Tap, Txt } from '@/components/ui';
 import { VerificationBadge, VerificationBlock } from '@/components/verification';
 import { api } from '@/lib/api';
 import { distanceLabel, timeAgo } from '@/lib/format';
@@ -31,6 +34,27 @@ function GoogleLive({ id }: { id: string }) {
   );
 }
 
+/** Longer text about the place with its source and licence (e.g. Wikipedia, CC BY-SA), collapsed after a few lines. */
+function About({ p }: { p: PlaceDTO }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const text = p.about?.text ?? p.description;
+  if (!text) return null;
+  const long = text.length > 420;
+  return (
+    <View style={{ gap: 6 }}>
+      <Txt v="headline">{t('detail.about')}</Txt>
+      <Txt v="body" tone="secondary" numberOfLines={long && !open ? 7 : undefined}>{text}</Txt>
+      {long ? <Button title={open ? t('place.readLess') : t('place.readMore')} kind="ghost" compact onPress={() => setOpen(!open)} style={{ alignSelf: 'flex-start' }} /> : null}
+      {p.about ? (
+        <Tap accessibilityRole={p.about.url ? 'link' : undefined} onPress={() => (p.about?.url ? void WebBrowser.openBrowserAsync(p.about.url) : undefined)}>
+          <Txt v="caption" tone="tertiary">{t('place.source', { source: p.about.source })}{p.about.license ? ` · ${t('place.license', { license: p.about.license })}` : ''}{p.about.url ? ' ↗' : ''}</Txt>
+        </Tap>
+      ) : null}
+    </View>
+  );
+}
+
 export default function PlaceScreen() {
   const th = useTheme();
   const { t } = useTranslation();
@@ -44,13 +68,17 @@ export default function PlaceScreen() {
   if (q.isLoading) return <View style={{ padding: 20, gap: 14, flex: 1, backgroundColor: th.c.background }}><Skeleton width="100%" height={200} radius={20} /><Skeleton width="60%" height={26} /></View>;
   if (q.isError || !q.data) return <ErrorState error={q.error} onRetry={() => void q.refetch()} />;
   const p: PlaceDTO = q.data.place;
-  const nav = q.data.navigation;
+  const where = [p.address, p.city?.name].filter(Boolean).join(', ');
   return (
     <>
-      <Stack.Screen options={{ headerRight: () => <SaveButton entity={p} /> }} />
-      <ScrollView style={{ flex: 1, backgroundColor: th.c.background }} contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 48 }}>
-        <Cover entity={p} height={200} radius={th.radius.lg} />
-        {p.images[0]?.attribution ? <Txt v="caption" tone="tertiary" style={{ marginTop: -12 }}>{p.images[0].attribution}</Txt> : null}
+      <Stack.Screen options={{ headerRight: () => <SaveButton entity={p} />, headerLeft: headerLeftForDirectOpen() }} />
+      <ScrollView style={{ flex: 1, backgroundColor: th.c.background }} contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 48, maxWidth: 820, width: '100%', alignSelf: 'center' }}>
+        <Cover entity={p} height={220} radius={th.radius.lg} />
+        {p.images[0]?.attribution ? (
+          <Tap onPress={() => (p.images[0]?.source ? void WebBrowser.openBrowserAsync(p.images[0].source) : undefined)} style={{ marginTop: -12 }}>
+            <Txt v="micro" tone="tertiary">{p.images[0].year ? `${t('place.photoYear', { year: p.images[0].year })} · ` : ''}{p.images[0].attribution}</Txt>
+          </Tap>
+        ) : null}
         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
           {p.isDemo ? <Badge label={t('common.demo')} tone="dark" /> : null}
           <Badge label={p.category.label} tone="primary" />
@@ -59,17 +87,23 @@ export default function PlaceScreen() {
           {p.ageMin ? <Badge label={t('detail.ageLimit', { age: p.ageMin })} /> : null}
         </View>
         <Txt v="display" accessibilityRole="header">{p.name}</Txt>
+        <EntityActions entity={p} />
+        <About p={p} />
+        <PlaceGallery images={p.images} />
+
         <View style={{ gap: 14 }}>
+          <Txt v="headline">{t('place.practical')}</Txt>
+          <InfoLine icon="map-marker-outline" label={t('detail.where')} value={where || p.category.label}
+            sub={[p.location.precision === 'approximate' ? t('detail.approxLocation') : null, distanceLabel(p.distanceKm)].filter(Boolean).join(' · ') || null} />
           {p.hours.label || p.hours.raw ? <InfoLine icon="clock-outline" label={t('detail.hours')} value={p.hours.label ?? p.hours.raw!} sub={p.hours.label && p.hours.raw ? p.hours.raw : null} /> : null}
-          <InfoLine icon="map-marker-outline" label={t('detail.where')} value={[p.address, p.city?.name].filter(Boolean).join(', ') || p.category.label} sub={distanceLabel(p.distanceKm)} />
+          {p.hours.weekText?.length ? <Txt v="caption" tone="secondary">{p.hours.weekText.join('\n')}</Txt> : null}
+          {p.free.isFree !== null || p.priceLevel !== null ? <InfoLine icon="ticket-outline" label={t('detail.price')} value={p.free.isFree ? (p.free.basis === 'typical' ? t('common.usuallyFree') : t('common.free')) : p.priceLevel ? '€'.repeat(p.priceLevel) : t('common.priceUnknown')} /> : null}
+          {p.phone ? <InfoLine icon="phone-outline" label={t('place.phone')} value={p.phone} /> : null}
+          <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+            {p.phone ? <Button title={t('detail.call')} icon="phone-outline" kind="secondary" compact onPress={() => void Linking.openURL(`tel:${p.phone!.replace(/\s/g, '')}`)} /> : null}
+            {p.website ? <Button title={t('detail.website')} icon="web" kind="secondary" compact onPress={() => void WebBrowser.openBrowserAsync(p.website!)} /> : null}
+          </View>
         </View>
-        <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
-          <Button title={t('detail.directions')} icon="directions" onPress={() => { void api.interactions([{ entityType: 'place', entityId: p.id, kind: 'navigate' }]).catch(() => undefined); void Linking.openURL(Platform.OS === 'ios' ? nav.apple : nav.google); }} />
-          {p.phone ? <Button title={t('detail.call')} icon="phone-outline" kind="secondary" onPress={() => void Linking.openURL(`tel:${p.phone!.replace(/\s/g, '')}`)} /> : null}
-          {p.website ? <Button title={t('detail.website')} icon="web" kind="secondary" onPress={() => void WebBrowser.openBrowserAsync(p.website!)} /> : null}
-          <Button title={t('common.share')} icon="share-variant-outline" kind="ghost" onPress={() => void Share.share({ message: `${p.name}\n${nav.google}` })} />
-        </View>
-        {p.description ? <Txt v="body" tone="secondary">{p.description}</Txt> : null}
         <GoogleLive id={p.id} />
         {q.data.upcomingEvents.length ? (
           <View style={{ gap: 4 }}>

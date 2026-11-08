@@ -13,18 +13,34 @@ import type { Logger } from './types';
  * Runs in the worker process, or inside the API process when RUN_WORKER=true (single-instance hosting).
  * stop() lets the run in progress finish before resolving.
  */
+const REMINDER_POLL_MS = 30_000;
+
 export function startBackground(pool: pg.Pool, config: AppConfig, log: Logger): { stop: () => Promise<void> } {
   const http = new HttpClient(config.BOT_USER_AGENT, 1100);
   const deps = { pool, config, http, geocoder: new Geocoder(pool, http, config.NOMINATIM_URL, config.GEOCODING_ENABLED), log };
   let stopping = false;
-  let wake: (() => void) | null = null;
-  const sleep = (ms: number) => new Promise<void>((r) => { const t = setTimeout(r, ms); wake = () => { clearTimeout(t); r(); }; });
+  const wakers = new Set<() => void>();
+  const sleep = (ms: number) => new Promise<void>((r) => {
+    const w = () => { clearTimeout(t); wakers.delete(w); r(); };
+    const t = setTimeout(w, ms);
+    wakers.add(w);
+  });
+  // Reminders run on their own short loop so a long source import never delays them.
+  const reminders = (async () => {
+    while (!stopping) {
+      try {
+        await deliverDueReminders(pool, config, log);
+      } catch (e) {
+        log.error({ err: (e as Error).message }, 'reminder loop error');
+      }
+      if (!stopping) await sleep(REMINDER_POLL_MS);
+    }
+  })();
   let lastMaintenance = 0;
   let lastNotifications = 0;
   const done = (async () => {
     while (!stopping) {
       try {
-        await deliverDueReminders(pool, config, log); // first: reminders are time-critical
         await tick(deps);
         if (Date.now() - lastMaintenance > 30 * 60_000) {
           lastMaintenance = Date.now();
@@ -40,5 +56,5 @@ export function startBackground(pool: pg.Pool, config: AppConfig, log: Logger): 
       if (!stopping) await sleep(config.WORKER_POLL_MS);
     }
   })();
-  return { stop: async () => { stopping = true; wake?.(); await done; } };
+  return { stop: async () => { stopping = true; wakers.forEach((w) => w()); await Promise.all([done, reminders]); } };
 }

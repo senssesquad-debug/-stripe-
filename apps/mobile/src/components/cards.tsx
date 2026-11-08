@@ -4,6 +4,9 @@ import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
+import { useQueryClient } from '@tanstack/react-query';
+import { api } from '@/lib/api';
+import { isSignedIn } from '@/lib/auth';
 import { distanceLabel } from '@/lib/format';
 import { iconFor } from '@/lib/icons';
 import { toggleSaved, useAppState } from '@/lib/store';
@@ -19,8 +22,18 @@ export function SaveButton({ entity, size = 20, onDark }: { entity: EntityDTO; s
   const t = useTheme();
   const { t: tr } = useTranslation();
   const saved = useAppState((s) => !!s.saved[entity.id]);
+  const qc = useQueryClient();
+  const toggle = () => {
+    toggleSaved(entity);
+    // Signed in: mirror the change on the server so other devices (and the Saved tab) agree.
+    if (isSignedIn()) {
+      void (saved ? api.unsave(entity.type, entity.id) : api.save(entity.type, entity.id))
+        .then(() => qc.invalidateQueries({ queryKey: ['saved'] }))
+        .catch(() => undefined);
+    }
+  };
   return (
-    <Tap onPress={() => toggleSaved(entity)} accessibilityRole="button" accessibilityLabel={saved ? tr('common.saved') : tr('common.save')} hitSlop={10}
+    <Tap onPress={toggle} accessibilityRole="button" accessibilityLabel={saved ? tr('common.saved') : tr('common.save')} hitSlop={10}
       style={{ width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: onDark ? 'rgba(255,255,255,0.92)' : t.c.surface }}>
       <Icon name={saved ? 'bookmark' : 'bookmark-outline'} size={size} color={saved ? t.c.primary : t.dark && !onDark ? t.c.text : '#0B1526'} />
     </Tap>

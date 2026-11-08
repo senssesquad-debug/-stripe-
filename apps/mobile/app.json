@@ -33,7 +33,10 @@
             ]
           }
         ]
-      }
+      },
+      "associatedDomains": [
+        "applinks:passtra.onrender.com"
+      ]
     },
     "android": {
       "package": "app.passtra.android",
@@ -52,12 +55,43 @@
       "blockedPermissions": [
         "ACCESS_BACKGROUND_LOCATION"
       ],
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "passtra.onrender.com",
+              "pathPrefix": "/event/"
+            },
+            {
+              "scheme": "https",
+              "host": "passtra.onrender.com",
+              "pathPrefix": "/place/"
+            },
+            {
+              "scheme": "https",
+              "host": "passtra.onrender.com",
+              "pathPrefix": "/my-events/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "output": "single",
       "favicon": "./assets/images/favicon.png",
-      "bundler": "metro"
+      "bundler": "metro",
+      "name": "passtra",
+      "shortName": "passtra",
+      "themeColor": "#1769E8",
+      "backgroundColor": "#FFFFFF"
     },
     "plugins": [
       "expo-router",

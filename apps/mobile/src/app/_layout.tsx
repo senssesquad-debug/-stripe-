@@ -7,7 +7,10 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ToastHost } from '@/components/toast';
 import i18n, { deviceLocale } from '@/i18n';
+import { initAuth, useSession } from '@/lib/auth';
+import { resyncPush } from '@/lib/push';
 import { store, useAppState } from '@/lib/store';
 import { ThemeProvider, useTheme } from '@/theme';
 
@@ -38,7 +41,12 @@ function Navigator() {
         <Stack.Screen name="notifications" options={{ title: '' }} />
         <Stack.Screen name="privacy" options={{ title: '' }} />
         <Stack.Screen name="submit" options={{ title: '' }} />
+        <Stack.Screen name="account" options={{ title: '' }} />
+        <Stack.Screen name="my-events/index" options={{ title: '' }} />
+        <Stack.Screen name="my-events/[id]" options={{ title: '' }} />
+        <Stack.Screen name="locate" options={{ title: '' }} />
       </Stack>
+      <ToastHost />
     </>
   );
 }
@@ -49,9 +57,15 @@ export default function RootLayout() {
   const locale = useAppState((s) => s.locale);
   const [ready, setReady] = useState(false);
 
+  const session = useSession();
   useEffect(() => {
     void store.hydrate();
+    void initAuth();
   }, []);
+  // Keep this device's push subscription registered with the signed-in account.
+  useEffect(() => {
+    if (session) void resyncPush().catch(() => undefined);
+  }, [session?.user.id]);
   useEffect(() => {
     if (hydrated) void i18n.changeLanguage(locale ?? deviceLocale());
   }, [hydrated, locale]);

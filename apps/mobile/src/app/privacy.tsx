@@ -1,7 +1,10 @@
+import { confirmAsync, showToast } from '@/lib/feedback';
+import { errorText } from '@/lib/errors';
+import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, Share, Switch } from 'react-native';
+import { ScrollView, Share, Switch } from 'react-native';
 import { Banner, Button, Divider, Row, Txt } from '@/components/ui';
 import { api } from '@/lib/api';
 import { signOut, useSession } from '@/lib/auth';
@@ -28,10 +31,17 @@ export default function Privacy() {
           <Divider />
           <Row icon="download-outline" title={t('privacy.export')} onPress={async () => { const data = await api.exportMe(); await Share.share({ message: JSON.stringify(data, null, 2) }); }} />
           <Divider />
-          <Button title={t('privacy.delete')} kind="danger" icon="delete-outline" onPress={() => Alert.alert(t('privacy.delete'), t('privacy.deleteConfirm'), [
-            { text: t('common.cancel'), style: 'cancel' },
-            { text: t('privacy.delete'), style: 'destructive', onPress: async () => { await api.deleteMe(); await signOut(); Alert.alert(t('privacy.deleted')); } },
-          ])} />
+          <Button title={t('privacy.delete')} kind="danger" icon="delete-outline" onPress={async () => {
+            if (!(await confirmAsync(t('privacy.delete'), t('privacy.deleteConfirm'), t('privacy.delete'), t('common.cancel'), true))) return;
+            try {
+              await api.deleteMe();
+              await signOut();
+              showToast(t('privacy.deleted'));
+              router.replace('/');
+            } catch (e) {
+              showToast(errorText(e), 'error');
+            }
+          }} />
         </>
       ) : null}
       <Row icon="file-document-outline" title={t('privacy.policy')} onPress={() => void WebBrowser.openBrowserAsync(PRIVACY_URL)} />

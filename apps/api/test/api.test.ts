@@ -113,6 +113,20 @@ describe('public API', () => {
     expect(r.place.verification.sources[0]!.attribution).toContain('OpenStreetMap');
   });
 
+  it('place "about" text follows the locale, with source, licence and the matching article link', async () => {
+    const id = (await pool.query(`SELECT id FROM places WHERE name = 'Sunday Market'`)).rows[0].id;
+    expect((await app.inject(`/v1/places/${id}?locale=en`)).json<{ place: PlaceDTO }>().place.about).toBeNull();
+    await pool.query(`UPDATE places SET description_i18n = $2, about_source = $3 WHERE id = $1`, [id,
+      JSON.stringify({ en: 'A weekly open-air market.', ru: 'Еженедельный рынок под открытым небом.' }),
+      JSON.stringify({ name: 'Wikipedia', url: 'https://en.wikipedia.org/wiki/X', license: 'CC BY-SA 4.0', urls: { en: 'https://en.wikipedia.org/wiki/X', ru: 'https://ru.wikipedia.org/wiki/X' } })]);
+    const ru = (await app.inject(`/v1/places/${id}?locale=ru`)).json<{ place: PlaceDTO }>().place.about;
+    expect(ru).toEqual({ text: 'Еженедельный рынок под открытым небом.', source: 'Wikipedia', url: 'https://ru.wikipedia.org/wiki/X', license: 'CC BY-SA 4.0' });
+    const el = (await app.inject(`/v1/places/${id}?locale=el`)).json<{ place: PlaceDTO }>().place.about;
+    expect(el?.text).toBe('A weekly open-air market.'); // no Greek text: English, with the English article
+    expect(el?.url).toBe('https://en.wikipedia.org/wiki/X');
+    await pool.query(`UPDATE places SET description_i18n = '{}', about_source = NULL WHERE id = $1`, [id]);
+  });
+
   it('unknown ids → 404, bad input → 400', async () => {
     expect((await app.inject('/v1/events/00000000-0000-4000-8000-000000000000')).statusCode).toBe(404);
     expect((await app.inject('/v1/events/not-a-uuid')).statusCode).toBe(400);

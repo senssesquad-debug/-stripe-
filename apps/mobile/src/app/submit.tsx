@@ -1,8 +1,10 @@
+import { confirmAsync, showToast } from '@/lib/feedback';
+import { errorText } from '@/lib/errors';
 import { CATEGORIES, CITIES, pickText, type Locale } from '@passtra/core';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, Switch, TextInput, View } from 'react-native';
+import { ScrollView, Switch, TextInput, View } from 'react-native';
 import { Button, Chip, Txt } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useSession } from '@/lib/auth';
@@ -29,7 +31,7 @@ export default function SubmitEvent() {
       <View style={{ flex: 1, padding: 20, gap: 14, backgroundColor: th.c.background }}>
         <Txt v="title">{t('submit.title')}</Txt>
         <Txt v="callout" tone="secondary">{t('submit.signInFirst')}</Txt>
-        <Button title={t('profile.signIn')} onPress={() => router.push('/signin')} />
+        <Button title={t('profile.signIn')} onPress={() => router.push({ pathname: '/signin', params: { reason: 'submit' } })} />
       </View>
     );
   }
@@ -67,10 +69,10 @@ export default function SubmitEvent() {
               startTime: f.startTime || undefined, endTime: f.endTime || undefined, isFree: f.isFree, priceMin: f.priceMin ? Number(f.priceMin) : undefined,
               ticketUrl: f.ticketUrl || undefined, organizer: f.organizer, contact: f.contact,
             });
-            Alert.alert(t('submit.sent'));
+            showToast(t('submit.sent'));
             router.back();
           } catch (e) {
-            Alert.alert((e as Error).message);
+            showToast(errorText(e), 'error');
           } finally {
             setBusy(false);
           }

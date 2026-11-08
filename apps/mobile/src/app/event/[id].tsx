@@ -4,8 +4,10 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Linking, Platform, ScrollView, Share, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { Cover, SaveButton } from '@/components/cards';
+import { EntityActions } from '@/components/entity-actions';
+import { headerLeftForDirectOpen } from '@/components/home-button';
 import { Badge, Banner, Button, ErrorState, InfoLine, Skeleton, Txt } from '@/components/ui';
 import { VerificationBadge, VerificationBlock } from '@/components/verification';
 import { api } from '@/lib/api';
@@ -26,15 +28,13 @@ export default function EventScreen() {
   if (q.isLoading) return <View style={{ padding: 20, gap: 14, backgroundColor: th.c.background, flex: 1 }}><Skeleton width="100%" height={210} radius={20} /><Skeleton width="70%" height={26} /><Skeleton width="50%" height={16} /></View>;
   if (q.isError || !q.data) return <ErrorState error={q.error} onRetry={() => void q.refetch()} />;
   const e: EventDTO = q.data.event;
-  const nav = q.data.navigation;
   const where = [e.venue.name, e.venue.address, e.city?.name].filter(Boolean).join(', ');
   const priceValue = e.price.label ?? t('common.priceUnknown');
-  const share = () => Share.share({ message: `${e.title} — ${e.time.label}${e.website ? `\n${e.website}` : ''}` });
 
   return (
     <>
-      <Stack.Screen options={{ headerRight: () => <SaveButton entity={e} /> }} />
-      <ScrollView style={{ flex: 1, backgroundColor: th.c.background }} contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 48 }}>
+      <Stack.Screen options={{ headerRight: () => <SaveButton entity={e} />, headerLeft: headerLeftForDirectOpen() }} />
+      <ScrollView style={{ flex: 1, backgroundColor: th.c.background }} contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 48, maxWidth: 820, width: '100%', alignSelf: 'center' }}>
         <Cover entity={e} height={210} radius={th.radius.lg} />
         <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
           {e.isDemo ? <Badge label={t('common.demo')} tone="dark" /> : null}
@@ -55,12 +55,13 @@ export default function EventScreen() {
           {e.organizer ? <InfoLine icon="account-group-outline" label={t('detail.organizer')} value={e.organizer} /> : null}
         </View>
 
-        <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
-          {e.ticketUrl ? <Button title={t('detail.tickets')} icon="ticket-confirmation-outline" onPress={() => { void api.interactions([{ entityType: 'event', entityId: e.id, kind: 'click_ticket' }]).catch(() => undefined); void WebBrowser.openBrowserAsync(e.ticketUrl!); }} /> : null}
-          {nav ? <Button title={t('detail.directions')} icon="directions" kind="secondary" onPress={() => { void api.interactions([{ entityType: 'event', entityId: e.id, kind: 'navigate' }]).catch(() => undefined); void Linking.openURL(Platform.OS === 'ios' ? nav.apple : nav.google); }} /> : null}
-          {e.website ? <Button title={t('detail.website')} icon="web" kind="secondary" onPress={() => void WebBrowser.openBrowserAsync(e.website!)} /> : null}
-          <Button title={t('common.share')} icon="share-variant-outline" kind="ghost" onPress={() => void share()} />
-        </View>
+        <EntityActions entity={e} />
+        {e.ticketUrl || e.website ? (
+          <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+            {e.ticketUrl ? <Button title={t('detail.tickets')} icon="ticket-confirmation-outline" onPress={() => { void api.interactions([{ entityType: 'event', entityId: e.id, kind: 'click_ticket' }]).catch(() => undefined); void WebBrowser.openBrowserAsync(e.ticketUrl!); }} /> : null}
+            {e.website ? <Button title={t('detail.website')} icon="web" kind="secondary" onPress={() => void WebBrowser.openBrowserAsync(e.website!)} /> : null}
+          </View>
+        ) : null}
 
         {e.description ? (
           <View style={{ gap: 6 }}>

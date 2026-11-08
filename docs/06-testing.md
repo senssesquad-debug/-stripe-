@@ -48,7 +48,7 @@ Playwright, экран 390×844, геолокация — центр Лимас�
 |---|---|---|
 | Нативные сборки iOS/Android, карта react-native-maps | нет Xcode/Android SDK и аккаунтов | `eas build --profile preview`, TestFlight / Internal testing |
 | Push-уведомления на устройстве | нужен EAS projectId и устройство | профиль development, «Уведомления» в профиле |
-| Вход через Supabase | нет проекта Supabase | заполнить `EXPO_PUBLIC_SUPABASE_*` и `AUTH_*` |
+| Доставка кодов на email / SMS | нет ключей Resend / Twilio | `RESEND_API_KEY` + `EMAIL_FROM`, `TWILIO_*`; локально — `DEV_SHOW_CODES=true` (код показывается в интерфейсе, в production запрещено) |
 | Живой вызов Claude API | нет ключа в среде | задать `ANTHROPIC_API_KEY`, `POST /v1/search` → `interpretation.engine = "ai"` |
 | Ticketmaster, Eventbrite, Google Places | нет ключей | задать ключи; в админке «Run now» |
 | Overpass по всей стране | egress песочницы закрывает overpass-api.de | в продакшене — стандартный режим `overpass` |

@@ -55,6 +55,8 @@ export async function buildApp(config: AppConfig, db: Db, overrides: Partial<App
     max: 180,
     timeWindow: '1 minute',
     keyGenerator: (req) => req.user?.id ?? req.ip,
+    // Only the API is limited: one page load of the web app fetches dozens of static files (bundles, fonts, icons).
+    allowList: (req) => !req.url.startsWith('/v1/'),
     errorResponseBuilder: (_req, ctx) => ({ statusCode: 429, error: { code: 'rate_limited', message: `Too many requests, retry in ${Math.ceil(ctx.ttl / 1000)}s` } }),
   });
 
@@ -78,7 +80,10 @@ export async function buildApp(config: AppConfig, db: Db, overrides: Partial<App
   const indexHandler = appDir ? makeIndexHandler(deps, appDir) : null;
   app.setNotFoundHandler((req, reply) => {
     // Client-side routes of the web app (e.g. /event/123) get index.html with link-preview tags; API paths keep JSON 404s.
-    if (indexHandler && req.method === 'GET' && !req.url.startsWith('/v1/') && !req.url.startsWith('/admin')) return indexHandler(req, reply);
+    // Missing build files (e.g. an old bundle name after a deploy) stay 404 instead of receiving HTML.
+    const path = req.url.split('?')[0]!;
+    const isAsset = path.startsWith('/_expo/') || /\.[a-z0-9]{2,5}$/i.test(path);
+    if (indexHandler && req.method === 'GET' && !isAsset && !path.startsWith('/v1/') && !path.startsWith('/admin')) return indexHandler(req, reply);
     return sendError(reply, new ApiError(404, 'not_found', 'Route not found'));
   });
 

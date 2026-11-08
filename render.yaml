@@ -32,6 +32,32 @@ services:
         sync: false
       - key: TICKETMASTER_API_KEY
         sync: false
+      # Public address used in shared links and link previews.
+      - key: PUBLIC_WEB_URL
+        value: https://passtra.onrender.com
+      # Email codes (registration, email linking, password reset) — https://resend.com, verified sending domain.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      # SMS codes for phone linking — Twilio.
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_FROM
+        sync: false
+      # Web Push (VAPID). If unset, a key pair is generated and stored in the database on first use;
+      # set them explicitly so browser subscriptions survive a database re-creation.
+      - key: WEB_PUSH_PUBLIC_KEY
+        sync: false
+      - key: WEB_PUSH_PRIVATE_KEY
+        sync: false
+      # Universal Links / App Links for the store apps.
+      - key: APPLE_TEAM_ID
+        sync: false
+      - key: ANDROID_CERT_SHA256
+        sync: false
 databases:
   - name: passtra-db
     plan: free

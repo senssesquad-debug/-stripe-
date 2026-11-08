@@ -1,7 +1,9 @@
+import { confirmAsync, showToast } from '@/lib/feedback';
+import { errorText } from '@/lib/errors';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, ScrollView, TextInput, View } from 'react-native';
+import { ScrollView, TextInput, View } from 'react-native';
 import { Button, Chip, Txt } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useTheme } from '@/theme';
@@ -20,10 +22,10 @@ export default function Report() {
     setBusy(true);
     try {
       await api.report({ entityType: type, entityId: id, kind, message: message.trim() || undefined });
-      Alert.alert(t('verification.reportThanks'));
+      showToast(t('verification.reportThanks'));
       router.back();
     } catch {
-      Alert.alert(t('errors.network'));
+      showToast(t('errors.network'), 'error');
     } finally {
       setBusy(false);
     }

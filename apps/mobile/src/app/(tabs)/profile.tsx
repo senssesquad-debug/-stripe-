@@ -4,10 +4,10 @@ import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Button, Chip, Divider, Row, Txt } from '@/components/ui';
+import { Badge, Button, Chip, Divider, Row, Txt } from '@/components/ui';
 import { LANGUAGE_NAMES } from '@/i18n';
 import { api } from '@/lib/api';
-import { authAvailable, signOut, useSession } from '@/lib/auth';
+import { requireAuth, useSession } from '@/lib/auth';
 import { store, useAppState } from '@/lib/store';
 import { useTheme } from '@/theme';
 
@@ -39,17 +39,26 @@ export default function Profile() {
       <View style={{ padding: 16, borderRadius: th.radius.lg, backgroundColor: th.c.surface, gap: 10 }}>
         {session ? (
           <>
-            <Txt v="bodyStrong">{session.user.email}</Txt>
-            <Button title={t('profile.signOut')} kind="secondary" compact onPress={() => void signOut()} />
-          </>
-        ) : authAvailable ? (
-          <>
-            <Txt v="callout" tone="secondary">{t('profile.signInBody')}</Txt>
-            <Button title={t('profile.signIn')} icon="email-outline" onPress={() => router.push('/signin')} />
+            <Txt v="headline">{session.user.name || session.user.email}</Txt>
+            {session.user.name && session.user.email ? <Txt v="callout" tone="secondary">{session.user.email}</Txt> : null}
+            {session.user.email && !session.user.emailVerified ? <Badge label={t('profile.emailNotConfirmed')} tone="warning" icon="alert-outline" /> : null}
+            <Button title={t('profile.account')} kind="secondary" compact icon="account-cog-outline" onPress={() => router.push('/account')} style={{ alignSelf: 'flex-start' }} />
           </>
         ) : (
-          <Txt v="callout" tone="secondary">{t('profile.authUnavailable')}</Txt>
+          <>
+            <Txt v="callout" tone="secondary">{t('profile.signInBody')}</Txt>
+            <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+              <Button title={t('profile.signIn')} icon="login" onPress={() => router.push('/signin')} />
+              <Button title={t('profile.createAccount')} kind="secondary" onPress={() => router.push({ pathname: '/signin', params: { mode: 'register' } })} />
+            </View>
+          </>
         )}
+      </View>
+
+      <View>
+        <Row icon="calendar-account-outline" title={t('profile.myEvents')} onPress={() => requireAuth('myEvents', () => router.push('/my-events'))} />
+        <Divider />
+        <Row icon="bell-outline" title={t('profile.notifications')} onPress={() => router.push('/notifications')} />
       </View>
 
       <Group title={t('profile.language')}>
@@ -86,8 +95,6 @@ export default function Profile() {
       </Group>
 
       <View>
-        <Row icon="bell-outline" title={t('profile.notifications')} onPress={() => router.push('/notifications')} />
-        <Divider />
         <Row icon="shield-lock-outline" title={t('profile.privacy')} onPress={() => router.push('/privacy')} />
         <Divider />
         <Row icon="database-check-outline" title={t('profile.aboutData')} onPress={() => router.push('/about')} />
