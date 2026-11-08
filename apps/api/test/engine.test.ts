@@ -244,8 +244,14 @@ describe('places: OpenStreetMap + Wikidata', () => {
     const s = await runSource(engineDeps(pool, { ...config, OVERPASS_URL: 'https://primary.example/api/interpreter, https://backup.example/api/interpreter' }, f, NOW), src, 'test');
     expect(s.status).toBe('partial');
     expect(s.created).toBe(1);
-    expect(s.error).toMatch(/1\/2 requests failed/);
-    expect(f.calls.filter((u) => u.includes('primary.example/api')).length).toBe(2); // tried first for each tile
+    expect(s.error).toMatch(/parts failed/);
+    expect(f.calls.filter((u) => u.includes('primary.example/api')).length).toBeGreaterThan(0); // first instance tried first
+    // Next run resumes: finished tiles are skipped, only the failed ones are requested again.
+    const f2 = fakeFetch([[/backup\.example/, () => ({ elements: [] })]]);
+    const s2 = await runSource(engineDeps(pool, { ...config, OVERPASS_URL: 'https://backup.example/api/interpreter' }, f2, NOW), src, 'test');
+    const firstRunUnits = f.calls.filter((u) => u.includes('backup.example/api')).length;
+    expect(f2.calls.filter((u) => u.includes('backup.example/api')).length).toBeLessThan(firstRunUnits);
+    expect(s2.status).toBe('success'); // cycle completed
     expect((await pool.query(`SELECT 1 FROM places WHERE name = 'Tile Test Café'`)).rowCount).toBe(1);
   });
 

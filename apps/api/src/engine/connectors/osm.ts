@@ -29,17 +29,21 @@ function matcherQl(m: Record<string, string | true>, requireAny: string[] | unde
   return req.map((r) => `nwr${filt}${r ? `["${r}"]` : ''}(${area});`);
 }
 
-/** Overpass query for one interest group inside a bbox [south, west, north, east]. */
-export function buildOverpassQuery(group: InterestGroup, bbox: [number, number, number, number]): string | null {
+/** Overpass query for the given categories inside a bbox [south, west, north, east]. */
+export function buildOverpassQuery(groupOrSlugs: InterestGroup | string[], bbox: [number, number, number, number]): string | null {
   const parts: string[] = [];
   const area = bbox.join(',');
+  const wanted = (c: (typeof CATEGORIES)[number]) => (Array.isArray(groupOrSlugs) ? groupOrSlugs.includes(c.slug) : c.group === groupOrSlugs);
   for (const c of CATEGORIES) {
-    if (c.group !== group || !c.osm) continue;
+    if (!wanted(c) || !c.osm) continue;
     for (const m of c.osm) parts.push(...matcherQl(m, c.osmRequireAny, area));
   }
   if (!parts.length) return null;
-  return `[out:json][timeout:120];(${parts.join('')});out center tags;`;
+  return `[out:json][timeout:90];(${parts.join('')});out center tags;`;
 }
+
+/** Categories that people search for most go first, so a partial import is already useful. */
+const PRIORITY = ['restaurant', 'cafe', 'bar', 'supermarket', 'beach', 'pharmacy', 'museum', 'nightclub', 'park', 'bakery', 'fast-food', 'hiking', 'historic-site', 'viewpoint'];
 
 /** Country bbox split into a 2×2 grid of [south, west, north, east] tiles. */
 export function countryTiles(iso: string): Array<[number, number, number, number]> {
@@ -110,32 +114,53 @@ export const osmConnector: Connector = {
       }
       return;
     }
+    // Resumable import: one unit = one category in one quarter of the country. Finished units are remembered for
+    // the current cycle, so an interrupted run (host sleep, Overpass overload) continues where it stopped.
     const iso = cfg.countryIso ?? ctx.source.country_code ?? 'CY';
+    const tiles = cfg.tiles ?? countryTiles(iso);
+    const groups = new Set(cfg.groups ?? [...INTEREST_GROUPS]);
+    const slugs = CATEGORIES.filter((c) => c.osm && groups.has(c.group as InterestGroup)).map((c) => c.slug)
+      .sort((a, b) => ((PRIORITY.indexOf(a) + 1 || 99) - (PRIORITY.indexOf(b) + 1 || 99)));
+    const units = slugs.flatMap((slug) => tiles.map((tile) => ({ key: `${slug}@${tile.join(',')}`, slug, tile })));
+    type Cycle = { startedAt: string; done: Record<string, string> };
+    let cycle = await ctx.state.get<Cycle>('osm_cycle');
+    if (!cycle) cycle = { startedAt: ctx.now.toISOString(), done: {} };
     const seen = new Set<string>();
     const failures: string[] = [];
-    let units = 0;
-    for (const group of cfg.groups ?? [...INTEREST_GROUPS]) {
-      for (const tile of cfg.tiles ?? countryTiles(iso)) {
-        const q = buildOverpassQuery(group, tile);
-        if (!q) continue;
-        units++;
-        let elements: OsmElement[];
-        try {
-          elements = await overpass(ctx, q);
-        } catch (e) {
-          failures.push(`${group}@${tile.join(',')}: ${(e as Error).message}`);
-          continue; // keep going: other groups/tiles still import
-        }
-        for (const el of elements) {
-          const id = `${el.type}/${el.id}`;
-          if (seen.has(id)) continue; // objects on tile borders come twice
-          seen.add(id);
-          yield { externalId: id, url: `https://www.openstreetmap.org/${id}`, payload: el };
-        }
+    let outOfTime = false;
+    for (const u of units) {
+      if (cycle.done[u.key]) continue;
+      if (Date.now() > ctx.deadline) { outOfTime = true; break; }
+      const q = buildOverpassQuery([u.slug], u.tile);
+      if (!q) { cycle.done[u.key] = ctx.now.toISOString(); continue; }
+      let elements: OsmElement[];
+      try {
+        elements = await overpass(ctx, q);
+      } catch (e) {
+        failures.push(`${u.key}: ${(e as Error).message}`);
+        continue; // other units still import; this one is retried next run
       }
+      for (const el of elements) {
+        const id = `${el.type}/${el.id}`;
+        if (seen.has(id)) continue; // objects on tile borders / in two categories come twice
+        seen.add(id);
+        yield { externalId: id, url: `https://www.openstreetmap.org/${id}`, payload: el };
+      }
+      cycle.done[u.key] = new Date().toISOString(); // after its records were ingested
+      await ctx.state.set('osm_cycle', cycle);
     }
-    // Any failed part makes the run incomplete (no "missing" marking), but everything fetched is kept.
-    if (failures.length) throw new Error(`Overpass: ${failures.length}/${units} requests failed — ${failures[0]}`);
+    const remaining = units.filter((u) => !cycle!.done[u.key]).length;
+    ctx.log.info({ source: ctx.source.key, done: units.length - remaining, total: units.length, failures: failures.length }, 'osm import progress');
+    if (remaining === 0) {
+      // Whole country covered: records not seen since the cycle began are missing. Next run starts a new cycle.
+      ctx.snapshot.since = new Date(cycle.startedAt);
+      await ctx.state.set('osm_cycle', null);
+      return;
+    }
+    ctx.snapshot.complete = false;
+    if (failures.length && !outOfTime && failures.length === remaining) {
+      throw new Error(`Overpass: ${failures.length}/${units.length} parts failed — ${failures[0]}`);
+    }
   },
 
   normalize(raw): NormalizedPlace | null {

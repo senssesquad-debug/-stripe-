@@ -29,9 +29,13 @@ export interface RunSummary {
   missing: number;
   changes: number;
   error?: string;
+  /** The connector stopped early on purpose and wants to continue soon. */
+  resume?: boolean;
 }
 
 const MAX_LOGGED_ERRORS = 200;
+/** One run works at most this long; resumable connectors continue in the next run (small hosts sleep or restart). */
+const RUN_BUDGET_MS = 8 * 60_000;
 
 /** Run one source end-to-end. Each record is ingested in its own transaction so one bad record never blocks the rest. */
 export async function runSource(deps: EngineDeps, source: SourceRow, trigger: 'schedule' | 'manual' | 'test' = 'schedule'): Promise<RunSummary> {
@@ -63,7 +67,28 @@ export async function runSource(deps: EngineDeps, source: SourceRow, trigger: 's
     return finish();
   }
 
-  const ctx: ConnectorContext = { source, http: deps.http, config: deps.config, now, log, httpCache: source.http_cache ?? {} };
+  const ctx: ConnectorContext = {
+    source, http: deps.http, config: deps.config, now, log, httpCache: source.http_cache ?? {},
+    state: {
+      async get<T>(key: string) {
+        const r = await deps.pool.query<{ value: T }>('SELECT value FROM connector_state WHERE source_id = $1 AND key = $2', [source.id, key]);
+        return r.rows[0]?.value ?? null;
+      },
+      async set(key: string, value: unknown) {
+        await deps.pool.query(`INSERT INTO connector_state (source_id, key, value) VALUES ($1,$2,$3)
+          ON CONFLICT (source_id, key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()`, [source.id, key, JSON.stringify(value)]);
+      },
+    },
+    snapshot: { complete: true, since: null },
+    deadline: Date.now() + RUN_BUDGET_MS,
+  };
+  // Live progress for /v1/status while a long import runs.
+  let lastProgress = Date.now();
+  const progress = async () => {
+    if (Date.now() - lastProgress < 15_000) return;
+    lastProgress = Date.now();
+    await deps.pool.query('UPDATE ingestion_runs SET fetched=$2, created=$3, updated=$4, merged=$5 WHERE id=$1', [runId, s.fetched, s.created, s.updated, s.merged]).catch(() => undefined);
+  };
   const logError = async (stage: string, message: string, externalId?: string, sample?: unknown) => {
     s.errors++;
     if (s.errors <= MAX_LOGGED_ERRORS) {
@@ -92,6 +117,7 @@ export async function runSource(deps: EngineDeps, source: SourceRow, trigger: 's
           return normalized.kind === 'event' ? ingestEvent(d, raw, normalized) : ingestPlace(d, raw, normalized);
         });
         s[outcome]++;
+        await progress();
       } catch (e) {
         await logError('merge', (e as Error).message, raw.externalId);
         log.warn({ err: (e as Error).message, externalId: raw.externalId, source: source.key }, 'record failed');
@@ -103,9 +129,13 @@ export async function runSource(deps: EngineDeps, source: SourceRow, trigger: 's
     await logError('fetch', s.error);
   }
 
-  if (!fetchFailed && connector.fullSnapshot) s.missing = await markMissing(deps.pool, source, startedAt, now);
+  if (!fetchFailed && connector.fullSnapshot && ctx.snapshot.complete) s.missing = await markMissing(deps.pool, source, ctx.snapshot.since ?? startedAt, now);
 
-  s.status = fetchFailed ? (s.fetched > 0 ? 'partial' : 'failed') : s.errors > 0 ? 'partial' : 'success';
+  s.status = fetchFailed ? (s.fetched > 0 ? 'partial' : 'failed') : s.errors > 0 || !ctx.snapshot.complete ? 'partial' : 'success';
+  if (!fetchFailed && !ctx.snapshot.complete) {
+    s.resume = true;
+    s.error ??= 'Import continues in the next run';
+  }
   log.info({ source: source.key, ...s }, 'ingestion run finished');
   return finish();
 }

@@ -102,6 +102,15 @@ export interface ConnectorContext {
   log: Logger;
   /** Persisted conditional-request validators for this source, keyed by URL. */
   httpCache: SourceRow['http_cache'];
+  /** Durable key/value state that survives interrupted runs (resumable imports). */
+  state: { get<T>(key: string): Promise<T | null>; set(key: string, value: unknown): Promise<void> };
+  /**
+   * Resumable connectors set complete=false when this run covered only part of the listing (time budget, failures);
+   * "since" is when the current full cycle began, so absence is judged against the whole cycle.
+   */
+  snapshot: { complete: boolean; since: Date | null };
+  /** Soft time budget for this run (epoch ms); resumable connectors stop and continue next run. */
+  deadline: number;
 }
 
 export interface Connector {

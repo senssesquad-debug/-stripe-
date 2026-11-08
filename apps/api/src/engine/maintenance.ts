@@ -13,6 +13,10 @@ import type { Logger } from './types';
  */
 export async function runMaintenance(pool: pg.Pool, log: Logger, now = new Date()): Promise<Record<string, number>> {
   const stats: Record<string, number> = {};
+  // Runs cut off by a host restart/sleep never finish on their own.
+  stats.interruptedRuns = (await pool.query(
+    `UPDATE ingestion_runs SET status = 'failed', finished_at = now(), error_message = 'Interrupted (the server restarted or went to sleep); the import resumes in the next run'
+      WHERE status = 'running' AND started_at < $1::timestamptz - interval '40 minutes'`, [now])).rowCount ?? 0;
   const completed = await pool.query(
     `UPDATE events SET status = 'completed', updated_at = now()
       WHERE status IN ('scheduled','rescheduled','unlisted') AND merged_into IS NULL AND (

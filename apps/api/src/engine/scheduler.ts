@@ -9,8 +9,9 @@ import type { SourceRow } from './types';
  *  - failure      → exponential backoff up to 6 h
  *  - skipped (missing key) → 6 h
  */
-export function nextInterval(source: Pick<SourceRow, 'min_interval_s' | 'max_interval_s' | 'current_interval_s' | 'consecutive_failures'>, summary: Pick<RunSummary, 'status' | 'changes'>): number {
+export function nextInterval(source: Pick<SourceRow, 'min_interval_s' | 'max_interval_s' | 'current_interval_s' | 'consecutive_failures'>, summary: Pick<RunSummary, 'status' | 'changes' | 'resume'>): number {
   if (summary.status === 'skipped') return 6 * 3600;
+  if (summary.resume) return 300; // a resumable import stopped early (time budget or busy servers): continue shortly
   if (summary.status === 'failed') return Math.min(6 * 3600, Math.max(source.min_interval_s, source.current_interval_s) * 2 ** Math.min(5, source.consecutive_failures + 1));
   if (summary.changes > 0) return Math.max(source.min_interval_s, Math.round(source.current_interval_s / 2));
   return Math.min(source.max_interval_s, Math.round(source.current_interval_s * 1.5));
