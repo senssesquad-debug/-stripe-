@@ -1,0 +1,2765 @@
+{
+ "events": [
+  {
+   "id": 784995,
+   "global_id": "www.visitcyprus.com?id=784995",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-03-24 14:21:43",
+   "date_utc": "2026-03-24 12:21:43",
+   "modified": "2026-03-24 14:21:43",
+   "modified_utc": "2026-03-24 12:21:43",
+   "url": "https://www.visitcyprus.com/event/regatta-of-champions-the-r-o-c-optimist-ilca4-8-15-11-2026-22-29-11-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/784995",
+   "title": "Regatta of Champions – The R.O.C. (Optimist &#038; ILCA4) &#8211; 8-15.11.2026 &#038; 22-29.11.2026",
+   "description": "<p>After several years of reviewing Optimist sailing events worldwide, the changes in sailing and the rapid transition to a technological race that has somehow relegated sailors and coaches to secondary status, Famagusta",
+   "slug": "regatta-of-champions-the-r-o-c-optimist-ilca4-8-15-11-2026-22-29-11-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/03/REGATTA.jpg"
+   },
+   "all_day": true,
+   "start_date": "2026-11-08 00:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "08",
+    "hour": "00",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-11-15 23:59:59",
+   "end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "15",
+    "hour": "23",
+    "minutes": "59",
+    "seconds": "59"
+   },
+   "utc_start_date": "2026-11-07 22:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "07",
+    "hour": "22",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-11-15 21:59:59",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "15",
+    "hour": "21",
+    "minutes": "59",
+    "seconds": "59"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "FREE",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "free"
+    ]
+   },
+   "website": "www.regattaofchampions.com",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Sailing",
+     "slug": "sailing",
+     "term_group": 0,
+     "term_taxonomy_id": 6810,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 3,
+     "filter": "raw",
+     "id": 6810,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6810",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 785002,
+    "author": "4191",
+    "status": "publish",
+    "date": "2026-03-24 14:21:43",
+    "date_utc": "2026-03-24 12:21:43",
+    "modified": "2026-03-24 14:21:43",
+    "modified_utc": "2026-03-24 12:21:43",
+    "url": "https://www.visitcyprus.com/venue/famagusta-nautical-club/",
+    "venue": "FAMAGUSTA NAUTICAL CLUB",
+    "slug": "famagusta-nautical-club",
+    "address": "Promachon Eleftherias 1",
+    "city": "Limassol",
+    "country": "Cyprus",
+    "zip": "4103",
+    "phone": "+357 25879767",
+    "website": "https://www.regattaofchampions.com",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=785002",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=785002"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 785003,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-03-24 14:21:44",
+     "date_utc": "2026-03-24 12:21:44",
+     "modified": "2026-03-24 14:21:44",
+     "modified_utc": "2026-03-24 12:21:44",
+     "url": "https://www.visitcyprus.com/organizer/famagusta-nautical-club/",
+     "organizer": "Famagusta Nautical Club",
+     "slug": "famagusta-nautical-club",
+     "phone": "+357 25879767",
+     "website": "https://www.famagustanauticalclub.com",
+     "email": "info@famagustanauticalclub.com",
+     "global_id": "www.visitcyprus.com?id=785003",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=785003"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 787995,
+   "global_id": "www.visitcyprus.com?id=787995",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-06-29 13:15:18",
+   "date_utc": "2026-06-29 10:15:18",
+   "modified": "2026-07-07 12:28:42",
+   "modified_utc": "2026-07-07 09:28:42",
+   "url": "https://www.visitcyprus.com/event/lefkara-classic-2026-15-11-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/787995",
+   "title": "Lefkara Classic 2026 &#8211; 12-15.11.2026",
+   "description": "<p>The Lefkara Classic is a premier international endurance cycling event (Brevet-style) organized end-to-end by the team running The Agora Hotel in Pano Lefkara. The event has evolved into a full <strong>&#8220;Race Wee",
+   "slug": "lefkara-classic-2026-15-11-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/06/agora.jpg"
+   },
+   "all_day": false,
+   "start_date": "2026-11-12 16:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "12",
+    "hour": "16",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-11-15 17:00:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "15",
+    "hour": "17",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-11-12 14:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "12",
+    "hour": "14",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-11-15 15:00:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "15",
+    "hour": "15",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "€60",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "60"
+    ]
+   },
+   "website": "https://lefkaraclassic.com/",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Cycling",
+     "slug": "cycling",
+     "term_group": 0,
+     "term_taxonomy_id": 6765,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 5,
+     "filter": "raw",
+     "id": 6765,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6765",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 788002,
+    "author": "4191",
+    "status": "publish",
+    "date": "2026-06-29 13:15:18",
+    "date_utc": "2026-06-29 10:15:18",
+    "modified": "2026-06-29 13:15:18",
+    "modified_utc": "2026-06-29 10:15:18",
+    "url": "https://www.visitcyprus.com/venue/the-agora-hotel-pano-lefkara-square/",
+    "venue": "The Agora Hotel / Pano Lefkara Square",
+    "slug": "the-agora-hotel-pano-lefkara-square",
+    "address": "25 Martiou",
+    "city": "Pano Lefkara",
+    "country": "Cyprus",
+    "zip": "7705",
+    "phone": "+357 24726000",
+    "website": "https://www.theagorahotel.com/",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=788002",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=788002"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 788003,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-06-29 13:15:18",
+     "date_utc": "2026-06-29 10:15:18",
+     "modified": "2026-06-29 13:15:18",
+     "modified_utc": "2026-06-29 10:15:18",
+     "url": "https://www.visitcyprus.com/organizer/the-agora-hotel/",
+     "organizer": "The Agora Hotel",
+     "slug": "the-agora-hotel",
+     "phone": "357 24726000",
+     "email": "hello@lefkaraclassic.com",
+     "global_id": "www.visitcyprus.com?id=788003",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=788003"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 791492,
+   "global_id": "www.visitcyprus.com?id=791492",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-08-27 09:50:22",
+   "date_utc": "2026-08-27 06:50:22",
+   "modified": "2026-08-27 09:51:37",
+   "modified_utc": "2026-08-27 06:51:37",
+   "url": "https://www.visitcyprus.com/event/cyprus-swim-series-pissouri-edition-13-15-11-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/791492",
+   "title": "CYPRUS SWIM SERIES – PISSOURI EDITION &#8211; 13-15.11.2026",
+   "description": "<p>Cyprus Swim Series is an international series of competitive open water swimming. The event will take place in Pissouri (3rd edition) on the 13th to 15th of November 2026, at Pissouri Beach, just in front of Columbia ",
+   "slug": "cyprus-swim-series-pissouri-edition-13-15-11-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/08/PISSOURI-EDITION.jpg"
+   },
+   "all_day": false,
+   "start_date": "2026-11-13 08:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "13",
+    "hour": "08",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-11-15 15:00:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "15",
+    "hour": "15",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-11-13 06:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "13",
+    "hour": "06",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-11-15 13:00:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "15",
+    "hour": "13",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "free",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "free"
+    ]
+   },
+   "website": "https://cyprusswimseries.com/",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    },
+    {
+     "name": "Swimming",
+     "slug": "swimming",
+     "term_group": 0,
+     "term_taxonomy_id": 6819,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 4,
+     "filter": "raw",
+     "id": 6819,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6819",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 791499,
+    "author": "4191",
+    "status": "publish",
+    "date": "2026-08-27 09:50:22",
+    "date_utc": "2026-08-27 06:50:22",
+    "modified": "2026-08-27 09:50:22",
+    "modified_utc": "2026-08-27 06:50:22",
+    "url": "https://www.visitcyprus.com/venue/pissouri-beach/",
+    "venue": "Pissouri Beach",
+    "slug": "pissouri-beach",
+    "address": "7 Rigenis Street",
+    "city": "Geroskipou",
+    "country": "Cyprus",
+    "province": "Paphos",
+    "zip": "8200",
+    "phone": "+357 99105680",
+    "website": "https://cyprusswimseries.com/",
+    "stateprovince": "Paphos",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=791499",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=791499"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 786997,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-05-20 08:44:37",
+     "date_utc": "2026-05-20 05:44:37",
+     "modified": "2026-05-20 08:44:37",
+     "modified_utc": "2026-05-20 05:44:37",
+     "url": "https://www.visitcyprus.com/organizer/ioannis-ioannides/",
+     "organizer": "Ioannis Ioannides",
+     "slug": "ioannis-ioannides",
+     "phone": "+357 99105680",
+     "website": "https://cyprusswimseries.com/",
+     "email": "hello@cyprusswimseries.com",
+     "global_id": "www.visitcyprus.com?id=786997",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=786997"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 787430,
+   "global_id": "www.visitcyprus.com?id=787430",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-06-03 09:24:30",
+   "date_utc": "2026-06-03 06:24:30",
+   "modified": "2026-10-05 10:24:35",
+   "modified_utc": "2026-10-05 07:24:35",
+   "url": "https://www.visitcyprus.com/event/radisson-blu-larnaka-international-marathon-15-11-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/787430",
+   "title": "Radisson Blu Larnaka International Marathon &#8211; 15.11.2026",
+   "description": "<p>The Radisson Hotels Larnaka Marathon is one of Cyprus’ leading sporting events and the official marathon of the city of Larnaka. Held annually, the event attracts thousands of runners and visitors from around the worl",
+   "slug": "radisson-blu-larnaka-international-marathon-15-11-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/06/Copy-of-20251116_RadissonBlu_Larnaka_Intl_Marathon_100625_DJI_.jpg"
+   },
+   "all_day": false,
+   "start_date": "2026-11-15 07:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "15",
+    "hour": "07",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-11-15 13:00:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "15",
+    "hour": "13",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-11-15 05:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "15",
+    "hour": "05",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-11-15 11:00:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "15",
+    "hour": "11",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "€20 – €70",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "20",
+     "70"
+    ]
+   },
+   "website": "www.larnakamarathon.com",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Running",
+     "slug": "running",
+     "term_group": 0,
+     "term_taxonomy_id": 6875,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 11,
+     "filter": "raw",
+     "id": 6875,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6875",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 787437,
+    "author": "4191",
+    "status": "publish",
+    "date": "2026-06-03 09:24:31",
+    "date_utc": "2026-06-03 06:24:31",
+    "modified": "2026-06-03 09:24:31",
+    "modified_utc": "2026-06-03 06:24:31",
+    "url": "https://www.visitcyprus.com/venue/finikoudes-larnaka/",
+    "venue": "Finikoudes Larnaka",
+    "slug": "finikoudes-larnaka",
+    "address": "Athinon Avenue (Finikoudes Promenade)",
+    "city": "Larnaka",
+    "country": "Cyprus",
+    "zip": "6022",
+    "phone": "+357 7005 0123",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=787437",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=787437"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 787409,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-06-03 09:06:56",
+     "date_utc": "2026-06-03 06:06:56",
+     "modified": "2026-06-03 09:06:56",
+     "modified_utc": "2026-06-03 06:06:56",
+     "url": "https://www.visitcyprus.com/organizer/eleven-blue-events/",
+     "organizer": "Eleven Blue Events",
+     "slug": "eleven-blue-events",
+     "phone": "+357 7005 0123",
+     "website": "https://www.elevenblueevents.com",
+     "email": "info@elevenblueevents.com",
+     "global_id": "www.visitcyprus.com?id=787409",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=787409"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 793487,
+   "global_id": "www.visitcyprus.com?id=793487",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-10-23 12:15:44",
+   "date_utc": "2026-10-23 09:15:44",
+   "modified": "2026-10-23 12:15:44",
+   "modified_utc": "2026-10-23 09:15:44",
+   "url": "https://www.visitcyprus.com/event/cyprus-symphony-orchestra-starlight-2-works-by-barber-and-tchaikovsky-celebrating-20-years-of-cyprus-symphony-orchestra-foundation-19-11-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/793487",
+   "title": "CYPRUS SYMPHONY ORCHESTRA &#8211; STARLIGHT 2 &#8211; Works by Barber and Tchaikovsky &#8211; Celebrating 20 years of Cyprus Symphony Orchestra Foundation &#8211; 19.11.2026",
+   "description": "<p><strong>Celebrating 20 years of Cyprus Symphony Orchestra Foundation</strong></p>\n<p><strong>Lefkosia: Thursday 19 November 2026</strong> &#8211; Strovolos Municipal Theatre, 20:30</p>\n<p>The Cyprus Symphony Orchestra",
+   "slug": "cyprus-symphony-orchestra-starlight-2-works-by-barber-and-tchaikovsky-celebrating-20-years-of-cyprus-symphony-orchestra-foundation-19-11-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/10/CYSO_19.11.2026.jpg"
+   },
+   "all_day": false,
+   "start_date": "2026-11-19 20:30:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "19",
+    "hour": "20",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "end_date": "2026-11-19 22:00:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "19",
+    "hour": "22",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-11-19 18:30:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "19",
+    "hour": "18",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-11-19 20:00:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "19",
+    "hour": "20",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "€12 – €25",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "12",
+     "15.",
+     "17",
+     "18.",
+     "20",
+     "25"
+    ]
+   },
+   "website": "https://www.cyso.org.cy",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Cultural",
+     "slug": "cultural",
+     "term_group": 0,
+     "term_taxonomy_id": 6699,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 88,
+     "filter": "raw",
+     "id": 6699,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6699",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    },
+    {
+     "name": "Music",
+     "slug": "music",
+     "term_group": 0,
+     "term_taxonomy_id": 6719,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6699,
+     "count": 232,
+     "filter": "raw",
+     "id": 6719,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6719",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6699"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 635877,
+    "author": "4191",
+    "status": "publish",
+    "date": "2024-12-02 11:54:06",
+    "date_utc": "2024-12-02 11:54:06",
+    "modified": "2024-12-02 11:54:06",
+    "modified_utc": "2024-12-02 11:54:06",
+    "url": "https://www.visitcyprus.com/venue/strovolos-municipal-theatre/",
+    "venue": "Strovolos Municipal Theatre",
+    "slug": "strovolos-municipal-theatre",
+    "address": "100 Strovolos Avenue",
+    "city": "Strovolos",
+    "country": "Cyprus",
+    "zip": "2020",
+    "phone": "+357 22313010",
+    "website": "https://www.strovolos.org.cy/en/home-page/the-municipality/tour-in-strovolos/municipal-theatre/",
+    "show_map": false,
+    "show_map_link": false,
+    "global_id": "www.visitcyprus.com?id=635877",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=635877"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 559682,
+     "author": "4191",
+     "status": "publish",
+     "date": "2024-10-09 05:16:16",
+     "date_utc": "2024-10-09 05:16:16",
+     "modified": "2024-10-09 05:16:16",
+     "modified_utc": "2024-10-09 05:16:16",
+     "url": "https://www.visitcyprus.com/organizer/cyprus-symphony-orchestra/",
+     "organizer": "Cyprus Symphony Orchestra",
+     "slug": "cyprus-symphony-orchestra",
+     "phone": "+357 22 463144",
+     "website": "https://www.cyso.org.cy/",
+     "email": "info@cyso.org.cy",
+     "global_id": "www.visitcyprus.com?id=559682",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=559682"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 793643,
+   "global_id": "www.visitcyprus.com?id=793643",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-11-02 11:15:47",
+   "date_utc": "2026-11-02 09:15:47",
+   "modified": "2026-11-02 11:15:47",
+   "modified_utc": "2026-11-02 09:15:47",
+   "url": "https://www.visitcyprus.com/event/recital-anousha-nazari-mezzo-soprano-antoine-moriniere-guitar-19-11-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/793643",
+   "title": "Recital: Anousha Nazari (mezzo-soprano) &#038; Antoine Morinière (guitar) &#8211; 19.11.2026",
+   "description": "<p class=\"wp-block-paragraph\">Mezzo-soprano Anousha Nazari and guitarist Antoine Morinière present <strong><em>Baroque Labyrinth</em></strong> – an unusually intimate recital in which European early music meets the Persi",
+   "slug": "recital-anousha-nazari-mezzo-soprano-antoine-moriniere-guitar-19-11-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/11/pharosnew.jpg"
+   },
+   "all_day": false,
+   "start_date": "2026-11-19 20:30:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "19",
+    "hour": "20",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "end_date": "2026-11-19 22:00:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "19",
+    "hour": "22",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-11-19 18:30:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "19",
+    "hour": "18",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-11-19 20:00:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "19",
+    "hour": "20",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "€20 – €25",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "20",
+     "25"
+    ]
+   },
+   "website": "https://pharosartsfoundation.org/event/recital-anousha-nazari-mezzo-soprano-antoine-morinire-guitar/",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Cultural",
+     "slug": "cultural",
+     "term_group": 0,
+     "term_taxonomy_id": 6699,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 88,
+     "filter": "raw",
+     "id": 6699,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6699",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    },
+    {
+     "name": "Music",
+     "slug": "music",
+     "term_group": 0,
+     "term_taxonomy_id": 6719,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6699,
+     "count": 232,
+     "filter": "raw",
+     "id": 6719,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6719",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6699"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 494085,
+    "author": "3508",
+    "status": "publish",
+    "date": "2015-12-29 14:37:24",
+    "date_utc": "2015-12-29 14:37:24",
+    "modified": "2015-12-29 14:37:24",
+    "modified_utc": "2015-12-29 14:37:24",
+    "url": "https://www.visitcyprus.com/venue/the-shoe-factory/",
+    "venue": "The Shoe Factory",
+    "slug": "the-shoe-factory",
+    "address": "304 Ermou, Nicosia, 01 ",
+    "city": "Nicosia",
+    "country": "Cyprus",
+    "stateprovince": "state",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=494085",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=494085"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 740744,
+     "author": "4191",
+     "status": "publish",
+     "date": "2025-05-14 13:20:06",
+     "date_utc": "2025-05-14 10:20:06",
+     "modified": "2025-05-14 13:20:06",
+     "modified_utc": "2025-05-14 10:20:06",
+     "url": "https://www.visitcyprus.com/organizer/pharos-arts-foundation/",
+     "organizer": "Pharos Arts Foundation",
+     "slug": "pharos-arts-foundation",
+     "phone": "+357 22663871",
+     "website": "https://pharosartsfoundation.org/",
+     "email": "info@pharosartsfoundation.org",
+     "global_id": "www.visitcyprus.com?id=740744",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=740744"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 793500,
+   "global_id": "www.visitcyprus.com?id=793500",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-10-23 12:20:01",
+   "date_utc": "2026-10-23 09:20:01",
+   "modified": "2026-10-23 12:20:01",
+   "modified_utc": "2026-10-23 09:20:01",
+   "url": "https://www.visitcyprus.com/event/cyprus-symphony-orchestra-starlight-2-works-by-barber-and-tchaikovsky-celebrating-20-years-of-cyprus-symphony-orchestra-foundation-20-11-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/793500",
+   "title": "CYPRUS SYMPHONY ORCHESTRA &#8211; STARLIGHT 2 &#8211; Works by Barber and Tchaikovsky &#8211; Celebrating 20 years of Cyprus Symphony Orchestra Foundation &#8211;  20.11.2026",
+   "description": "<p><strong>Celebrating 20 years of Cyprus Symphony Orchestra Foundation</strong></p>\n<p><strong>Lemesos: Friday 20 November 2026 </strong>&#8211; Pattihio Municipal Theatre, 20:30</p>\n<p>The Cyprus Symphony Orchestra is ",
+   "slug": "cyprus-symphony-orchestra-starlight-2-works-by-barber-and-tchaikovsky-celebrating-20-years-of-cyprus-symphony-orchestra-foundation-20-11-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/10/CYSO_19.11.2026.jpg"
+   },
+   "all_day": false,
+   "start_date": "2026-11-20 20:30:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "20",
+    "hour": "20",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "end_date": "2026-11-20 22:00:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "20",
+    "hour": "22",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-11-20 18:30:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "20",
+    "hour": "18",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-11-20 20:00:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "20",
+    "hour": "20",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "€12 – €25",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "12",
+     "15.",
+     "17",
+     "18.",
+     "20",
+     "25"
+    ]
+   },
+   "website": "https://www.cyso.org.cy",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Cultural",
+     "slug": "cultural",
+     "term_group": 0,
+     "term_taxonomy_id": 6699,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 88,
+     "filter": "raw",
+     "id": 6699,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6699",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    },
+    {
+     "name": "Music",
+     "slug": "music",
+     "term_group": 0,
+     "term_taxonomy_id": 6719,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6699,
+     "count": 232,
+     "filter": "raw",
+     "id": 6719,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6719",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6699"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 635904,
+    "author": "4191",
+    "status": "publish",
+    "date": "2024-12-02 12:11:37",
+    "date_utc": "2024-12-02 12:11:37",
+    "modified": "2024-12-02 12:11:37",
+    "modified_utc": "2024-12-02 12:11:37",
+    "url": "https://www.visitcyprus.com/venue/pattihio-municipal-theatre/",
+    "venue": "Pattihio Municipal Theatre",
+    "slug": "pattihio-municipal-theatre",
+    "address": "Agias Zonis 4",
+    "city": "Limassol",
+    "country": "Cyprus",
+    "zip": "3031",
+    "phone": "25 377277",
+    "website": "https://www.pattihio.com.cy/",
+    "show_map": false,
+    "show_map_link": false,
+    "global_id": "www.visitcyprus.com?id=635904",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=635904"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 559682,
+     "author": "4191",
+     "status": "publish",
+     "date": "2024-10-09 05:16:16",
+     "date_utc": "2024-10-09 05:16:16",
+     "modified": "2024-10-09 05:16:16",
+     "modified_utc": "2024-10-09 05:16:16",
+     "url": "https://www.visitcyprus.com/organizer/cyprus-symphony-orchestra/",
+     "organizer": "Cyprus Symphony Orchestra",
+     "slug": "cyprus-symphony-orchestra",
+     "phone": "+357 22 463144",
+     "website": "https://www.cyso.org.cy/",
+     "email": "info@cyso.org.cy",
+     "global_id": "www.visitcyprus.com?id=559682",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=559682"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 787362,
+   "global_id": "www.visitcyprus.com?id=787362",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-06-03 08:39:47",
+   "date_utc": "2026-06-03 05:39:47",
+   "modified": "2026-06-03 08:46:07",
+   "modified_utc": "2026-06-03 05:46:07",
+   "url": "https://www.visitcyprus.com/event/teu16-tennis-europe-u16-23-29-11-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/787362",
+   "title": "TEU16 (Tennis Europe U16) &#8211; 23-29.11.2026",
+   "description": "<p>European tennis tournament for athletes under 16 years old. It is expected to have approximately 100 athletes, coaches and parents.</p>\n<p>It is a large-scale event that will offer significant exposure and visibility ",
+   "slug": "teu16-tennis-europe-u16-23-29-11-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/06/famagusta.jpg"
+   },
+   "all_day": true,
+   "start_date": "2026-11-23 00:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "23",
+    "hour": "00",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-11-29 23:59:59",
+   "end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "29",
+    "hour": "23",
+    "minutes": "59",
+    "seconds": "59"
+   },
+   "utc_start_date": "2026-11-22 22:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "22",
+    "hour": "22",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-11-29 21:59:59",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "29",
+    "hour": "21",
+    "minutes": "59",
+    "seconds": "59"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "Free",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "free"
+    ]
+   },
+   "website": "www.famagustatc.com",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    },
+    {
+     "name": "Tennis",
+     "slug": "tennis",
+     "term_group": 0,
+     "term_taxonomy_id": 7337,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 3,
+     "filter": "raw",
+     "id": 7337,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/7337",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 787363,
+    "author": "4191",
+    "status": "publish",
+    "date": "2026-06-03 08:24:42",
+    "date_utc": "0000-00-00 00:00:00",
+    "modified": "2026-06-03 08:24:42",
+    "modified_utc": "0000-00-00 00:00:00",
+    "url": "https://www.visitcyprus.com/venue/famagusta-tennis-club/",
+    "venue": "Famagusta Tennis Club",
+    "slug": "famagusta-tennis-club",
+    "address": "3 Mesaorias Str",
+    "city": "Limassol",
+    "zip": "3071",
+    "phone": "+357 25335952",
+    "website": "https://www.famagustatc.com",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=787363",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=787363"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 787364,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-06-03 08:24:43",
+     "date_utc": "0000-00-00 00:00:00",
+     "modified": "2026-06-03 08:24:43",
+     "modified_utc": "0000-00-00 00:00:00",
+     "url": "https://www.visitcyprus.com/organizer/famagusta-tennis-club/",
+     "organizer": "Famagusta Tennis Club",
+     "slug": "famagusta-tennis-club",
+     "phone": "+357 25335952",
+     "website": "https://www.tenniseurope.org",
+     "email": "info@famagustatc.com",
+     "global_id": "www.visitcyprus.com?id=787364",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=787364"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 784975,
+   "global_id": "www.visitcyprus.com?id=784975",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-03-24 14:06:52",
+   "date_utc": "2026-03-24 12:06:52",
+   "modified": "2026-03-24 14:06:52",
+   "modified_utc": "2026-03-24 12:06:52",
+   "url": "https://www.visitcyprus.com/event/leptos-cyprus-international-4-day-challenge-26-29-11-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/784975",
+   "title": "Leptos Cyprus International 4-day Challenge &#8211; 26-29.11.2026",
+   "description": "<p>The “Leptos Cyprus International 4-day Challenge” is a staged running event, successfully combining a 6k time trial, an 11k mountain trail run, a multiterrain half marathon, and a 10k City Run over four consecutive da",
+   "slug": "leptos-cyprus-international-4-day-challenge-26-29-11-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/03/Paphos-LEPTOS.jpg"
+   },
+   "all_day": true,
+   "start_date": "2026-11-26 00:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "26",
+    "hour": "00",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-11-29 23:59:59",
+   "end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "29",
+    "hour": "23",
+    "minutes": "59",
+    "seconds": "59"
+   },
+   "utc_start_date": "2026-11-25 22:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "25",
+    "hour": "22",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-11-29 21:59:59",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "11",
+    "day": "29",
+    "hour": "21",
+    "minutes": "59",
+    "seconds": "59"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "€10",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "10",
+     "58.00",
+     "215.00"
+    ]
+   },
+   "website": "https://www.arena-sports.com ",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Running",
+     "slug": "running",
+     "term_group": 0,
+     "term_taxonomy_id": 6875,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 11,
+     "filter": "raw",
+     "id": 6875,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6875",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 651091,
+    "author": "4191",
+    "status": "publish",
+    "date": "2025-02-07 09:06:53",
+    "date_utc": "2025-02-07 09:06:53",
+    "modified": "2025-02-07 09:06:53",
+    "modified_utc": "2025-02-07 09:06:53",
+    "url": "https://www.visitcyprus.com/venue/arena-sports/",
+    "venue": "Arena Sports",
+    "slug": "arena-sports",
+    "address": "Coral Bay",
+    "city": "Paphos",
+    "country": "Cyprus",
+    "zip": "8099",
+    "phone": "+357 26880877",
+    "website": "https://www.cypruschallenge.com",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=651091",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=651091"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 651092,
+     "author": "4191",
+     "status": "publish",
+     "date": "2025-02-07 09:06:54",
+     "date_utc": "2025-02-07 09:06:54",
+     "modified": "2025-02-07 09:06:54",
+     "modified_utc": "2025-02-07 09:06:54",
+     "url": "https://www.visitcyprus.com/organizer/arena-sports/",
+     "organizer": "Arena Sports",
+     "slug": "arena-sports",
+     "phone": "+357 26880877 / 878",
+     "website": "http://www.arena-sports.com/",
+     "email": "info@arena.com.cy",
+     "global_id": "www.visitcyprus.com?id=651092",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=651092"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 793550,
+   "global_id": "www.visitcyprus.com?id=793550",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-10-30 15:10:39",
+   "date_utc": "2026-10-30 13:10:39",
+   "modified": "2026-10-30 15:10:39",
+   "modified_utc": "2026-10-30 13:10:39",
+   "url": "https://www.visitcyprus.com/event/33rd-shore-angling-world-championship-for-clubs-7-11-12-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/793550",
+   "title": "33rd Shore Angling World Championship for Clubs &#8211; 7-11.12.2026",
+   "description": "<p><span lang=\"EN-US\">The Cyprus Sport Fishing Federation is organising the 33rd Shore Angling World Championship for Clubs, which will take place in Cyprus from 5 to 12 December 2026, welcoming athletes and teams from v",
+   "slug": "33rd-shore-angling-world-championship-for-clubs-7-11-12-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/10/shore-angling.jpg"
+   },
+   "all_day": false,
+   "start_date": "2026-12-07 10:00:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "12",
+    "day": "07",
+    "hour": "10",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2026-12-11 14:00:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "12",
+    "day": "11",
+    "hour": "14",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-12-07 08:00:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "12",
+    "day": "07",
+    "hour": "08",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-12-11 12:00:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "12",
+    "day": "11",
+    "hour": "12",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "free",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "free"
+    ]
+   },
+   "website": "https://www.facebook.com/CyprusFederationSportsFishingsea?utm_source=chatgpt.com",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Angling/Fishing",
+     "slug": "angling-fishing",
+     "term_group": 0,
+     "term_taxonomy_id": 6833,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 1,
+     "filter": "raw",
+     "id": 6833,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6833",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 793551,
+    "author": "4191",
+    "status": "publish",
+    "date": "2026-10-30 15:04:44",
+    "date_utc": "0000-00-00 00:00:00",
+    "modified": "2026-10-30 15:04:44",
+    "modified_utc": "0000-00-00 00:00:00",
+    "url": "https://www.visitcyprus.com/venue/ladys-mile-beach/",
+    "venue": "Lady&#8217;s Mile Beach",
+    "slug": "ladys-mile-beach",
+    "address": "Limassol",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=793551",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=793551"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 793552,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-10-30 15:04:45",
+     "date_utc": "0000-00-00 00:00:00",
+     "modified": "2026-10-30 15:04:45",
+     "modified_utc": "0000-00-00 00:00:00",
+     "url": "https://www.visitcyprus.com/organizer/christos-kitsios/",
+     "organizer": "CHRISTOS KITSIOS",
+     "slug": "christos-kitsios",
+     "phone": "+357 99550136",
+     "email": "cyprus.f.s.f.s@gmail.com",
+     "global_id": "www.visitcyprus.com?id=793552",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=793552"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 793747,
+   "global_id": "www.visitcyprus.com?id=793747",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-11-04 09:42:33",
+   "date_utc": "2026-11-04 07:42:33",
+   "modified": "2026-11-04 09:42:33",
+   "modified_utc": "2026-11-04 07:42:33",
+   "url": "https://www.visitcyprus.com/event/cyprus-youth-symphony-orchestra-la-traviata-9-10-december-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/793747",
+   "title": "Cyprus Youth Symphony Orchestra LA TRAVIATA &#8211; 9-10 December 2026",
+   "description": "<p><strong>LA TRAVIATA </strong>Giuseppe Verdi</p>\n<p><strong><em>Celebrating 20 years of Cyprus Symphony Orchestra Foundation</em></strong></p>\n<p>One of the most moving operas of the Romantic repertoire, Giuseppe Verdi",
+   "slug": "cyprus-youth-symphony-orchestra-la-traviata-9-10-december-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/11/La-Traviata-image.jpg"
+   },
+   "all_day": false,
+   "start_date": "2026-12-09 19:30:00",
+   "start_date_details": {
+    "year": "2026",
+    "month": "12",
+    "day": "09",
+    "hour": "19",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "end_date": "2026-12-10 22:00:00",
+   "end_date_details": {
+    "year": "2026",
+    "month": "12",
+    "day": "10",
+    "hour": "22",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2026-12-09 17:30:00",
+   "utc_start_date_details": {
+    "year": "2026",
+    "month": "12",
+    "day": "09",
+    "hour": "17",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_end_date": "2026-12-10 20:00:00",
+   "utc_end_date_details": {
+    "year": "2026",
+    "month": "12",
+    "day": "10",
+    "hour": "20",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "€25 – €35",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "25",
+     "35"
+    ]
+   },
+   "website": "https://www.cyso.org.cy",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Cultural",
+     "slug": "cultural",
+     "term_group": 0,
+     "term_taxonomy_id": 6699,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 88,
+     "filter": "raw",
+     "id": 6699,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6699",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    },
+    {
+     "name": "Musical/opera",
+     "slug": "musical-opera",
+     "term_group": 0,
+     "term_taxonomy_id": 6739,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6699,
+     "count": 10,
+     "filter": "raw",
+     "id": 6739,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6739",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6699"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 640262,
+    "author": "4191",
+    "status": "publish",
+    "date": "2025-01-22 07:27:00",
+    "date_utc": "2025-01-22 07:27:00",
+    "modified": "2025-01-22 07:27:00",
+    "modified_utc": "2025-01-22 07:27:00",
+    "url": "https://www.visitcyprus.com/venue/nicosia-municipal-theatre/",
+    "venue": "Nicosia Municipal Theatre",
+    "slug": "nicosia-municipal-theatre",
+    "address": "Mouseiou 4",
+    "city": "Lefkosia",
+    "country": "Cyprus",
+    "zip": "1097",
+    "phone": "+357 22 797979",
+    "website": "https://www.facebook.com/NicosiaMunicipalTheatre/",
+    "show_map": false,
+    "show_map_link": false,
+    "global_id": "www.visitcyprus.com?id=640262",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=640262"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 559682,
+     "author": "4191",
+     "status": "publish",
+     "date": "2024-10-09 05:16:16",
+     "date_utc": "2024-10-09 05:16:16",
+     "modified": "2024-10-09 05:16:16",
+     "modified_utc": "2024-10-09 05:16:16",
+     "url": "https://www.visitcyprus.com/organizer/cyprus-symphony-orchestra/",
+     "organizer": "Cyprus Symphony Orchestra",
+     "slug": "cyprus-symphony-orchestra",
+     "phone": "+357 22 463144",
+     "website": "https://www.cyso.org.cy/",
+     "email": "info@cyso.org.cy",
+     "global_id": "www.visitcyprus.com?id=559682",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=559682"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 785452,
+   "global_id": "www.visitcyprus.com?id=785452",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-04-02 14:51:36",
+   "date_utc": "2026-04-02 11:51:36",
+   "modified": "2026-04-02 14:51:36",
+   "modified_utc": "2026-04-02 11:51:36",
+   "url": "https://www.visitcyprus.com/event/kambos-mountain-race-17-1-2027/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/785452",
+   "title": "Kambos Mountain Race &#8211; 17.1.2027",
+   "description": "<p>Kambos Mountain Race is one of the most authentic and demanding mountain races in Cyprus, taking place in the mountainous area of Kambos tis Tsakistras, in the heart of the Paphos forest. The race combines technical t",
+   "slug": "kambos-mountain-race-17-1-2027",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/04/kambos-tsakistras.jpg"
+   },
+   "all_day": false,
+   "start_date": "2027-01-17 08:00:00",
+   "start_date_details": {
+    "year": "2027",
+    "month": "01",
+    "day": "17",
+    "hour": "08",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2027-01-17 14:30:00",
+   "end_date_details": {
+    "year": "2027",
+    "month": "01",
+    "day": "17",
+    "hour": "14",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_start_date": "2027-01-17 06:00:00",
+   "utc_start_date_details": {
+    "year": "2027",
+    "month": "01",
+    "day": "17",
+    "hour": "06",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2027-01-17 12:30:00",
+   "utc_end_date_details": {
+    "year": "2027",
+    "month": "01",
+    "day": "17",
+    "hour": "12",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "€18",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "18"
+    ]
+   },
+   "website": "www.kambosmountainrace.com ",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Running",
+     "slug": "running",
+     "term_group": 0,
+     "term_taxonomy_id": 6875,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 11,
+     "filter": "raw",
+     "id": 6875,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6875",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 785459,
+    "author": "4191",
+    "status": "publish",
+    "date": "2026-04-02 14:51:38",
+    "date_utc": "2026-04-02 11:51:38",
+    "modified": "2026-04-02 14:51:38",
+    "modified_utc": "2026-04-02 11:51:38",
+    "url": "https://www.visitcyprus.com/venue/kambos-tis-tsakistras/",
+    "venue": "Kambos tis Tsakistras",
+    "slug": "kambos-tis-tsakistras",
+    "address": "Kambos tis Tsakistras",
+    "country": "Cyprus",
+    "province": "Kambos",
+    "zip": "2863",
+    "phone": "+357 99 693069",
+    "website": "https://www.kambosmountainrace.com",
+    "stateprovince": "Kambos",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=785459",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=785459"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 785405,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-04-02 14:21:21",
+     "date_utc": "2026-04-02 11:21:21",
+     "modified": "2026-04-02 14:21:21",
+     "modified_utc": "2026-04-02 11:21:21",
+     "url": "https://www.visitcyprus.com/organizer/s-body-and-mind-productions-ltd/",
+     "organizer": "S BODY AND MIND PRODUCTIONS LTD",
+     "slug": "s-body-and-mind-productions-ltd",
+     "phone": "+357 99693069",
+     "website": "https://www.sas-sports.com",
+     "email": "sotirismavros@gmail.com",
+     "global_id": "www.visitcyprus.com?id=785405",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=785405"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 787416,
+   "global_id": "www.visitcyprus.com?id=787416",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-06-03 09:17:26",
+   "date_utc": "2026-06-03 06:17:26",
+   "modified": "2026-06-03 09:17:41",
+   "modified_utc": "2026-06-03 06:17:41",
+   "url": "https://www.visitcyprus.com/event/bank-of-cyprus-nicosia-marathon-24-1-2027/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/787416",
+   "title": "Bank of Cyprus Nicosia Marathon &#8211; 24.1.2027",
+   "description": "<p>The Bank of Cyprus Nicosia Marathon is the official marathon of Cyprus’ capital city and one of the island’s leading sporting events. Held annually in Nicosia, the event attracts thousands of runners and visitors from",
+   "slug": "bank-of-cyprus-nicosia-marathon-24-1-2027",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/06/nicosia-marathon.jpg"
+   },
+   "all_day": false,
+   "start_date": "2027-01-24 06:45:00",
+   "start_date_details": {
+    "year": "2027",
+    "month": "01",
+    "day": "24",
+    "hour": "06",
+    "minutes": "45",
+    "seconds": "00"
+   },
+   "end_date": "2027-01-24 13:00:00",
+   "end_date_details": {
+    "year": "2027",
+    "month": "01",
+    "day": "24",
+    "hour": "13",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2027-01-24 04:45:00",
+   "utc_start_date_details": {
+    "year": "2027",
+    "month": "01",
+    "day": "24",
+    "hour": "04",
+    "minutes": "45",
+    "seconds": "00"
+   },
+   "utc_end_date": "2027-01-24 11:00:00",
+   "utc_end_date_details": {
+    "year": "2027",
+    "month": "01",
+    "day": "24",
+    "hour": "11",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "€17.5 – €65",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "17.5",
+     "65"
+    ]
+   },
+   "website": "https://www.elevenblueevents.com ",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Running",
+     "slug": "running",
+     "term_group": 0,
+     "term_taxonomy_id": 6875,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 11,
+     "filter": "raw",
+     "id": 6875,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6875",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 787423,
+    "author": "4191",
+    "status": "publish",
+    "date": "2026-06-03 09:17:26",
+    "date_utc": "2026-06-03 06:17:26",
+    "modified": "2026-06-03 09:17:26",
+    "modified_utc": "2026-06-03 06:17:26",
+    "url": "https://www.visitcyprus.com/venue/tba/",
+    "venue": "TBA",
+    "slug": "tba",
+    "phone": "+357 7005 0123",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=787423",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=787423"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 787409,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-06-03 09:06:56",
+     "date_utc": "2026-06-03 06:06:56",
+     "modified": "2026-06-03 09:06:56",
+     "modified_utc": "2026-06-03 06:06:56",
+     "url": "https://www.visitcyprus.com/organizer/eleven-blue-events/",
+     "organizer": "Eleven Blue Events",
+     "slug": "eleven-blue-events",
+     "phone": "+357 7005 0123",
+     "website": "https://www.elevenblueevents.com",
+     "email": "info@elevenblueevents.com",
+     "global_id": "www.visitcyprus.com?id=787409",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=787409"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 794071,
+   "global_id": "www.visitcyprus.com?id=794071",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-11-06 13:39:47",
+   "date_utc": "2026-11-06 11:39:47",
+   "modified": "2026-11-06 13:39:47",
+   "modified_utc": "2026-11-06 11:39:47",
+   "url": "https://www.visitcyprus.com/event/tui-cyprus-marathon-27-28-2-2026/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/794071",
+   "title": "TUI Cyprus Marathon &#8211; 27-28.2.2026",
+   "description": "<p>Set against the timeless beauty of Paphos, the TUI Cyprus Marathon invites runners to trace the footsteps of legend. First held in 1999, this prestigious event celebrates endurance and heritage<br />\nalong one of the ",
+   "slug": "tui-cyprus-marathon-27-28-2-2026",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/11/tui-marathon.jpg"
+   },
+   "all_day": true,
+   "start_date": "2027-02-27 00:00:00",
+   "start_date_details": {
+    "year": "2027",
+    "month": "02",
+    "day": "27",
+    "hour": "00",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2027-02-28 23:59:59",
+   "end_date_details": {
+    "year": "2027",
+    "month": "02",
+    "day": "28",
+    "hour": "23",
+    "minutes": "59",
+    "seconds": "59"
+   },
+   "utc_start_date": "2027-02-26 22:00:00",
+   "utc_start_date_details": {
+    "year": "2027",
+    "month": "02",
+    "day": "26",
+    "hour": "22",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2027-02-28 21:59:59",
+   "utc_end_date_details": {
+    "year": "2027",
+    "month": "02",
+    "day": "28",
+    "hour": "21",
+    "minutes": "59",
+    "seconds": "59"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "Free",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "20.00",
+     "70.00"
+    ]
+   },
+   "website": "https://www.tuicyprusmarathon.com",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Running",
+     "slug": "running",
+     "term_group": 0,
+     "term_taxonomy_id": 6875,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 11,
+     "filter": "raw",
+     "id": 6875,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6875",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 794084,
+    "author": "4191",
+    "status": "publish",
+    "date": "2026-11-06 13:39:47",
+    "date_utc": "2026-11-06 11:39:47",
+    "modified": "2026-11-06 13:39:47",
+    "modified_utc": "2026-11-06 11:39:47",
+    "url": "https://www.visitcyprus.com/venue/marathon-expo-organisers-office-en-plo-exhibition-hall-pafos-castle/",
+    "venue": "Marathon Expo (Organisers Office) – “En Plo” Exhibition Hall – Pafos Castle",
+    "slug": "marathon-expo-organisers-office-en-plo-exhibition-hall-pafos-castle",
+    "address": "https://maps.app.goo.gl/EFxhRDfBp9Zt9CKK6",
+    "city": "Paphos",
+    "country": "Cyprus",
+    "phone": "+357 99788929",
+    "website": "https://www.tuicyprusmarathon.com",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=794084",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=794084"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 793725,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-11-04 08:36:09",
+     "date_utc": "2026-11-04 06:36:09",
+     "modified": "2026-11-04 08:36:09",
+     "modified_utc": "2026-11-04 06:36:09",
+     "url": "https://www.visitcyprus.com/organizer/running-in-cyprus/",
+     "organizer": "Running in Cyprus",
+     "slug": "running-in-cyprus",
+     "phone": "+357 99436826",
+     "website": "https://www.cyprusmarathon.com/wine-run",
+     "email": "skakourides@gmail.com",
+     "global_id": "www.visitcyprus.com?id=793725",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=793725"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 793706,
+   "global_id": "www.visitcyprus.com?id=793706",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-11-04 08:36:09",
+   "date_utc": "2026-11-04 06:36:09",
+   "modified": "2026-11-04 08:36:09",
+   "modified_utc": "2026-11-04 06:36:09",
+   "url": "https://www.visitcyprus.com/event/cyprus-wine-run-2-3-2027/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/793706",
+   "title": "Cyprus Wine Run &#8211; 2.3.2027",
+   "description": "<p>Join us for an unforgettable journey through the heart of Cyprus’ wine country at the Cyprus Wine Run.</p>\n<p>We’re taking the scenic roads and vineyards of Letymbou, nestled in the Paphos District. The event is set t",
+   "slug": "cyprus-wine-run-2-3-2027",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/11/Cyprus-Wine-Run.jpg"
+   },
+   "all_day": false,
+   "start_date": "2027-03-02 10:00:00",
+   "start_date_details": {
+    "year": "2027",
+    "month": "03",
+    "day": "02",
+    "hour": "10",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2027-03-02 12:30:00",
+   "end_date_details": {
+    "year": "2027",
+    "month": "03",
+    "day": "02",
+    "hour": "12",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "utc_start_date": "2027-03-02 08:00:00",
+   "utc_start_date_details": {
+    "year": "2027",
+    "month": "03",
+    "day": "02",
+    "hour": "08",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2027-03-02 10:30:00",
+   "utc_end_date_details": {
+    "year": "2027",
+    "month": "03",
+    "day": "02",
+    "hour": "10",
+    "minutes": "30",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "€55,00",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "55.00"
+    ]
+   },
+   "website": "www.cyprusmarathon.com/wine-run",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Running",
+     "slug": "running",
+     "term_group": 0,
+     "term_taxonomy_id": 6875,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 11,
+     "filter": "raw",
+     "id": 6875,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6875",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 749185,
+    "author": "4191",
+    "status": "publish",
+    "date": "2025-07-14 08:07:34",
+    "date_utc": "2025-07-14 05:07:34",
+    "modified": "2025-07-14 08:07:34",
+    "modified_utc": "2025-07-14 05:07:34",
+    "url": "https://www.visitcyprus.com/venue/letymbou-cultural-centre/",
+    "venue": "LETYMBOU CULTURAL CENTRE",
+    "slug": "letymbou-cultural-centre",
+    "address": "Letymbou",
+    "city": "Paphos",
+    "country": "Cyprus",
+    "zip": "8546",
+    "phone": "+357 99814149 / +357 99675288",
+    "website": "https://www.facebook.com/events/1411558107844038",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=749185",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=749185"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 793725,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-11-04 08:36:09",
+     "date_utc": "2026-11-04 06:36:09",
+     "modified": "2026-11-04 08:36:09",
+     "modified_utc": "2026-11-04 06:36:09",
+     "url": "https://www.visitcyprus.com/organizer/running-in-cyprus/",
+     "organizer": "Running in Cyprus",
+     "slug": "running-in-cyprus",
+     "phone": "+357 99436826",
+     "website": "https://www.cyprusmarathon.com/wine-run",
+     "email": "skakourides@gmail.com",
+     "global_id": "www.visitcyprus.com?id=793725",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=793725"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 785015,
+   "global_id": "www.visitcyprus.com?id=785015",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-03-26 07:55:12",
+   "date_utc": "2026-03-26 05:55:12",
+   "modified": "2026-03-26 07:55:12",
+   "modified_utc": "2026-03-26 05:55:12",
+   "url": "https://www.visitcyprus.com/event/cyprus-backyard-ultra-13-3-2027/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/785015",
+   "title": "Cyprus Backyard Ultra &#8211; 13.3.2027",
+   "description": "<p>Cyprus Backyard Ultra (CBU) is the island’s only official Backyard Ultra endurance race and <strong>the only ultramarathon event of its kind in Cyprus</strong>, held annually in the Larnaca region. The race follows th",
+   "slug": "cyprus-backyard-ultra-13-3-2027",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/03/cyprus-backyard-ultra.jpg"
+   },
+   "all_day": false,
+   "start_date": "2027-03-13 10:00:00",
+   "start_date_details": {
+    "year": "2027",
+    "month": "03",
+    "day": "13",
+    "hour": "10",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2027-03-13 22:00:00",
+   "end_date_details": {
+    "year": "2027",
+    "month": "03",
+    "day": "13",
+    "hour": "22",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2027-03-13 08:00:00",
+   "utc_start_date_details": {
+    "year": "2027",
+    "month": "03",
+    "day": "13",
+    "hour": "08",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2027-03-13 20:00:00",
+   "utc_end_date_details": {
+    "year": "2027",
+    "month": "03",
+    "day": "13",
+    "hour": "20",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EET",
+   "cost": "€50 – €65",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "50",
+     "65"
+    ]
+   },
+   "website": "https://cyprusbackyardultra.com/",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Running",
+     "slug": "running",
+     "term_group": 0,
+     "term_taxonomy_id": 6875,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 11,
+     "filter": "raw",
+     "id": 6875,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6875",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 715000,
+    "author": "4191",
+    "status": "publish",
+    "date": "2025-03-20 07:13:11",
+    "date_utc": "2025-03-20 07:13:11",
+    "modified": "2025-03-20 07:13:11",
+    "modified_utc": "2025-03-20 07:13:11",
+    "url": "https://www.visitcyprus.com/venue/oroklini-picnic-area/",
+    "venue": "Oroklini Picnic Area",
+    "slug": "oroklini-picnic-area",
+    "address": "Oroklini picknic area",
+    "city": "Larnaka",
+    "country": "Cyprus",
+    "province": "Oroklini",
+    "phone": "+357 99468887",
+    "website": "https://cyprusbackyardultra.com/ https://bigsbackyardultra.com/races/cyprus-backyard-ultra/",
+    "stateprovince": "Oroklini",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=715000",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=715000"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 715001,
+     "author": "4191",
+     "status": "publish",
+     "date": "2025-03-20 07:13:12",
+     "date_utc": "2025-03-20 07:13:12",
+     "modified": "2025-03-20 07:13:12",
+     "modified_utc": "2025-03-20 07:13:12",
+     "url": "https://www.visitcyprus.com/organizer/nicolas-aristokleous/",
+     "organizer": "Nicolas Aristokleous",
+     "slug": "nicolas-aristokleous",
+     "phone": "+357 99 468887",
+     "website": "https://www.cyprusbackyardultra.com/",
+     "email": "cyprus.backyard@gmail.com",
+     "global_id": "www.visitcyprus.com?id=715001",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=715001"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 787401,
+   "global_id": "www.visitcyprus.com?id=787401",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-06-03 09:06:56",
+   "date_utc": "2026-06-03 06:06:56",
+   "modified": "2026-06-03 09:06:56",
+   "modified_utc": "2026-06-03 06:06:56",
+   "url": "https://www.visitcyprus.com/event/xm-limassol-marathon-3-4-4-2027/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/787401",
+   "title": "XM Limassol Marathon &#8211; 3-4.4.2027",
+   "description": "<p>The XM Limassol Marathon is the largest road-running event in Cyprus and one of the most important sports tourism events in the Eastern Mediterranean. Held annually in the city of Limassol, the event attracts thousand",
+   "slug": "xm-limassol-marathon-3-4-4-2027",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/06/xml-marathon.jpg"
+   },
+   "all_day": false,
+   "start_date": "2027-04-03 07:15:00",
+   "start_date_details": {
+    "year": "2027",
+    "month": "04",
+    "day": "03",
+    "hour": "07",
+    "minutes": "15",
+    "seconds": "00"
+   },
+   "end_date": "2027-04-04 13:15:00",
+   "end_date_details": {
+    "year": "2027",
+    "month": "04",
+    "day": "04",
+    "hour": "13",
+    "minutes": "15",
+    "seconds": "00"
+   },
+   "utc_start_date": "2027-04-03 04:15:00",
+   "utc_start_date_details": {
+    "year": "2027",
+    "month": "04",
+    "day": "03",
+    "hour": "04",
+    "minutes": "15",
+    "seconds": "00"
+   },
+   "utc_end_date": "2027-04-04 10:15:00",
+   "utc_end_date_details": {
+    "year": "2027",
+    "month": "04",
+    "day": "04",
+    "hour": "10",
+    "minutes": "15",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EEST",
+   "cost": "€20 – €70",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "20",
+     "70"
+    ]
+   },
+   "website": "https://www.limassolmarathon.com",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Running",
+     "slug": "running",
+     "term_group": 0,
+     "term_taxonomy_id": 6875,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 11,
+     "filter": "raw",
+     "id": 6875,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6875",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 787408,
+    "author": "4191",
+    "status": "publish",
+    "date": "2026-06-03 09:06:56",
+    "date_utc": "2026-06-03 06:06:56",
+    "modified": "2026-06-03 09:06:56",
+    "modified_utc": "2026-06-03 06:06:56",
+    "url": "https://www.visitcyprus.com/venue/molos-limassol/",
+    "venue": "Molos, Limassol",
+    "slug": "molos-limassol",
+    "address": "Limassol Molos Seafront Promenade",
+    "city": "Limassol",
+    "country": "Cyprus",
+    "zip": "3036",
+    "phone": "+357 7005 0123",
+    "website": "https://www.limassolmarathon.com",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=787408",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=787408"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 787409,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-06-03 09:06:56",
+     "date_utc": "2026-06-03 06:06:56",
+     "modified": "2026-06-03 09:06:56",
+     "modified_utc": "2026-06-03 06:06:56",
+     "url": "https://www.visitcyprus.com/organizer/eleven-blue-events/",
+     "organizer": "Eleven Blue Events",
+     "slug": "eleven-blue-events",
+     "phone": "+357 7005 0123",
+     "website": "https://www.elevenblueevents.com",
+     "email": "info@elevenblueevents.com",
+     "global_id": "www.visitcyprus.com?id=787409",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=787409"
+     ]
+    }
+   ]
+  },
+  {
+   "id": 788314,
+   "global_id": "www.visitcyprus.com?id=788314",
+   "author": "4191",
+   "status": "publish",
+   "date": "2026-07-13 08:25:38",
+   "date_utc": "2026-07-13 05:25:38",
+   "modified": "2026-07-13 08:25:38",
+   "modified_utc": "2026-07-13 05:25:38",
+   "url": "https://www.visitcyprus.com/event/mcdonalds-ayia-napa-international-youth-soccer-festival-2027-24-29-4-2027/",
+   "rest_url": "https://www.visitcyprus.com/wp-json/tribe/events/v1/events/788314",
+   "title": "McDonald’s Ayia Napa International Youth Soccer Festival 2027 &#8211; 24-29.4.2027",
+   "description": "<p>We would like to invite your team to participate in the Ayia Napa International Youth Soccer Festival in a venue that can only be described as one of the most famous soccer activities in Cyprus and one of the biggest ",
+   "slug": "mcdonalds-ayia-napa-international-youth-soccer-festival-2027-24-29-4-2027",
+   "image": {
+    "url": "https://www.visitcyprus.com/wp-content/uploads/2026/07/ayia-napa-youth-soccer-festival.jpg"
+   },
+   "all_day": false,
+   "start_date": "2027-04-24 09:00:00",
+   "start_date_details": {
+    "year": "2027",
+    "month": "04",
+    "day": "24",
+    "hour": "09",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "end_date": "2027-04-29 19:00:00",
+   "end_date_details": {
+    "year": "2027",
+    "month": "04",
+    "day": "29",
+    "hour": "19",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_start_date": "2027-04-24 06:00:00",
+   "utc_start_date_details": {
+    "year": "2027",
+    "month": "04",
+    "day": "24",
+    "hour": "06",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "utc_end_date": "2027-04-29 16:00:00",
+   "utc_end_date_details": {
+    "year": "2027",
+    "month": "04",
+    "day": "29",
+    "hour": "16",
+    "minutes": "00",
+    "seconds": "00"
+   },
+   "timezone": "Asia/Nicosia",
+   "timezone_abbr": "EEST",
+   "cost": "free",
+   "cost_details": {
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "currency_position": "prefix",
+    "values": [
+     "free"
+    ]
+   },
+   "website": "www.ayianapasoccerfestival.com",
+   "show_map": false,
+   "show_map_link": true,
+   "hide_from_listings": false,
+   "sticky": false,
+   "featured": false,
+   "categories": [
+    {
+     "name": "Football",
+     "slug": "football",
+     "term_group": 0,
+     "term_taxonomy_id": 6838,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 6704,
+     "count": 6,
+     "filter": "raw",
+     "id": 6838,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6838",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories",
+      "up": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704"
+     }
+    },
+    {
+     "name": "Sports",
+     "slug": "sports",
+     "term_group": 0,
+     "term_taxonomy_id": 6704,
+     "taxonomy": "tribe_events_cat",
+     "description": "",
+     "parent": 0,
+     "count": 61,
+     "filter": "raw",
+     "id": 6704,
+     "urls": {
+      "self": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories/6704",
+      "collection": "https://www.visitcyprus.com/wp-json/tribe/events/v1/categories"
+     }
+    }
+   ],
+   "tags": [],
+   "venue": {
+    "id": 782946,
+    "author": "4191",
+    "status": "publish",
+    "date": "2026-02-04 07:57:25",
+    "date_utc": "0000-00-00 00:00:00",
+    "modified": "2026-02-04 07:57:25",
+    "modified_utc": "0000-00-00 00:00:00",
+    "url": "https://www.visitcyprus.com/venue/ayia-napa-municipality-sports-center/",
+    "venue": "AYIA NAPA MUNICIPALITY SPORTS CENTER",
+    "slug": "ayia-napa-municipality-sports-center",
+    "address": "Kokkines area",
+    "city": "Ayia Napa",
+    "country": "Cyprus",
+    "phone": "+357 23816300",
+    "website": "https://ayianapasoccerfestival.com/el/facilities",
+    "show_map": true,
+    "show_map_link": true,
+    "global_id": "www.visitcyprus.com?id=782946",
+    "global_id_lineage": [
+     "www.visitcyprus.com?id=782946"
+    ]
+   },
+   "organizer": [
+    {
+     "id": 782947,
+     "author": "4191",
+     "status": "publish",
+     "date": "2026-02-04 07:57:25",
+     "date_utc": "0000-00-00 00:00:00",
+     "modified": "2026-02-04 07:57:25",
+     "modified_utc": "0000-00-00 00:00:00",
+     "url": "https://www.visitcyprus.com/organizer/mcdonalds-ayia-napa-international-youth-soccer-festival/",
+     "organizer": "MCDONALD’S AYIA NAPA INTERNATIONAL YOUTH SOCCER FESTIVAL",
+     "slug": "mcdonalds-ayia-napa-international-youth-soccer-festival",
+     "phone": "+357 99596166",
+     "website": "https://www.facebook.com/AyiaNapaYouthSoccerFestival/https://www.instagram.com/ayianapayouthsoccerfestival/https://www.youtube.com/channel/UCwe5sDclvWm-saOKcKeJzwA",
+     "email": "soccerworldcyprus@cytanet.com.cy",
+     "global_id": "www.visitcyprus.com?id=782947",
+     "global_id_lineage": [
+      "www.visitcyprus.com?id=782947"
+     ]
+    }
+   ]
+  }
+ ],
+ "total": 18,
+ "total_pages": 1
+}

@@ -117,6 +117,8 @@ export interface PlaceDTO {
   website: string | null;
   hours: OpeningHoursDTO;
   priceLevel: number | null;
+  /** "source": a source states it (e.g. OSM fee=no). "typical": category is usually free (beaches, parks) — label accordingly. */
+  free: { isFree: boolean | null; basis: 'source' | 'typical' | null };
   rating: { average: number; count: number; source: 'passtra' } | null;
   ageMin: number | null;
   status: PlaceStatus;

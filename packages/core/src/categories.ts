@@ -147,6 +147,8 @@ export const CATEGORIES: CategoryDef[] = [
   c('tech-meetup', 'event', 'technology', 'chip', ['Tech & startups', 'Τεχνολογία & startups', 'Технологии и стартапы'],
     [['meetup', 'conference', 'hackathon', 'startup', 'summit', 'tech'], ['συνεδρι', 'χακαθον', 'νεοφυ'], ['митап', 'конференц', 'хакатон', 'стартап', 'саммит']],
     { visitMinutes: 180 }),
+  c('community-event', 'event', 'culture', 'calendar', ['Other events', 'Άλλες εκδηλώσεις', 'Другие события'],
+    [[], [], []], { visitMinutes: 120 }),
   c('wellness-event', 'event', 'wellness', 'lotus', ['Yoga & wellness', 'Γιόγκα & ευεξία', 'Йога и велнес'],
     [['yoga', 'retreat', 'meditation', 'breathwork', 'pilates'], ['γιογκα', 'διαλογισμ', 'πιλατες'], ['йог', 'ретрит', 'медитац', 'пилатес']],
     { visitMinutes: 90 }),
@@ -408,3 +410,17 @@ export const GROUP_KEYWORDS: Record<InterestGroup, Partial<Record<Locale, string
   wellness: { en: ['wellness', 'relax', 'self-care'], el: ['ευεξι', 'χαλαρωσ'], ru: ['релакс', 'расслаб', 'велнес'] },
   practical: { en: ['services', 'errands'], el: ['υπηρεσι'], ru: ['услуг', 'сервис'] },
 };
+
+/** Broad categories a user may search for, and the narrower categories they include. */
+export const CATEGORY_UMBRELLAS: Record<string, string[]> = {
+  concert: ['rock-metal', 'electronic', 'jazz-blues', 'classical', 'music-festival'],
+  festival: ['music-festival', 'food-festival'],
+  'sports-event': ['motorsport'],
+  theatre: ['dance', 'comedy'],
+  party: ['electronic'],
+};
+
+/** Expand umbrella categories ("concert" → also classical, jazz, rock …). */
+export function expandCategories(slugs: readonly string[]): string[] {
+  return [...new Set(slugs.flatMap((s) => [s, ...(CATEGORY_UMBRELLAS[s] ?? [])]))];
+}
