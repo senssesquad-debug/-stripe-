@@ -42,7 +42,7 @@
       "package": "app.passtra.android",
       "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#1769E8",
+        "backgroundColor": "#0009A9",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -99,11 +99,11 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#1769E8",
+          "backgroundColor": "#0009A9",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 120,
           "dark": {
-            "backgroundColor": "#0D47A1",
+            "backgroundColor": "#0009A9",
             "image": "./assets/images/splash-icon.png"
           }
         }

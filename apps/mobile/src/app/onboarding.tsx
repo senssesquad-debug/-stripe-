@@ -16,6 +16,9 @@ const INTEREST_ICON: Record<OnboardingInterest, Parameters<typeof Icon>[0]['name
   culture: 'bank-outline', family: 'human-male-female-child', adventure: 'compass-outline', technology: 'chip', art: 'palette-outline', other: 'dots-horizontal',
 };
 
+/** Background of the logo tile — the deep blue of the passtra logo (same as the app icon). */
+const LOGO_BLUE = '#0009A9';
+
 export default function Onboarding() {
   const th = useTheme();
   const { t } = useTranslation();
@@ -43,7 +46,7 @@ export default function Onboarding() {
         {step === 0 && (
           <>
             <View style={{ alignItems: 'flex-start', gap: 18, marginTop: 24 }}>
-              <View style={{ width: 72, height: 72, borderRadius: 20, backgroundColor: th.c.primary, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 72, height: 72, borderRadius: 20, overflow: 'hidden', backgroundColor: LOGO_BLUE, alignItems: 'center', justifyContent: 'center' }}>
                 <Image source={require('@/assets/images/splash-icon.png')} style={{ width: 72, height: 72 }} />
               </View>
               <Image source={require('@/assets/brand/wordmark-blue.png')} style={{ width: 160, height: 48, marginLeft: -26 }} contentFit="contain" tintColor={th.dark ? '#FFFFFF' : undefined} />
