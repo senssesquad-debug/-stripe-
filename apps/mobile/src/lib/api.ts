@@ -3,9 +3,14 @@ import { Platform } from 'react-native';
 import i18n from '@/i18n';
 import { getAccessToken } from './auth';
 
-/** API base: EXPO_PUBLIC_API_URL; Android emulator maps the host's localhost to 10.0.2.2. */
+/**
+ * API base: EXPO_PUBLIC_API_URL. "same-origin" (web only) calls the API on the page's own host,
+ * e.g. behind scripts/preview-server.mjs. Android emulator maps the host's localhost to 10.0.2.2.
+ */
 const fromEnv = process.env.EXPO_PUBLIC_API_URL;
-export const API_URL = (fromEnv && fromEnv.length ? fromEnv : Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080').replace(/\/$/, '');
+export const API_URL = fromEnv === 'same-origin'
+  ? ''
+  : (fromEnv && fromEnv.length ? fromEnv : Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080').replace(/\/$/, '');
 
 export class ApiError extends Error {
   constructor(public status: number, public code: string, message: string) {
