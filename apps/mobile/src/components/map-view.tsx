@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
-import MapView, { Marker, Polyline, type Region } from 'react-native-maps';
+import MapView, { Circle, Marker, Polyline, type Region } from 'react-native-maps';
 import { api, type MapMarker } from '@/lib/api';
 import { useTheme } from '@/theme';
 import { MarkerCard, type MapPanelProps } from './map-shared';
@@ -13,7 +13,7 @@ import { Button } from './ui';
  * Native map (Apple Maps on iOS, Google Maps SDK on Android) showing passtra's own markers
  * (OpenStreetMap places + events), a focused object and an in-app route. No Google Places content is placed on the map (EEA terms).
  */
-export function MapPanel({ center, filters, focus, route, bottomInset = 0 }: MapPanelProps) {
+export function MapPanel({ center, filters, focus, route, user, bottomInset = 0 }: MapPanelProps) {
   const th = useTheme();
   const { t } = useTranslation();
   const start = focus ?? center;
@@ -43,7 +43,8 @@ export function MapPanel({ center, filters, focus, route, bottomInset = 0 }: Map
             pinColor={m.type === 'event' ? th.c.primary : groupAccent.practical} accessibilityLabel={m.title} />
         ))}
         {focus ? <Marker coordinate={{ latitude: focus.lat, longitude: focus.lng }} title={focus.title} description={focus.subtitle ?? undefined} pinColor={th.c.primary} /> : null}
-        {route ? <Polyline coordinates={route.geometry.map(([lng, lat]) => ({ latitude: lat, longitude: lng }))} strokeColor={th.c.primary} strokeWidth={5} /> : null}
+        {route ? <Polyline coordinates={route.geometry.map(([lng, lat]) => ({ latitude: lat, longitude: lng }))} strokeColor={th.c.primary} strokeWidth={5} lineDashPattern={route.schematic ? [8, 8] : undefined} /> : null}
+        {user?.accuracyM ? <Circle center={{ latitude: user.lat, longitude: user.lng }} radius={user.accuracyM} fillColor="rgba(23,105,232,0.12)" strokeColor="rgba(23,105,232,0.35)" /> : null}
         {route ? <Marker coordinate={{ latitude: route.origin.lat, longitude: route.origin.lng }} pinColor="#0D47A1" /> : null}
       </MapView>
       {filters && moved.current && Math.abs(region.latitude - query.latitude) + Math.abs(region.longitude - query.longitude) > region.latitudeDelta * 0.25 ? (

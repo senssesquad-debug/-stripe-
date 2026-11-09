@@ -6,8 +6,8 @@ import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { headerLeftForDirectOpen } from '@/components/home-button';
 import { MapPanel } from '@/components/map-view';
-import { openDetails, type FocusPoint, type RouteOverlay } from '@/components/map-shared';
-import { RoutePanel } from '@/components/route-panel';
+import { DirectionsPanel } from '@/components/directions-panel';
+import { openDetails, type FocusPoint, type RouteOverlay, type UserFix } from '@/components/map-shared';
 import { Button, EmptyState, ErrorState, Skeleton, Txt } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useTheme } from '@/theme';
@@ -21,6 +21,7 @@ export default function Locate() {
   const details = () => (from === 'detail' && router.canGoBack() ? router.back() : openDetails({ type, id }));
   const [routing, setRouting] = useState(mode === 'route');
   const [route, setRoute] = useState<RouteOverlay | null>(null);
+  const [user, setUser] = useState<UserFix | null>(null);
   const [panelH, setPanelH] = useState(0);
   const q = useQuery({
     queryKey: ['locate', type, id],
@@ -36,6 +37,7 @@ export default function Locate() {
     },
   });
   const onRoute = useCallback((r: RouteOverlay | null) => setRoute(r), []);
+  const onUser = useCallback((u: UserFix | null) => setUser(u), []);
   const focus = q.data?.focus as FocusPoint | null | undefined;
   const center = useMemo(() => (focus ? { lat: focus.lat, lng: focus.lng } : { lat: 34.68, lng: 33.04 }), [focus]);
 
@@ -47,13 +49,13 @@ export default function Locate() {
   return (
     <View style={{ flex: 1, backgroundColor: th.c.background }}>
       {header}
-      <MapPanel center={center} filters={null} focus={focus} route={routing ? route : null} bottomInset={panelH} />
+      <MapPanel center={center} filters={null} focus={focus} route={routing ? route : null} user={routing ? user : null} bottomInset={panelH} />
       <View onLayout={(e) => setPanelH(e.nativeEvent.layout.height)}
         style={{ position: 'absolute', left: 12, right: 12, bottom: insets.bottom + 12, maxWidth: 520, padding: 16, borderRadius: th.radius.lg, backgroundColor: th.c.background, gap: 10, ...th.shadow.floating }}>
         {routing ? (
           <>
-            <RoutePanel dest={{ lat: focus.lat, lng: focus.lng, title: focus.title }} nav={q.data?.nav ?? null} onRoute={onRoute} />
-            <Button title={t('common.close')} kind="ghost" compact onPress={() => { setRouting(false); setRoute(null); }} style={{ alignSelf: 'flex-start' }} />
+            <DirectionsPanel dest={{ lat: focus.lat, lng: focus.lng, title: focus.title }} nav={q.data?.nav ?? null} onRoute={onRoute} onUser={onUser} />
+            <Button title={t('common.close')} kind="ghost" compact onPress={() => { setRouting(false); setRoute(null); setUser(null); }} style={{ alignSelf: 'flex-start' }} />
           </>
         ) : (
           <>

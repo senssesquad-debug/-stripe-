@@ -14,7 +14,7 @@ import { MarkerCard, type MapPanelProps } from './map-shared';
 const STYLE = { light: 'https://tiles.openfreemap.org/styles/liberty', dark: 'https://tiles.openfreemap.org/styles/dark' };
 const EMPTY = { type: 'FeatureCollection' as const, features: [] };
 
-export function MapPanel({ center, filters, focus, route, bottomInset = 0 }: MapPanelProps) {
+export function MapPanel({ center, filters, focus, route, user, bottomInset = 0 }: MapPanelProps) {
   const th = useTheme();
   const box = useRef<HTMLDivElement | null>(null);
   const map = useRef<MlMap | null>(null);
@@ -53,6 +53,12 @@ export function MapPanel({ center, filters, focus, route, bottomInset = 0 }: Map
       m.addSource('route', { type: 'geojson', data: EMPTY });
       m.addLayer({ id: 'route-casing', type: 'line', source: 'route', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#fff', 'line-width': 8 } }, 'clusters');
       m.addLayer({ id: 'route', type: 'line', source: 'route', layout: { 'line-cap': 'round', 'line-join': 'round' }, paint: { 'line-color': '#1769E8', 'line-width': 5 } }, 'clusters');
+      // Live position: accuracy circle (metres → pixels at the current zoom) and a dot.
+      m.addSource('user', { type: 'geojson', data: EMPTY });
+      m.addLayer({ id: 'user-acc', type: 'circle', source: 'user', paint: {
+        'circle-color': '#1769E8', 'circle-opacity': 0.12, 'circle-stroke-color': '#1769E8', 'circle-stroke-opacity': 0.3, 'circle-stroke-width': 1,
+        'circle-radius': ['interpolate', ['exponential', 2], ['zoom'], 0, 0, 22, ['/', ['*', ['get', 'acc'], 4194304], ['*', 156543.03, ['cos', ['/', ['*', ['get', 'lat'], 3.14159], 180]]]]] } });
+      m.addLayer({ id: 'user-dot', type: 'circle', source: 'user', paint: { 'circle-color': '#1769E8', 'circle-radius': 7, 'circle-stroke-color': '#fff', 'circle-stroke-width': 3 } });
       m.on('click', 'points', (e) => {
         const id = e.features?.[0]?.properties?.key as string | undefined;
         const hit = markersRef.current.find((x) => `${x.type}:${x.id}` === id);
@@ -104,6 +110,7 @@ export function MapPanel({ center, filters, focus, route, bottomInset = 0 }: Map
     extras.current = [];
     if (focus) extras.current.push(new maplibregl.Marker({ color: '#1769E8' }).setLngLat([focus.lng, focus.lat]).setPopup(new maplibregl.Popup({ offset: 24 }).setText(focus.title)).addTo(m));
     (m.getSource('route') as GeoJSONSource | undefined)?.setData(route ? { type: 'Feature', geometry: { type: 'LineString', coordinates: route.geometry }, properties: {} } : EMPTY);
+    if (m.getLayer('route')) m.setPaintProperty('route', 'line-dasharray', route?.schematic ? [1.5, 1.5] : [1, 0]);
     if (route) {
       const dot = document.createElement('div');
       dot.style.cssText = 'width:16px;height:16px;border-radius:8px;background:#fff;border:4px solid #0D47A1;box-shadow:0 1px 4px rgba(0,0,0,.3)';
@@ -116,6 +123,14 @@ export function MapPanel({ center, filters, focus, route, bottomInset = 0 }: Map
       m.easeTo({ center: [focus.lng, focus.lat], zoom: Math.max(m.getZoom(), 14), offset: [0, -bottomInset / 2] });
     }
   }, [focus?.id, focus?.lat, focus?.lng, route, loaded, bottomInset]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const m = map.current;
+    if (!m || !loaded) return;
+    (m.getSource('user') as GeoJSONSource | undefined)?.setData(user
+      ? { type: 'Feature', geometry: { type: 'Point', coordinates: [user.lng, user.lat] }, properties: { acc: user.accuracyM ?? 0, lat: user.lat } }
+      : EMPTY);
+  }, [user?.lat, user?.lng, user?.accuracyM, loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const style = useMemo(() => ({ position: 'absolute' as const, inset: 0 }), []);
   return (

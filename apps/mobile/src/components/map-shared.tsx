@@ -7,7 +7,14 @@ import { Button, Icon, Tap, Txt } from './ui';
 
 export interface MapFilters { layers: string; category?: string; open_now?: boolean; free?: boolean }
 export interface FocusPoint { type: 'event' | 'place'; id: string; lat: number; lng: number; title: string; subtitle?: string | null }
-export interface RouteOverlay { geometry: Array<[number, number]>; origin: { lat: number; lng: number } }
+export interface RouteOverlay {
+  geometry: Array<[number, number]>;
+  origin: { lat: number; lng: number };
+  /** Transit drawn stop-to-stop (no street shape): shown dashed. */
+  schematic?: boolean;
+}
+/** The live position with its accuracy circle. */
+export interface UserFix { lat: number; lng: number; accuracyM: number | null }
 
 export interface MapPanelProps {
   center: { lat: number; lng: number };
@@ -17,6 +24,7 @@ export interface MapPanelProps {
   route?: RouteOverlay | null;
   /** Space kept free at the bottom for an overlay panel (route sheet). */
   bottomInset?: number;
+  user?: UserFix | null;
 }
 
 export const openDetails = (m: { type: 'event' | 'place'; id: string }) =>
