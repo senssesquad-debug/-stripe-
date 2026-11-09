@@ -13,7 +13,7 @@ MET Norway, Nominatim, детерминированный умный поиск)
 | **PostgreSQL 15+ с PostGIS** | Supabase (Database → Extensions → включить `postgis`, `pg_trgm`), Neon, AWS RDS, свой сервер | `DATABASE_URL` (сервер) | Supabase Pro от $25/мес |
 | **Аккаунты passtra** (email + пароль, отзываемые сессии) | встроено в API | `AUTH_JWT_SECRET` — случайная строка ≥ 32 символов (на Render генерируется автоматически). Смена секрета разлогинивает всех | — |
 | **Отправка email-кодов** (подтверждение email, сброс пароля) | resend.com → API Keys; домен отправителя подтвердить (DNS: SPF/DKIM) | `RESEND_API_KEY`, `EMAIL_FROM` (например `passtra <no-reply@ваш-домен>`). Без ключа регистрация работает, но email остаётся «не подтверждён», а сброс пароля недоступен — интерфейс так и говорит | 3000 писем/мес бесплатно, далее от $20/мес |
-| **Администраторы** | id пользователя из таблицы `users` (виден в админке и в `GET /v1/me`) | `ADMIN_USER_IDS` (через запятую) | — |
+| **Администраторы** | id пользователя из таблицы `users` (виден в `GET /v1/me`) **или** его email | `ADMIN_USER_IDS` и/или `ADMIN_EMAILS` (через запятую). Email даёт роль только после подтверждения кода. Вход в админку `/admin/` — тем же email и паролем | — |
 | **REPORT_SALT** | любая случайная строка (`openssl rand -hex 32`) | сервер | — |
 | **Хостинг API + worker** | Fly.io / Render / Railway / AWS ECS — образ `infra/Dockerfile`, два процесса | env хостинга | от ~$10–20/мес |
 | **Apple Developer Program** | developer.apple.com | EAS (`eas credentials`) | $99/год |
@@ -43,12 +43,29 @@ iPhone/iPad: только если сайт добавлен на экран «�
 
 | Ключ | Что даёт | Где взять / ограничения | Куда |
 |---|---|---|---|
-| `GOOGLE_MAPS_API_KEY` | Живые рейтинг/часы Google на карточке места, поиск `place_id` | Google Cloud → APIs → включить **Places API (New)**; ограничить ключ: API = Places, приложения = IP серверов. Бесплатно ~10k Essentials / 5k Pro вызовов в месяц на SKU. **Не хранить контент Places** (уже соблюдено в коде) | сервер |
+| `GOOGLE_MAPS_API_KEY` | Живые рейтинг/часы Google на карточке места, **фото мест из Google** (с авторством), поиск `place_id`, **проверка адресов** через Geocoding (без ключа — Nominatim) | Google Cloud → APIs → включить **Places API (New)** и **Geocoding API**; ограничить ключ: API = Places + Geocoding, приложения = IP серверов. Бесплатно ~10k Essentials / 5k Pro вызовов в месяц на SKU. **Не хранить контент Places** (уже соблюдено в коде) | сервер |
 | `GOOGLE_MAPS_ANDROID_KEY` | Карта на Android (Maps SDK for Android) | Google Cloud → Maps SDK for Android; ограничить по пакету `app.passtra.android` + SHA-1 сертификата из `eas credentials`. Мобильные динамические карты бесплатны | env сборки EAS (`eas secret:create`) |
-| `ANTHROPIC_API_KEY` | AI-интерпретация запросов (en/el/ru) с откатом на правила | console.anthropic.com → API Keys. Модель по умолчанию `claude-opus-5-5` (`ANTHROPIC_MODEL`), effort `low`, кеш интерпретаций в БД | сервер |
+| `ANTHROPIC_API_KEY` | AI-интерпретация запросов (en/el/ru) с откатом на правила; короткие описания карточек (принимаются только если все числа есть в фактах); AI-модерация отзывов и аватаров (без ключа — только правила + ручная очередь) | console.anthropic.com → API Keys. Модель по умолчанию `claude-opus-5-5` (`ANTHROPIC_MODEL`), effort `low`, кеш интерпретаций в БД | сервер |
 | `TICKETMASTER_API_KEY` | Коннектор Ticketmaster (покрытие Кипра ожидается малым — проверить) | developer.ticketmaster.com — бесплатно, 5000 вызовов/сутки | сервер |
 | `EVENTBRITE_TOKEN` + organization IDs | События организаторов, подключивших Eventbrite | eventbrite.com → Account → Developer → private token; ID организаций добавить в админке: Sources → Eventbrite → `config.organizationIds` | сервер |
 | `SENTRY_DSN` (по желанию) | Crash reporting | sentry.io; в приложении — `@sentry/react-native` (не подключён по умолчанию, см. чек-лист релиза) | env |
+
+### Общественный транспорт
+
+Расписания автобусов Кипра — открытые GTFS-фиды Motion (CC BY 4.0, 7 операторов), импортируются автоматически
+каждые 12 часов, ключ не нужен. Живые позиции автобусов (GTFS-Realtime) пока **не подключены**: фид отдаётся
+только по HTTP с IP-адреса без документации и SLA — в приложении показывается расписание, а не реальное
+опоздание.
+
+### Instagram и Facebook
+
+Сбор с сайтов Instagram/Facebook запрещён их условиями — не делаем. Легальный путь — Meta Graph API:
+нужен **Instagram Professional-аккаунт passtra, связанный с Facebook-страницей**, приложение в Meta for Developers
+и прохождение App Review (права `instagram_basic`, `pages_read_engagement`, функция Business Discovery).
+Business Discovery отдаёт публичные посты других бизнес-аккаунтов (не события как структуру) — из них можно
+извлекать афиши AI-разбором с обязательной проверкой модератором. События Facebook-страниц доступны только
+с функцией Page Public Content Access (отдельное одобрение Meta, выдаётся редко) или если организатор сам
+подключит свою страницу.
 
 ## 3. Для масштаба
 
@@ -58,6 +75,7 @@ iPhone/iPad: только если сайт добавлен на экран «�
 | Свой **Nominatim** (`NOMINATIM_URL`) | Публичный — не более 1 запроса/сек |
 | `EXPO_ACCESS_TOKEN` | Усиленная защита push (Expo → Access tokens → enhanced security) |
 | Redis | Распределённый rate limiting при нескольких экземплярах API |
+| Платный инстанс Render (Starter) | Free засыпает через 15 мин: первый запрос ждёт ~1 мин, импорт OSM и напоминания идут только пока сервис не спит |
 
 ## 4. Источники, требующие договорённости (не ключ, а разрешение)
 

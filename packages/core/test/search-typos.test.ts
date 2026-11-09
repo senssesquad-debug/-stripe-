@@ -51,3 +51,19 @@ describe('typo correction', () => {
     expect(correctQuery('пляжи')).toBeNull();
   });
 });
+
+describe('dishes search restaurants and takeaways by cuisine', () => {
+  it.each(['pizza', 'πίτσα', 'пицца', 'pizzeria in Limassol'])('%s', (q) => {
+    const f = parseQuery(q);
+    expect(f.categories.sort()).toEqual(['fast-food', 'restaurant']);
+    expect(f.keywords).toEqual(['pizza']);
+  });
+  it('sushi and burger', () => {
+    expect(parseQuery('суши').keywords).toEqual(['sushi']);
+    expect(parseQuery('best burger').keywords).toEqual(['burger']);
+  });
+  it('plain fast food stays a category only', () => {
+    expect(parseQuery('fast food').categories).toEqual(['fast-food']);
+    expect(parseQuery('fast food').keywords).toEqual([]);
+  });
+});

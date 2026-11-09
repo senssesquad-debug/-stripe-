@@ -42,6 +42,18 @@ function matchers(): Matcher[] {
   return out;
 }
 
+/**
+ * Dishes: a pizzeria is a restaurant or a takeaway tagged with that cuisine, so "pizza" searches both
+ * categories and narrows them by the cuisine word (OSM `cuisine=*`, which is in the search text).
+ */
+const DISHES: Array<{ stems: string[]; cuisine: string }> = [
+  { stems: ['pizza', 'pizzeria', 'πιτσα', 'πιτσαρ', 'пицц'], cuisine: 'pizza' },
+  { stems: ['burger', 'hamburger', 'μπεργκερ', 'χαμπουργκερ', 'бургер', 'гамбургер'], cuisine: 'burger' },
+  { stems: ['sushi', 'σουσι', 'суши'], cuisine: 'sushi' },
+  { stems: ['kebab', 'κεμπαπ', 'кебаб'], cuisine: 'kebab' },
+];
+const DISH_CATS = ['restaurant', 'fast-food'];
+
 const TIME_PATTERNS: Array<[WindowRe: RegExp, kind: (typeof TIME_KINDS)[number]]> = [
   [/(right now|at the moment|open now|currently|прямо сейчас|сейчас|τωρα|αυτη τη στιγμη)/, 'now'],
   [/(tonight|this evening|сегодня вечером|вечером|этим вечером|ночью|αποψε|το βραδυ)/, 'tonight'],
@@ -192,6 +204,14 @@ export function parseQuery(query: string): SearchFilters {
   const consumed = new Array(toks.length).fill(false);
   const cats = new Set<string>();
   const groups = new Set<InterestGroup>();
+  const dishWords: string[] = [];
+  toks.forEach((tok, i) => {
+    const d = DISHES.find((x) => x.stems.some((st) => tok === st || (st.length >= 4 && tok.startsWith(st))));
+    if (!d) return;
+    consumed[i] = true;
+    for (const c of DISH_CATS) cats.add(c);
+    if (!dishWords.includes(d.cuisine)) dishWords.push(d.cuisine);
+  });
   for (const m of matchers()) {
     for (let i = 0; i + m.words.length <= toks.length; i++) {
       let ok = true;
@@ -220,7 +240,7 @@ export function parseQuery(query: string): SearchFilters {
   const leftovers = toks.filter((t, i) => !consumed[i] && !FILLER.has(t) && t.length > 2 && !/^\d+$/.test(t) && !cityWords.has(t)
     && !TIME_PATTERNS.some(([re]) => re.test(t)) && !FREE_RE.test(t) && !NEAR_RE.test(t) && !EVENT_RE.test(t) && !PLACE_RE.test(t) && !BEST_RE.test(t) && !RADIUS_RE.test(t)
     && !(filters.city && matchCity(t, canonicalKey(t)) === filters.city));
-  filters.keywords = leftovers.map((k) => k.slice(0, 40)).slice(0, 8);
+  filters.keywords = [...dishWords, ...leftovers.map((k) => k.slice(0, 40))].slice(0, 8);
   return filters;
 }
 
