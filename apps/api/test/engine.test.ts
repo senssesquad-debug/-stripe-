@@ -397,3 +397,19 @@ describe('adaptive scheduling', () => {
     expect(nextInterval(src, { status: 'skipped', changes: 0 })).toBe(6 * 3600);
   });
 });
+
+describe('restart recovery', () => {
+  it('closes runs left running by a stopped process and releases their source at once', async () => {
+    const { recoverInterruptedRuns } = await import('../src/engine/background');
+    const db = await freshDb('recover');
+    const src = await source(db.pool, 'osm_cy');
+    await db.pool.query(`UPDATE sources SET locked_until = now() + interval '30 minutes', next_run_at = now() + interval '1 day' WHERE id = $1`, [src.id]);
+    await db.pool.query(`INSERT INTO ingestion_runs (source_id, status, trigger) VALUES ($1, 'running', 'schedule')`, [src.id]);
+    expect(await recoverInterruptedRuns(db.pool)).toBe(1);
+    const s = (await db.pool.query(`SELECT locked_until, next_run_at <= now() AS due FROM sources WHERE id = $1`, [src.id])).rows[0];
+    expect(s.locked_until).toBeNull();
+    expect(s.due).toBe(true);
+    expect((await db.pool.query(`SELECT count(*)::int AS n FROM ingestion_runs WHERE status = 'running'`)).rows[0].n).toBe(0);
+    await db.pool.end();
+  });
+});

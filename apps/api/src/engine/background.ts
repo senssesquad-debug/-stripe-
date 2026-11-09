@@ -17,6 +17,15 @@ import type { Logger } from './types';
  */
 const REMINDER_POLL_MS = 30_000;
 
+export async function recoverInterruptedRuns(pool: pg.Pool): Promise<number> {
+  const r = await pool.query(
+    `UPDATE ingestion_runs SET status = 'failed', finished_at = now(), error_message = 'Interrupted by a restart; the import resumes now'
+      WHERE status = 'running' RETURNING source_id`);
+  const ids = [...new Set(r.rows.map((x: { source_id: number }) => x.source_id))];
+  if (ids.length) await pool.query(`UPDATE sources SET locked_until = NULL, next_run_at = LEAST(next_run_at, now()) WHERE id = ANY($1::int[])`, [ids]);
+  return r.rowCount ?? 0;
+}
+
 export function startBackground(pool: pg.Pool, config: AppConfig, log: Logger): { stop: () => Promise<void> } {
   const http = new HttpClient(config.BOT_USER_AGENT, 1100);
   const deps = { pool, config, http, geocoder: new Geocoder(pool, http, config.NOMINATIM_URL, config.GEOCODING_ENABLED), log };
@@ -27,6 +36,10 @@ export function startBackground(pool: pg.Pool, config: AppConfig, log: Logger): 
     const t = setTimeout(w, ms);
     wakers.add(w);
   });
+  // Single-instance hosting (worker inside the API process): runs left "running" belong to the previous process,
+  // which a deploy or restart has stopped. Close them and release their sources now, so an import continues straight
+  // away instead of waiting for the 30-minute lock to expire.
+  const recovered = config.RUN_WORKER ? recoverInterruptedRuns(pool).catch((e) => { log.warn({ err: (e as Error).message }, 'run recovery failed'); }) : Promise.resolve();
   // Reminders run on their own short loop so a long source import never delays them.
   const reminders = (async () => {
     while (!stopping) {
@@ -42,6 +55,7 @@ export function startBackground(pool: pg.Pool, config: AppConfig, log: Logger): 
   let lastNotifications = 0;
   let lastAddressChecks = 0;
   const done = (async () => {
+    await recovered;
     while (!stopping) {
       try {
         await tick(deps);
