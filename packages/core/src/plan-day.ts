@@ -1,5 +1,6 @@
 import { bucketOf } from './activities';
 import { getCategory } from './categories';
+import { normalizeText } from './text';
 import { estimateTravelMinutes, haversineKm, suggestMode, type LatLng, type TravelMode } from './geo';
 import { DateTime } from 'luxon';
 import { normalizeZone } from './time';
@@ -179,6 +180,8 @@ export function planDay(input: PlanRequest): DayPlan {
   let totalTravel = 0;
   // Variety: how many stops of each kind (food, active, nature, nightlife…) the day already has.
   const kinds = new Map<string, number>();
+  // The same place can exist twice in the data (two map objects with one name): never visit a name twice.
+  const titles = new Set<string>();
   let snacks = 0; // café/bakery stops outside meal times
 
   const pushFixed = (f: PlanCandidate) => {
@@ -206,7 +209,7 @@ export function planDay(input: PlanRequest): DayPlan {
 
     let best: { c: PlanCandidate; arrive: Date; depart: Date; tr: { min: number; mode: TravelMode }; value: number; notes: StopNote[] } | null = null;
     for (const c of req.candidates) {
-      if (c.type !== 'place' || used.has(c.id)) continue;
+      if (c.type !== 'place' || used.has(c.id) || titles.has(normalizeText(c.title))) continue;
       if (activeMeal && !activeMeal.cats.includes(c.category)) continue;
       if (!activeMeal && MEAL_CATEGORIES.has(c.category) && c.category !== 'cafe') continue; // restaurants only at meal times
       if (!activeMeal && c.category === 'cafe' && snacks >= 1) continue; // one coffee break is enough
@@ -249,6 +252,7 @@ export function planDay(input: PlanRequest): DayPlan {
         travelMinFromPrev: best.tr.min, travelMode: best.tr.mode, travelIsEstimate: true, price: best.c.price ?? null, notes: best.notes,
       });
       used.add(best.c.id);
+      titles.add(normalizeText(best.c.title));
       spent += best.c.price ?? 0;
       totalTravel += best.tr.min;
       t = best.depart;

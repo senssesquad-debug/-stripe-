@@ -43,3 +43,11 @@ describe('a day out is not a café and bar crawl', () => {
     expect(p.stops.some((s) => s.category === 'bar')).toBe(true);
   });
 });
+
+describe('duplicates in the data', () => {
+  it('two map objects with the same name are never both in one day', () => {
+    const park = (id: string, i: number) => ({ id, type: 'place' as const, title: 'Gauguin Park', category: 'park', location: away(1 + i * 0.2, i), score: 0.9 });
+    const p = planDay({ ...req, candidates: [...cands, park('gp1', 1), park('gp2', 2)] });
+    expect(p.stops.filter((s) => s.title === 'Gauguin Park').length).toBeLessThanOrEqual(1);
+  });
+});
