@@ -11,6 +11,14 @@ services:
     dockerfilePath: ./infra/Dockerfile
     dockerContext: .
     healthCheckPath: /v1/health
+    # Free workspaces get 500 build minutes a month; commits that touch only docs, tests or CI don't need a new image.
+    buildFilter:
+      ignoredPaths:
+        - docs/**
+        - "**/*.md"
+        - "**/test/**"
+        - .github/**
+        - brand/source/**
     envVars:
       - key: DATABASE_URL
         fromDatabase:
