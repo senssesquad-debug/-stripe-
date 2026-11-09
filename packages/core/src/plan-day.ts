@@ -1,3 +1,4 @@
+import { bucketOf } from './activities';
 import { getCategory } from './categories';
 import { estimateTravelMinutes, haversineKm, suggestMode, type LatLng, type TravelMode } from './geo';
 import { DateTime } from 'luxon';
@@ -42,6 +43,8 @@ export interface PlanRequest {
   maxDistanceKm?: number | null;
   /** Typical visit length multiplier (relaxed days linger longer). */
   pace?: number;
+  /** Bars and clubs are fine at any hour (a nightlife trip); otherwise only from the evening. */
+  nightlifeAnyTime?: boolean;
 }
 
 export type StopNote = 'meal' | 'hours_unknown' | 'price_unknown' | 'fixed_time';
@@ -174,6 +177,9 @@ export function planDay(input: PlanRequest): DayPlan {
   let pos = req.origin;
   let lastCat = '';
   let totalTravel = 0;
+  // Variety: how many stops of each kind (food, active, nature, nightlife…) the day already has.
+  const kinds = new Map<string, number>();
+  let snacks = 0; // café/bakery stops outside meal times
 
   const pushFixed = (f: PlanCandidate) => {
     const tr = travel(pos, f.location, req.mode);
@@ -203,7 +209,10 @@ export function planDay(input: PlanRequest): DayPlan {
       if (c.type !== 'place' || used.has(c.id)) continue;
       if (activeMeal && !activeMeal.cats.includes(c.category)) continue;
       if (!activeMeal && MEAL_CATEGORIES.has(c.category) && c.category !== 'cafe') continue; // restaurants only at meal times
+      if (!activeMeal && c.category === 'cafe' && snacks >= 1) continue; // one coffee break is enough
       if (c.category === lastCat) continue;
+      const kind = bucketOf(c.category);
+      if (!activeMeal && kind === 'food' && bucketOf(lastCat) === 'food') continue; // no café right after a meal
       const tr = travel(pos, c.location, req.mode);
       let arrive = addMin(t, tr.min);
       if (activeMeal && arrive < activeMeal.from) arrive = activeMeal.from;
@@ -212,6 +221,8 @@ export function planDay(input: PlanRequest): DayPlan {
       const backToFixed = nextFixed ? travel(c.location, nextFixed.location, req.mode).min : 0;
       if (addMin(depart, backToFixed) > horizon) continue;
       if (!NIGHT_GROUPS.has(getCategory(c.category)?.group ?? '') && !within(arrive, depart, DAY_LIMITS)) continue;
+      // Bars and clubs belong to the evening (from 17:00), unless the trip is about nightlife.
+      if (NIGHT_GROUPS.has(getCategory(c.category)?.group ?? '') && !req.nightlifeAnyTime && localMinutes(arrive, dayStart, zone) < 17 * 60) continue;
       const open = isOpenThrough(c, arrive, depart);
       const notes: StopNote[] = [];
       let penalty = 0;
@@ -225,7 +236,10 @@ export function planDay(input: PlanRequest): DayPlan {
       if (c.price === null || c.price === undefined) notes.push('price_unknown');
       else if (spent + c.price > budget) continue;
       if (activeMeal) notes.push('meal');
-      const value = c.score - tr.min / 120 - penalty;
+      // A kind of stop the day doesn't have yet is worth more; repeating one is worth less (meals aside).
+      const seen = kinds.get(kind) ?? 0;
+      const variety = activeMeal ? 0 : seen === 0 ? 0.2 : -0.15 * seen;
+      const value = c.score - tr.min / 120 - penalty + variety;
       if (!best || value > best.value) best = { c, arrive, depart, tr, value, notes };
     }
 
@@ -240,6 +254,8 @@ export function planDay(input: PlanRequest): DayPlan {
       t = best.depart;
       pos = best.c.location;
       lastCat = best.c.category;
+      if (!activeMeal) kinds.set(bucketOf(best.c.category), (kinds.get(bucketOf(best.c.category)) ?? 0) + 1);
+      if (!activeMeal && MEAL_CATEGORIES.has(best.c.category)) snacks++;
       if (activeMeal) mealsDone.add(activeMeal.kind);
       continue;
     }

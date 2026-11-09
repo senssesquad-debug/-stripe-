@@ -566,7 +566,17 @@ export async function planMyDay(db: pg.Pool, ctx: DiscoveryContext, profile: Pro
   const window = { kind: 'custom' as const, start: start.toJSDate(), end: end.toJSDate(), startDate: start.toISODate()!, endDate: end.minus({ milliseconds: 1 }).toISODate()! };
   const [events, places] = await Promise.all([
     upcomingEvents(db, ctx, { window, excludeMultiDay: true, categories: interestCats.filter((s) => getCategory(s)?.kind !== 'place'), radiusKm: radius, limit: 60 }),
-    nearbyPlaces(db, ctx, { categories: placeCats, radiusKm: radius, limit: 500 }),
+    // Food and bars are by far the most numerous places: they get their own small share of the pool, so the
+    // nearest few hundred cafés can't push every activity out of the plan.
+    (async () => {
+      const eatDrink = placeCats.filter((c) => ['food', 'events_nightlife'].includes(getCategory(c)?.bucket ?? ''));
+      const other = placeCats.filter((c) => !eatDrink.includes(c));
+      const [a, b] = await Promise.all([
+        eatDrink.length ? nearbyPlaces(db, ctx, { categories: eatDrink, radiusKm: radius, limit: 80 }) : Promise.resolve([] as PlaceRow[]),
+        other.length ? nearbyPlaces(db, ctx, { categories: other, radiusKm: radius, limit: 500 }) : Promise.resolve([] as PlaceRow[]),
+      ]);
+      return [...b, ...a];
+    })(),
   ]);
   const placeDTOs = new Map(places.map((r) => [r.id, placeToDTO(r, ctx.locale, ctx.now)]));
   const p2: Profile = { ...profile, interests };
@@ -589,7 +599,8 @@ export async function planMyDay(db: pg.Pool, ctx: DiscoveryContext, profile: Pro
   const used = new Set<string>();
   for (let v = 0; v < Math.max(1, Math.min(3, input.variants ?? 3)); v++) {
     const plan = planDay({ start: start.toJSDate(), end: end.toJSDate(), tz: zone, origin, budget: input.budget ?? null, mode: input.mode ?? 'auto', candidates,
-      boost, pace: trip.pace, maxStops: trip.maxStops, maxDistanceKm: radius, exclude: v === 0 ? undefined : new Set(used) });
+      boost, pace: trip.pace, maxStops: trip.maxStops, maxDistanceKm: radius, exclude: v === 0 ? undefined : new Set(used),
+      nightlifeAnyTime: input.tripType === 'nightlife' });
     if (plan.stops.length < (v === 0 ? 1 : 2)) break; // an alternative needs at least two new stops
     plan.stops.forEach((st) => used.add(st.candidateId));
     variants.push({
