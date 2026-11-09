@@ -112,7 +112,10 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
     const events = (await Promise.all(upcoming.rows.map((r) => getEventRow(db, r.id, null)))).filter((x) => !!x).map((r) => eventToDTO(r!, locale, now()));
     // Opening hours for the next 7 days (Cyprus time), with breaks, closed days and public holidays.
     const schedule = { week: weeklySchedule(row.opening_hours?.value, now(), row.city_tz ?? 'Europe/Nicosia', row.lat, row.lng, locale), holidayRule: holidayRule(row.opening_hours?.value) };
-    const summary = !dto.about && (!dto.description || dto.description.length < 120) ? await summarizer.get('place', id, placeFacts(dto, row.tags ?? []), locale) : null;
+    // A summary only when there is something beyond the card's own fields (tags such as cuisine, or texts).
+    const facts = placeFacts(dto, row.tags ?? []);
+    const hasMore = (row.tags ?? []).length > 0 || (facts.sourceDescriptions as string[]).length > 0;
+    const summary = !dto.about && (!dto.description || dto.description.length < 120) && hasMore ? await summarizer.get('place', id, facts, locale) : null;
     return { place: dto, schedule, summary, upcomingEvents: events, navigation: navigationLinks(dto.location, dto.name) };
   });
 
@@ -148,12 +151,6 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
     }
   });
 
-  app.get('/v1/places/:id/reviews', async (req) => {
-    const { id } = parse(z.object({ id: Uuid }), req.params);
-    const r = await db.query<{ rating: number; body: string | null; created_at: Date }>(
-      `SELECT rating, body, created_at FROM reviews WHERE entity_type = 'place' AND entity_id = $1 AND status = 'published' ORDER BY created_at DESC LIMIT 50`, [id]);
-    return { items: r.rows.map((x) => ({ rating: x.rating, body: x.body, createdAt: x.created_at.toISOString() })) };
-  });
 
   // ── Events ──
   const EventsQuery = LocationQuery.extend({

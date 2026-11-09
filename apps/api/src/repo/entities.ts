@@ -28,7 +28,7 @@ export const EVENT_COLUMNS = (dist: string) => `
   e.id, e.title, e.description, e.primary_category, e.categories, e.place_id, e.venue_name, e.address,
   c.slug AS city_slug, c.name AS city_name,
   ST_Y(e.location::geometry) AS lat, ST_X(e.location::geometry) AS lng, e.location_precision,
-  e.timezone, e.starts_at, e.ends_at, e.doors_at, e.time_precision, e.time_unconfirmed, e.local_start_date, e.local_end_date,
+  e.user_rating_avg, e.user_rating_count, e.timezone, e.starts_at, e.ends_at, e.doors_at, e.time_precision, e.time_unconfirmed, e.local_start_date, e.local_end_date,
   e.is_free, e.price_min, e.price_max, e.currency, e.price_text, e.ticket_url, e.website, e.organizer_name, e.age_min,
   e.images, e.status, e.verification_status, e.confidence, e.last_verified_at, e.is_demo, e.popularity, e.source_count,
   ${dist} AS distance_km`;
@@ -84,6 +84,8 @@ export function keywordsWhere(q: Sql, alias: 'e' | 'p', keywords: string[], cano
 
 export interface EventRow extends pg.QueryResultRow {
   doors_at: Date | null;
+  user_rating_avg: number | null;
+  user_rating_count: number;
   id: string; title: string; description: string | null; primary_category: string; categories: string[]; place_id: string | null;
   venue_name: string | null; address: string | null; city_slug: string | null; city_name: LocalizedText | null;
   lat: number | null; lng: number | null; location_precision: LocationPrecision;
@@ -159,6 +161,7 @@ export function eventToDTO(r: EventRow, locale: Locale, now: Date, extra?: { sou
     status: r.status,
     images: r.images ?? [],
     distanceKm: round(r.distance_km),
+    rating: r.user_rating_count > 0 && r.user_rating_avg !== null ? { average: Math.round(r.user_rating_avg * 10) / 10, count: r.user_rating_count, source: 'passtra' } : null,
     verification: {
       status: r.verification_status,
       confidence: r.confidence,

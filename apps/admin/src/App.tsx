@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { AdminError, ago, auth, call, fmtDate } from './api';
 
-type Page = 'dashboard' | 'review' | 'conflicts' | 'duplicates' | 'reports' | 'submissions' | 'sources' | 'runs' | 'errors' | 'audit';
+type Page = 'dashboard' | 'review' | 'conflicts' | 'duplicates' | 'reports' | 'reviews' | 'submissions' | 'sources' | 'runs' | 'errors' | 'audit';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Any = any;
 
@@ -192,6 +192,31 @@ function Reports({ open }: { open: (t: 'events' | 'places', id: string) => void 
   );
 }
 
+function Reviews({ open }: { open: (t: 'events' | 'places', id: string) => void }) {
+  const [tab, setTab] = useState<'pending' | 'reported' | 'rejected'>('pending');
+  const { data, reload } = useLoad(`/v1/admin/reviews?status=${tab}`, [tab]);
+  const decide = (id: string, action: 'publish' | 'reject' | 'remove') => act(() => call(`/v1/admin/reviews/${id}`, { method: 'POST', body: { action } }), action === 'publish' ? 'Published' : action === 'reject' ? 'Rejected' : 'Removed', reload);
+  return (
+    <>
+      <h1>Review moderation</h1>
+      <p className="muted">Held by automatic moderation (insults, threats, links, ads, duplicates, suspicious accounts) or hidden after reports. Personal data is already masked.</p>
+      <div className="row" style={{ marginBottom: 12 }}>
+        {(['pending', 'reported', 'rejected'] as const).map((k) => <button key={k} className={`btn ${tab === k ? '' : 'ghost'}`} onClick={() => setTab(k)}>{k}</button>)}
+      </div>
+      <Table head={['Review', 'About', 'Why', 'Author', 'When', '']} rows={(data?.items ?? []).map((r: Any) => [
+        <div><b>{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</b><div className="small" style={{ maxWidth: 420, whiteSpace: 'pre-wrap' }}>{r.body ?? '—'}</div></div>,
+        <a onClick={() => open(r.entity_type === 'event' ? 'events' : 'places', r.entity_id)} style={{ cursor: 'pointer' }}>{r.entity_title}</a>,
+        <div className="small">{(r.moderation?.labels ?? []).map((l: string) => <span key={l} className="badge b-warn" style={{ marginRight: 4 }}>{l}</span>)}{(r.moderation?.reasons ?? []).join('; ')}{(r.reports ?? []).map((x: Any, i: number) => <div key={i}>report: {x.reason}{x.message ? ` — ${x.message}` : ''}</div>)}</div>,
+        <span className="small">{r.author_name ?? '—'}<br />{r.author_email}</span>, ago(r.created_at),
+        <div className="row">
+          <button className="btn" onClick={() => decide(r.id, 'publish')}>Publish</button>
+          <button className="btn ghost" onClick={() => decide(r.id, tab === 'reported' ? 'remove' : 'reject')}>{tab === 'reported' ? 'Remove' : 'Reject'}</button>
+        </div>,
+      ])} empty="Nothing to moderate." />
+    </>
+  );
+}
+
 function Submissions() {
   const { data, reload } = useLoad('/v1/admin/submissions');
   return (
@@ -294,7 +319,7 @@ export default function App() {
   const t = stats.data?.totals ?? {};
   const nav: Array<[Page, string, number?]> = [
     ['dashboard', 'Overview'], ['review', 'Review queue', t.needsReview], ['conflicts', 'Conflicts', t.openConflicts], ['duplicates', 'Duplicates', t.pendingDuplicates],
-    ['reports', 'Reports', t.openReports], ['submissions', 'Submissions', t.pendingSubmissions], ['sources', 'Sources'], ['runs', 'Runs'], ['errors', 'Errors', t.ingestionErrors24h], ['audit', 'Audit log'],
+    ['reports', 'Reports', t.openReports], ['reviews', 'Reviews', t.pendingReviews], ['submissions', 'Submissions', t.pendingSubmissions], ['sources', 'Sources'], ['runs', 'Runs'], ['errors', 'Errors', t.ingestionErrors24h], ['audit', 'Audit log'],
   ];
   const open = (type: 'events' | 'places', id: string) => setDrawer({ type, id });
   return (
@@ -313,6 +338,7 @@ export default function App() {
         {page === 'conflicts' && <Conflicts open={open} />}
         {page === 'duplicates' && <Duplicates />}
         {page === 'reports' && <Reports open={open} />}
+        {page === 'reviews' && <Reviews open={open} />}
         {page === 'submissions' && <Submissions />}
         {page === 'sources' && <Sources />}
         {page === 'runs' && <Runs />}

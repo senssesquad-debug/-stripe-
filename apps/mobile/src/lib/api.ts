@@ -119,6 +119,12 @@ export interface DaySchedule { date: string; weekday: string; intervals: Array<[
 
 export interface EventFilters { category?: string; group?: string; when?: string; from?: string; to?: string; free?: boolean; maxPrice?: number; age?: 'family' | 'adults' }
 
+export interface ReviewItem {
+  id: string; rating: number; body: string | null; createdAt: string; editedAt: string | null; helpfulCount: number; mine: boolean; votedHelpful: boolean;
+  author: { name: string; avatarUrl: string | null; avatarPreset: string | null }; status?: 'published' | 'pending' | 'rejected' | 'removed';
+}
+export interface ReviewList { summary: { average: number | null; count: number; distribution: Record<string, number> }; items: ReviewItem[] }
+
 export interface RouteResult { mode: 'walk' | 'drive'; estimate: boolean; distanceKm: number; durationMin: number; geometry: Array<[number, number]>; attribution: string | null }
 export interface GeocodeItem { label: string; sublabel: string | null; lat: number; lng: number; source: string }
 export interface DeliveryResult { webPush: { sent: number; failed: number }; expo: { sent: number; failed: number } }
@@ -148,6 +154,11 @@ export const api = {
   planDay: (b: PlanParams & { interests?: string[]; tripType?: TripType; maxDistanceKm?: number | null; variants?: number }) => request<PlanDayResponse>('/v1/plan-day', { method: 'POST', body: { ...b, locale: i18n.language }, timeoutMs: 25_000 }),
   planEvaluate: (b: PlanParams & { items: PlanItem[] }) => request<PlanDayResponse>('/v1/plan-day/evaluate', { method: 'POST', body: { ...b, locale: i18n.language }, timeoutMs: 20_000 }),
   planAlternatives: (b: { arrive: string; durationMin: number; near: { lat: number; lng: number }; categories?: string[]; exclude?: string[] }) => request<{ items: EntityDTO[] }>('/v1/plan-day/alternatives', { method: 'POST', body: { ...b, locale: i18n.language } }),
+  reviews: (type: 'events' | 'places', id: string, sort: 'recent' | 'helpful' = 'recent') => request<ReviewList>(`/v1/${type}/${id}/reviews`, { query: { sort } }),
+  postReview: (type: 'events' | 'places', id: string, b: { rating: number; body?: string }) => request<{ id: string; status: 'published' | 'pending' | 'rejected'; created: boolean; edited: boolean }>(`/v1/${type}/${id}/reviews`, { method: 'POST', body: b, auth: true }),
+  deleteReview: (id: string) => request<void>(`/v1/reviews/${id}`, { method: 'DELETE', auth: true }),
+  helpful: (id: string, on: boolean) => request<unknown>(`/v1/reviews/${id}/helpful`, { method: on ? 'POST' : 'DELETE', body: {}, auth: true }),
+  reportReview: (id: string, reason: string) => request<unknown>(`/v1/reviews/${id}/report`, { method: 'POST', body: { reason } }),
   myPlans: () => request<{ items: Array<{ id: string; title: string; date: string; stops: number; shared: boolean }> }>('/v1/me/plans', { auth: true }),
   myPlan: (id: string) => request<SavedPlan>(`/v1/me/plans/${id}`, { auth: true }),
   savePlan: (b: { title: string; date: string; params: Omit<PlanParams, 'date'>; items: PlanItem[] }, id?: string) => request<{ id: string }>(id ? `/v1/me/plans/${id}` : '/v1/me/plans', { method: id ? 'PUT' : 'POST', body: b, auth: true }),

@@ -25,7 +25,7 @@ export async function adminRoutes(app: FastifyInstance, deps: AppDeps) {
   app.get('/v1/admin/stats', async (req) => {
     staff(req);
     const one = async (sql: string) => Number((await db.query<{ n: number }>(sql)).rows[0]?.n ?? 0);
-    const [events, upcoming, places, conflicts, dupes, reports, submissions, unverified, errors24h, users] = await Promise.all([
+    const [events, upcoming, places, conflicts, dupes, reports, submissions, unverified, errors24h, users, pendingReviews] = await Promise.all([
       one(`SELECT COUNT(*) AS n FROM events WHERE merged_into IS NULL AND archived_at IS NULL`),
       one(`SELECT COUNT(*) AS n FROM events WHERE merged_into IS NULL AND status IN ('scheduled','rescheduled') AND starts_at > now() - interval '1 day'`),
       one(`SELECT COUNT(*) AS n FROM places WHERE merged_into IS NULL AND status = 'active'`),
@@ -36,12 +36,13 @@ export async function adminRoutes(app: FastifyInstance, deps: AppDeps) {
       one(`SELECT COUNT(*) AS n FROM events WHERE merged_into IS NULL AND status IN ('scheduled','rescheduled') AND starts_at > now() AND verification_status IN ('unverified','conflicting')`),
       one(`SELECT COUNT(*) AS n FROM ingestion_errors WHERE created_at > now() - interval '24 hours'`),
       one(`SELECT COUNT(*) AS n FROM users`),
+      one(`SELECT COUNT(*) AS n FROM reviews WHERE status = 'pending'`),
     ]);
     const byStatus = await db.query(`SELECT verification_status, COUNT(*)::int AS n FROM events WHERE merged_into IS NULL AND status IN ('scheduled','rescheduled') AND starts_at > now() - interval '1 day' GROUP BY 1`);
     const byCategory = await db.query(`SELECT primary_category AS category, COUNT(*)::int AS n FROM places WHERE merged_into IS NULL AND status = 'active' GROUP BY 1 ORDER BY 2 DESC LIMIT 25`);
     const runs = await db.query(`SELECT date_trunc('hour', started_at) AS hour, SUM(created)::int AS created, SUM(updated)::int AS updated, SUM(errors)::int AS errors FROM ingestion_runs WHERE started_at > now() - interval '48 hours' GROUP BY 1 ORDER BY 1`);
     return {
-      totals: { events, upcomingEvents: upcoming, places, openConflicts: conflicts, pendingDuplicates: dupes, openReports: reports, pendingSubmissions: submissions, needsReview: unverified, ingestionErrors24h: errors24h, users },
+      totals: { events, upcomingEvents: upcoming, places, openConflicts: conflicts, pendingDuplicates: dupes, openReports: reports, pendingSubmissions: submissions, needsReview: unverified, ingestionErrors24h: errors24h, users, pendingReviews },
       eventsByVerification: byStatus.rows, placesByCategory: byCategory.rows, ingestionByHour: runs.rows, integrations: integrationStatus(deps.config),
     };
   });

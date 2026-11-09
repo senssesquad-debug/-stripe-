@@ -9,6 +9,7 @@ import { Cover, EntityRow, SaveButton } from '@/components/cards';
 import { EntityActions } from '@/components/entity-actions';
 import { fromGoogle, PlaceGallery } from '@/components/gallery';
 import { PlaceHours } from '@/components/schedule';
+import { Reviews } from '@/components/reviews';
 import { headerLeftForDirectOpen } from '@/components/home-button';
 import { Badge, Button, ErrorState, InfoLine, Skeleton, Tap, Txt } from '@/components/ui';
 import { VerificationBadge, VerificationBlock } from '@/components/verification';
@@ -112,6 +113,7 @@ export default function PlaceScreen() {
             {p.website ? <Button title={t('detail.website')} icon="web" kind="secondary" compact onPress={() => void WebBrowser.openBrowserAsync(p.website!)} /> : null}
           </View>
         </View>
+        <Reviews type="places" id={p.id} />
         <GoogleLive id={p.id} />
         {q.data.upcomingEvents.length ? (
           <View style={{ gap: 4 }}>

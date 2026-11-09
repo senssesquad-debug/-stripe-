@@ -197,28 +197,5 @@ export async function meRoutes(app: FastifyInstance, deps: AppDeps) {
     return reply.status(204).send();
   });
 
-  // ── Reviews ──
-  app.post('/v1/:type/:id/reviews', { config: { rateLimit: { max: 20, timeWindow: '1 hour' } } }, async (req) => {
-    const user = requireUser(req);
-    const p = parse(z.object({ type: z.enum(['events', 'places']), id: Uuid }), req.params);
-    const b = parse(z.object({ rating: z.number().int().min(1).max(5), body: z.string().trim().max(2000).optional() }), req.body);
-    const type = p.type === 'events' ? 'event' : 'place';
-    const exists = await db.query(`SELECT 1 FROM ${p.type} WHERE id = $1`, [p.id]);
-    if (!exists.rowCount) throw new ApiError(404, 'not_found', 'Not found');
-    await tx(db, async (c) => {
-      await c.query(
-        `INSERT INTO reviews (user_id, entity_type, entity_id, rating, body) VALUES ($1,$2,$3,$4,$5)
-         ON CONFLICT (user_id, entity_type, entity_id) DO UPDATE SET rating = EXCLUDED.rating, body = EXCLUDED.body, updated_at = now()`,
-        [user.id, type, p.id, b.rating, b.body ?? null],
-      );
-      if (type === 'place') {
-        await c.query(
-          `UPDATE places SET (user_rating_avg, user_rating_count) =
-             (SELECT AVG(rating)::numeric(3,2), COUNT(*) FROM reviews WHERE entity_type = 'place' AND entity_id = $1 AND status = 'published') WHERE id = $1`,
-          [p.id],
-        );
-      }
-    });
-    return { ok: true };
-  });
+  // Reviews live in routes/reviews.ts.
 }

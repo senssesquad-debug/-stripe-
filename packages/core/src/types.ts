@@ -101,6 +101,8 @@ export interface EventDTO {
   status: EventStatus;
   images: ImageDTO[];
   distanceKm: number | null;
+  /** passtra users' ratings only (never mixed with Google's). */
+  rating: { average: number; count: number; source: 'passtra' } | null;
   verification: VerificationDTO;
   sponsored: false;
   isDemo: boolean;

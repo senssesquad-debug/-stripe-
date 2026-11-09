@@ -8,6 +8,7 @@ import { ScrollView, View } from 'react-native';
 import { Cover, SaveButton } from '@/components/cards';
 import { EntityActions } from '@/components/entity-actions';
 import { EventSchedule } from '@/components/schedule';
+import { Reviews } from '@/components/reviews';
 import { headerLeftForDirectOpen } from '@/components/home-button';
 import { Badge, Banner, Button, ErrorState, InfoLine, Skeleton, Tap, Txt } from '@/components/ui';
 import { VerificationBadge, VerificationBlock } from '@/components/verification';
@@ -79,6 +80,7 @@ export default function EventScreen() {
             ) : null}
           </View>
         ) : null}
+        <Reviews type="events" id={e.id} canRate={Date.parse(e.time.startsAt) <= Date.now()} />
         <VerificationBlock entity={e} />
       </ScrollView>
     </>
