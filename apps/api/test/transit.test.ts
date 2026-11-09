@@ -65,6 +65,14 @@ describe('transit planning from timetables', () => {
     expect(buses.map((b) => b.type === 'bus' && b.route)).toEqual(['10', '20']);
     expect(buses[0]!.type === 'bus' && buses[0]!.departure).toBe('2026-11-09T08:00:00.000Z'); // 10:00 Cyprus time
     expect(buses[1]!.type === 'bus' && buses[1]!.waitMin).toBeGreaterThanOrEqual(8); // arrives 10:10, next bus 10:20
+    // Each bus leg lists its stops with scheduled times, boarding first and alighting last.
+    const b0 = buses[0]!;
+    if (b0.type !== 'bus') throw new Error('bus expected');
+    expect(b0.stopList.length).toBe(b0.stops + 1);
+    expect(b0.stopList[0]!.name).toBe(b0.from);
+    expect(b0.stopList.at(-1)!.name).toBe(b0.to);
+    expect(b0.stopList[0]!.at).toBe(b0.departure);
+    for (let i = 1; i < b0.stopList.length; i++) expect(Date.parse(b0.stopList[i]!.at)).toBeGreaterThanOrEqual(Date.parse(b0.stopList[i - 1]!.at));
     expect(o.fareEur).toBe(5);
     expect(o.legs[0]!.type).toBe('walk');
     expect(o.legs.at(-1)!.type).toBe('walk');

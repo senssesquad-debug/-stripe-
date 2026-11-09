@@ -29,7 +29,7 @@ const PROFILE: Record<RouteMode, string> = { walk: 'routed-foot/route/v1/foot', 
 
 export interface StreetRoute {
   mode: RouteMode; estimate: boolean; distanceKm: number; durationMin: number; geometry: Array<[number, number]>; attribution: string | null;
-  steps: Array<{ text: string; distanceM: number; durationMin: number; location: [number, number] }>;
+  steps: Array<{ text: string; distanceM: number; durationMin: number; location: [number, number]; maneuver: { type: string; modifier: string | null } }>;
 }
 
 /**
@@ -39,7 +39,7 @@ export interface StreetRoute {
 export async function streetRoute(deps: AppDeps, mode: RouteMode, from: { lat: number; lng: number }, to: { lat: number; lng: number }, locale: Locale): Promise<StreetRoute> {
   const { db, config } = deps;
   const km = haversineKm(from, to);
-  const key = `route2:${mode}:${locale}:${from.lat.toFixed(5)},${from.lng.toFixed(5)}:${to.lat.toFixed(5)},${to.lng.toFixed(5)}`;
+  const key = `route3:${mode}:${locale}:${from.lat.toFixed(5)},${from.lng.toFixed(5)}:${to.lat.toFixed(5)},${to.lng.toFixed(5)}`;
   const cached = await db.query<{ payload: StreetRoute }>('SELECT payload FROM http_cache WHERE key = $1 AND expires_at > now()', [key]);
   if (cached.rows[0]) return cached.rows[0].payload;
   try {
@@ -48,7 +48,7 @@ export async function streetRoute(deps: AppDeps, mode: RouteMode, from: { lat: n
     const res = await deps.http.json<{ code: string; routes?: Array<{ distance: number; duration: number; geometry: { coordinates: Array<[number, number]> }; legs: Array<{ steps: Step[] }> }> }>(url, { timeoutMs: 12_000 });
     const route = res.data?.routes?.[0];
     if (res.data?.code !== 'Ok' || !route) throw new Error('no route');
-    const steps = (route.legs[0]?.steps ?? []).map((st) => ({ text: instruction(st.maneuver, st.name, locale), distanceM: Math.round(st.distance), durationMin: Math.round(st.duration / 6) / 10, location: st.maneuver.location }))
+    const steps = (route.legs[0]?.steps ?? []).map((st) => ({ text: instruction(st.maneuver, st.name, locale), distanceM: Math.round(st.distance), durationMin: Math.round(st.duration / 6) / 10, location: st.maneuver.location, maneuver: { type: st.maneuver.type, modifier: st.maneuver.modifier ?? null } }))
       .filter((x): x is StreetRoute['steps'][number] & { text: string } => !!x.text);
     const payload: StreetRoute = {
       mode, estimate: false, distanceKm: Math.round(route.distance / 100) / 10, durationMin: Math.max(1, Math.round(route.duration / 60)),

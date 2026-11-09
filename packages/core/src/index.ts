@@ -10,6 +10,7 @@ export * from './confidence';
 export * from './dedup';
 export * from './ranking';
 export * from './plan-day';
+export * from './navigation';
 export * from './query-parser';
 export * from './types';
 export * from './names';

@@ -21,7 +21,9 @@ export interface StopRef { feed: string; id: string; name: string; lat: number; 
 export type TransitLeg =
   | { type: 'walk'; from: string; to: string; distanceM: number; durationMin: number; fromPoint: [number, number]; toPoint: [number, number] }
   | { type: 'bus'; operator: string; route: string | null; routeName: string | null; color: string | null; headsign: string | null; from: string; to: string;
-      departure: string; arrival: string; stops: number; waitMin: number; fareEur: number | null; fromPoint: [number, number]; toPoint: [number, number] };
+      departure: string; arrival: string; stops: number; waitMin: number; fareEur: number | null; fromPoint: [number, number]; toPoint: [number, number];
+      /** Every stop the bus calls at on this leg, boarding and alighting stops included, with scheduled times. */
+      stopList: Array<{ name: string; at: string; point: [number, number] }> };
 export interface TransitOption { departAt: string; arriveAt: string; durationMin: number; transfers: number; walkMin: number; fareEur: number | null; fareComplete: boolean; legs: TransitLeg[] }
 export interface TransitResult {
   status: 'ok' | 'no_stops_nearby' | 'no_service' | 'no_timetable';
@@ -175,6 +177,17 @@ export async function planTransit(db: pg.Pool, from: { lat: number; lng: number 
   }
 
   const at = (s: number) => day.plus({ seconds: s }).toUTC().toISO()!;
+  // Intermediate stops of the legs that can be shown (first options only), for stop lists and the bus line on the map.
+  const shownLegs = cands.slice(0, 12).flatMap((c) => c.legs);
+  const calls = new Map<string, Array<{ seq: number; name: string; arr: number; lat: number; lng: number }>>();
+  if (shownLegs.length) {
+    const r = await db.query<{ k: string; seq: number; name: string; arr: number; lat: number; lng: number }>(
+      `SELECT st.feed_key || ':' || st.trip_id AS k, st.seq, s.name, st.arr, ST_Y(s.location::geometry) AS lat, ST_X(s.location::geometry) AS lng
+         FROM gtfs_stop_times st JOIN gtfs_stops s ON s.feed_key = st.feed_key AND s.stop_id = st.stop_id
+        WHERE st.feed_key || ':' || st.trip_id = ANY($1) ORDER BY st.feed_key, st.trip_id, st.seq`,
+      [[...new Set(shownLegs.map((l) => key(l.feed, l.trip)))]]);
+    for (const row of r.rows) { const list = calls.get(row.k) ?? []; list.push(row); calls.set(row.k, list); }
+  }
   const seen = new Set<string>();
   const options: TransitOption[] = [];
   for (const c of cands) {
@@ -202,6 +215,8 @@ export async function planTransit(db: pg.Pool, from: { lat: number; lng: number 
         type: 'bus', operator: agency.get(l.feed) ?? l.feed, route: info?.short_name ?? null, routeName: info?.long_name ?? null, color: info?.color ? `#${info.color}` : null,
         headsign: info?.headsign ?? null, from: s1.name, to: s2.name, departure: at(l.dep), arrival: at(l.arr), stops: l.toSeq - l.fromSeq,
         waitMin: Math.max(0, Math.round((l.dep - prevArr) / 60)), fareEur: f, fromPoint: [s1.lng, s1.lat], toPoint: [s2.lng, s2.lat],
+        stopList: (calls.get(key(l.feed, l.trip)) ?? []).filter((x) => x.seq >= l.fromSeq && x.seq <= l.toSeq)
+          .map((x) => ({ name: x.name, at: at(x.seq === l.fromSeq ? l.dep : x.arr), point: [x.lng, x.lat] as [number, number] })),
       });
       prevArr = l.arr;
     });

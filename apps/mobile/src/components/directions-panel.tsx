@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { router } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Linking, Platform, ScrollView, TextInput, View } from 'react-native';
@@ -10,6 +11,11 @@ import type { RouteOverlay, UserFix } from './map-shared';
 import { Banner, Button, Chip, Icon, Tap, Txt } from './ui';
 
 type Mode = 'walk' | 'bike' | 'drive' | 'transit';
+
+/** Developer tools (navigation simulation): development builds, or EXPO_PUBLIC_DEV_TOOLS=true, or ?devtools=1 on the web. */
+export const devToolsEnabled = () =>
+  __DEV__ || process.env.EXPO_PUBLIC_DEV_TOOLS === 'true' || (Platform.OS === 'web' && typeof location !== 'undefined' && new URLSearchParams(location.search).has('devtools'));
+const SIM_SCENARIOS = ['walk', 'bike', 'scooter', 'drive', 'off_route', 'stop', 'turn_around', 'gps_loss'] as const;
 type Origin = { lat: number; lng: number; label: string; kind: 'gps' | 'manual' };
 
 const hhmm = (iso: string) => new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Nicosia' }).format(new Date(iso));
@@ -101,6 +107,7 @@ export function DirectionsPanel({ dest, nav, onRoute, onUser }: { dest: { lat: n
   const [origin, setOrigin] = useState<Origin | null>(null);
   const [mode, setMode] = useState<Mode>('walk');
   const [transitIdx, setTransitIdx] = useState(0);
+  const [bikeKind, setBikeKind] = useState<'bike' | 'scooter'>('bike');
   const [manual, setManual] = useState(false);
   const [text, setText] = useState('');
   const [debounced, setDebounced] = useState('');
@@ -224,6 +231,34 @@ export function DirectionsPanel({ dest, nav, onRoute, onUser }: { dest: { lat: n
           {d.transit.attribution ? <Txt v="micro" tone="tertiary">{d.transit.attribution}</Txt> : null}
         </View>
       ) : null}
+
+      {origin && d ? (() => {
+        const navKind = mode === 'bike' ? bikeKind : mode;
+        const canNavigate = mode === 'transit' ? d.transit.status === 'ok' && !!opt : !!street && !street.estimate;
+        const go = (sim?: string) => router.push({ pathname: '/navigate', params: {
+          lat: String(dest.lat), lng: String(dest.lng), title: dest.title, mode: navKind, from: `${origin.lat},${origin.lng}`, transit: String(transitIdx), ...(sim ? { sim, speed: '4' } : {}),
+        } });
+        return (
+          <View style={{ gap: 8 }}>
+            {mode === 'bike' ? (
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                <Chip icon="bike" label={t('nav.bikeKind')} active={bikeKind === 'bike'} onPress={() => setBikeKind('bike')} />
+                <Chip icon="scooter" label={t('nav.scooterKind')} active={bikeKind === 'scooter'} onPress={() => setBikeKind('scooter')} />
+              </View>
+            ) : null}
+            {canNavigate ? <Button testID="start-navigation" title={t('nav.start').toUpperCase()} icon="navigation-variant" onPress={() => go()} />
+              : street?.estimate ? <Txt v="caption" tone="tertiary">{t('nav.noTurnByTurn')}</Txt> : null}
+            {canNavigate && devToolsEnabled() ? (
+              <View style={{ gap: 6, padding: 10, borderRadius: th.radius.md, borderWidth: 1, borderStyle: 'dashed', borderColor: th.c.danger }}>
+                <Txt v="caption" tone="secondary">{t('nav.simTitle')}</Txt>
+                <View style={{ flexDirection: 'row', gap: 6, flexWrap: 'wrap' }}>
+                  {SIM_SCENARIOS.map((x) => <Chip key={x} icon="test-tube" label={t(`nav.sim_${x}`)} onPress={() => go(x)} />)}
+                </View>
+              </View>
+            ) : null}
+          </View>
+        );
+      })() : null}
 
       {nav ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>

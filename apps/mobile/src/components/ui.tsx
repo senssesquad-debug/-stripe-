@@ -28,12 +28,12 @@ export function Tap({ children, style, ...rest }: PressableProps & { style?: Sty
   );
 }
 
-export function Button({ title, onPress, kind = 'primary', icon, loading, disabled, style, compact }: { title: string; onPress?: () => void; kind?: 'primary' | 'secondary' | 'ghost' | 'danger'; icon?: IconName; loading?: boolean; disabled?: boolean; style?: StyleProp<ViewStyle>; compact?: boolean }) {
+export function Button({ title, onPress, kind = 'primary', icon, loading, disabled, style, compact, testID }: { title: string; onPress?: () => void; kind?: 'primary' | 'secondary' | 'ghost' | 'danger'; icon?: IconName; loading?: boolean; disabled?: boolean; style?: StyleProp<ViewStyle>; compact?: boolean; testID?: string }) {
   const t = useTheme();
   const bg = { primary: t.c.primary, secondary: t.c.primarySoft, ghost: 'transparent', danger: t.c.danger }[kind];
   const fg = { primary: t.c.onPrimary, secondary: t.c.primaryText, ghost: t.c.primaryText, danger: '#fff' }[kind];
   return (
-    <Tap accessibilityRole="button" accessibilityLabel={title} onPress={onPress} disabled={disabled || loading}
+    <Tap testID={testID} accessibilityRole="button" accessibilityLabel={title} onPress={onPress} disabled={disabled || loading}
       style={[{ backgroundColor: bg, borderRadius: t.radius.pill, paddingVertical: compact ? 9 : 14, paddingHorizontal: compact ? 14 : 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, opacity: disabled ? 0.5 : 1, minHeight: 44 }, style]}>
       {loading ? <ActivityIndicator color={fg} /> : icon ? <Icon name={icon} size={18} color={fg} /> : null}
       <Txt v="bodyStrong" style={{ color: fg }}>{title}</Txt>

@@ -98,12 +98,13 @@ export interface MyEventInput {
 
 export interface StreetRoute {
   mode: 'walk' | 'bike' | 'drive'; estimate: boolean; distanceKm: number; durationMin: number; arriveAt: string; geometry: Array<[number, number]>; attribution: string | null; note?: string;
-  steps: Array<{ text: string; distanceM: number; durationMin: number; location: [number, number] }>;
+  steps: Array<{ text: string; distanceM: number; durationMin: number; location: [number, number]; maneuver?: { type: string; modifier: string | null } }>;
 }
 export type TransitLeg =
   | { type: 'walk'; from: string; to: string; distanceM: number; durationMin: number; fromPoint: [number, number]; toPoint: [number, number] }
   | { type: 'bus'; operator: string; route: string | null; routeName: string | null; color: string | null; headsign: string | null; from: string; to: string;
-      departure: string; arrival: string; stops: number; waitMin: number; fareEur: number | null; fromPoint: [number, number]; toPoint: [number, number] };
+      departure: string; arrival: string; stops: number; waitMin: number; fareEur: number | null; fromPoint: [number, number]; toPoint: [number, number];
+      stopList?: Array<{ name: string; at: string; point: [number, number] }> };
 export interface TransitOption { departAt: string; arriveAt: string; durationMin: number; transfers: number; walkMin: number; fareEur: number | null; fareComplete: boolean; legs: TransitLeg[] }
 export interface Directions {
   departAt: string; walk: StreetRoute; bike: StreetRoute; drive: StreetRoute;
@@ -172,7 +173,7 @@ export const api = {
   report: (b: { entityType: 'event' | 'place'; entityId: string; kind: string; message?: string }) => request<{ id: string }>('/v1/reports', { method: 'POST', body: b }),
   status: () => request<{ integrations: Record<string, boolean>; sources: Array<{ key: string; name: string; lastSuccessAt: string | null }> }>('/v1/status'),
   route: (from: { lat: number; lng: number }, to: { lat: number; lng: number }, mode: 'walk' | 'drive') => request<RouteResult>('/v1/route', { query: { from: `${from.lat},${from.lng}`, to: `${to.lat},${to.lng}`, mode }, timeoutMs: 20_000 }),
-  directions: (from: { lat: number; lng: number }, to: { lat: number; lng: number }) => request<Directions>('/v1/directions', { query: { from: `${from.lat},${from.lng}`, to: `${to.lat},${to.lng}` }, timeoutMs: 30_000 }),
+  directions: (from: { lat: number; lng: number }, to: { lat: number; lng: number }, at?: string) => request<Directions>('/v1/directions', { query: { from: `${from.lat},${from.lng}`, to: `${to.lat},${to.lng}`, ...(at ? { at } : {}) }, timeoutMs: 30_000 }),
   geocode: (q: string) => request<{ items: GeocodeItem[] }>('/v1/geocode', { query: { q } }),
   // Accounts
   register: (b: { email: string; password: string; name?: string; locale?: string }) => request<AuthResponse>('/v1/auth/register', { method: 'POST', body: b }),
