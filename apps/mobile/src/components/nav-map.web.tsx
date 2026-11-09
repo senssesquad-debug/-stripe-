@@ -25,7 +25,7 @@ export function NavMap({ geometry, traveled, position, headingDeg, accuracyM, vi
   const arrow = useRef<HTMLDivElement | null>(null);
   const [loaded, setLoaded] = useState(false);
   const gestureRef = useRef(onGesture);
-  gestureRef.current = onGesture;
+  useEffect(() => { gestureRef.current = onGesture; }, [onGesture]);
 
   useEffect(() => {
     if (!box.current) return;

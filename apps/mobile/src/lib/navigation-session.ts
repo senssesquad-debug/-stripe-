@@ -64,9 +64,9 @@ export interface SessionOptions {
 }
 
 export function useNavigationSession(o: SessionOptions) {
-  const built = useRef(routeFor(o.kind, o.initial, o.transitIdx));
-  const [route, setRoute] = useState<PreparedRoute | null>(() => (built.current ? prepareRoute(built.current.input) : null));
-  const [transit, setTransit] = useState<TransitOption | null>(built.current?.transit ?? null);
+  const [built] = useState(() => routeFor(o.kind, o.initial, o.transitIdx));
+  const [route, setRoute] = useState<PreparedRoute | null>(() => (built ? prepareRoute(built.input) : null));
+  const [transit, setTransit] = useState<TransitOption | null>(built?.transit ?? null);
   const [state, setState] = useState<NavState | null>(() => (route ? initialState(route, Date.now()) : null));
   const [camMode, setCamMode] = useState<CameraMode>('follow');
   const [rotate, setRotate] = useState(true);
@@ -74,23 +74,25 @@ export function useNavigationSession(o: SessionOptions) {
   const [rerouteError, setRerouteError] = useState<string | null>(null);
   const [lastFix, setLastFix] = useState<NavFix | null>(null);
   const [permission, setPermission] = useState<'unknown' | 'granted' | 'denied'>(o.sim ? 'granted' : 'unknown');
+  const [view, setView] = useState<CameraView>({ kind: 'manual' });
+  const [arrivalAt, setArrivalAt] = useState<number | null>(null);
   const camRef = useRef<Camera | null>(null);
-  const overviewRef = useRef<{ route: PreparedRoute; view: CameraView } | null>(null);
-  const manualView = useRef<CameraView>({ kind: 'manual' });
-  const followView = useRef<CameraView | null>(null);
   const routeRef = useRef(route);
   const stateRef = useRef(state);
   const lastReroute = useRef(0);
   const simClock = useRef<number | null>(null); // simulated "now" (ms)
-  routeRef.current = route;
-  stateRef.current = state;
+  useEffect(() => { routeRef.current = route; }, [route]);
 
   const onFix = useCallback((fix: NavFix | null, now: number) => {
     const r = routeRef.current;
     const s = stateRef.current;
     if (!r || !s) return;
     const next = advance(r, s, fix, now);
-    if (next !== s) { stateRef.current = next; setState(next); }
+    if (next !== s) {
+      stateRef.current = next;
+      setState(next);
+      if (next.status === 'arrived' && s.status !== 'arrived') setCamMode((m) => nextCameraMode(m, 'arrived')); // show the whole trip
+    }
     if (fix) setLastFix(fix);
   }, []);
 
@@ -154,32 +156,38 @@ export function useNavigationSession(o: SessionOptions) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state?.status]);
 
-  // Camera for the current mode.
-  let view: CameraView = manualView.current;
-  if (route && state) {
+  // Camera for the current mode: recomputed when the position, the mode or the route changes. The follow camera
+  // returns the previous one for GPS jitter, and the overview is fixed while shown, so the map only moves when it should.
+  // The camera depends on the previous camera (dead-band, limited rotation), so it can't be derived during render:
+  // it is synced here from the navigation state.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    if (!route || !state) return;
     if (camMode === 'follow' && state.lastFixAt !== null) {
       const cam = followCamera(route, state, camRef.current, { rotate });
-      if (cam !== camRef.current || !followView.current) followView.current = { kind: 'follow', cam };
-      camRef.current = cam;
-      view = followView.current;
-    } else if (camMode === 'overview' || (camMode === 'follow' && state.lastFixAt === null)) {
-      // Fixed while the overview is shown (recomputing it on every fix would keep the map moving).
-      if (!overviewRef.current || overviewRef.current.route !== route) overviewRef.current = { route, view: { kind: 'overview', bounds: overviewBounds(route, state) } };
-      view = overviewRef.current.view;
+      if (cam !== camRef.current) { camRef.current = cam; setView({ kind: 'follow', cam }); }
+    } else if (camMode === 'overview' || camMode === 'follow') {
+      camRef.current = null;
+      setView((v) => (v.kind === 'overview' ? v : { kind: 'overview', bounds: overviewBounds(route, state) }));
+    } else {
+      camRef.current = null;
+      setView((v) => (v.kind === 'manual' ? v : { kind: 'manual' }));
     }
-    if (view.kind !== 'overview') overviewRef.current = null;
-  }
-
-  useEffect(() => { if (state?.status === 'arrived') setCamMode((m) => nextCameraMode(m, 'arrived')); }, [state?.status]);
+    // Wall-clock arrival (the simulation may run faster than real time).
+    const nowRef = o.sim ? simClock.current ?? Date.now() : state.lastFixAt ?? Date.now();
+    setArrivalAt(Date.now() + (state.etaAt - nowRef));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route, state, camMode, rotate]);
+  // A new route gets a new overview.
+  useEffect(() => { setView((v) => (v.kind === 'overview' ? { kind: 'manual' } : v)); }, [route]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   return {
-    route, state, transit, view, camMode, rotate, rerouting, rerouteError, lastFix, permission,
+    route, state, transit, view, camMode, rotate, rerouting, rerouteError, lastFix, permission, arrivalAt,
     simulated: !!o.sim,
-    /** wall-clock time of arrival (the simulation may run faster than real time) */
-    arrivalAt: state ? Date.now() + (state.etaAt - (o.sim ? simClock.current ?? Date.now() : state.lastFixAt ?? Date.now())) : null,
     gesture: () => setCamMode((m) => nextCameraMode(m, 'gesture')),
-    recenter: () => { camRef.current = null; followView.current = null; setCamMode(nextCameraMode(camMode, 'recenter')); },
+    recenter: () => { camRef.current = null; setCamMode(nextCameraMode(camMode, 'recenter')); },
     toggleOverview: () => setCamMode((m) => nextCameraMode(m, 'overview')),
-    toggleRotate: () => { camRef.current = null; followView.current = null; setRotate((r) => !r); },
+    toggleRotate: () => { camRef.current = null; setRotate((r) => !r); },
   };
 }
