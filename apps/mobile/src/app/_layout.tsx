@@ -45,6 +45,8 @@ function Navigator() {
         <Stack.Screen name="my-events/index" options={{ title: '' }} />
         <Stack.Screen name="my-events/[id]" options={{ title: '' }} />
         <Stack.Screen name="locate" options={{ title: '' }} />
+        <Stack.Screen name="plans" options={{ title: '' }} />
+        <Stack.Screen name="shared-plan/[token]" options={{ title: '' }} />
       </Stack>
       <ToastHost />
     </>

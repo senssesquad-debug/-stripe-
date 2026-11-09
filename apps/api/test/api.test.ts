@@ -273,6 +273,59 @@ describe('public API', () => {
     expect(night.window).toEqual({ date: '2026-11-09', start: '21:00', end: '02:00', endsNextDay: true });
   });
 
+  describe('plan my day', () => {
+    const base = { lat: 34.6755, lng: 33.0435, date: '2026-11-09', start: '09:00', end: '21:00' };
+    it('several different variants with full stop details and group cost', async () => {
+      const r = (await app.inject({ method: 'POST', url: '/v1/plan-day', payload: { ...base, interests: ['food', 'culture'], participants: 3, tripType: 'foodie' } })).json();
+      expect(r.variants.length).toBeGreaterThanOrEqual(2);
+      const ids = r.variants.map((v: { stops: Array<{ entity: { id: string } }> }) => new Set(v.stops.map((st) => st.entity.id)));
+      expect([...ids[1]].some((id) => ids[0].has(id))).toBe(false); // alternatives use different places
+      const st = r.variants[0].stops[0];
+      expect(st).toMatchObject({ durationMin: expect.any(Number), arriveLabel: expect.stringMatching(/^\d\d:\d\d$/) });
+      expect(st.entity.name ?? st.entity.title).toBeTruthy();
+      expect(r.variants[0].stops.at(-1).distanceToNextKm).toBeNull();
+      expect(r.participants).toBe(3);
+    });
+    it('respects the maximum distance', async () => {
+      const r = (await app.inject({ method: 'POST', url: '/v1/plan-day', payload: { ...base, maxDistanceKm: 1 } })).json();
+      for (const v of r.variants) for (const st of v.stops) {
+        const loc = st.entity.location;
+        if (loc) expect(Math.hypot((loc.lat - base.lat) * 111, (loc.lng - base.lng) * 92)).toBeLessThan(1.2);
+      }
+    });
+    it('re-times an edited plan: keeps the order, adds own stops, flags problems', async () => {
+      const plan = (await app.inject({ method: 'POST', url: '/v1/plan-day', payload: { ...base, interests: ['food'] } })).json();
+      const placeIds = plan.variants[0].stops.filter((st: { entity: { type: string } }) => st.entity.type === 'place').map((st: { entity: { id: string } }) => st.entity.id);
+      const items = [{ kind: 'custom', title: 'Coffee with Maria', durationMin: 30 }, ...placeIds.reverse().map((id: string) => ({ kind: 'place', id }))];
+      const r = (await app.inject({ method: 'POST', url: '/v1/plan-day/evaluate', payload: { ...base, start: '10:00', items } })).json();
+      expect(r.stops[0]).toMatchObject({ entity: null, custom: { title: 'Coffee with Maria' }, arriveLabel: '10:00', departLabel: '10:30' });
+      expect(r.stops.slice(1).map((st: { entity: { id: string } }) => st.entity.id)).toEqual(placeIds);
+      for (let i = 1; i < r.stops.length; i++) expect(Date.parse(r.stops[i].arrive)).toBeGreaterThanOrEqual(Date.parse(r.stops[i - 1].depart));
+      const late = (await app.inject({ method: 'POST', url: '/v1/plan-day/evaluate', payload: { ...base, start: '20:50', items: [{ kind: 'place', id: placeIds[0] }] } })).json();
+      expect(late.stops[0].issues.length).toBeGreaterThan(0); // runs past the end of the day and/or closed
+    });
+    it('alternatives for a stop are open for the whole visit', async () => {
+      const r = (await app.inject({ method: 'POST', url: '/v1/plan-day/alternatives', payload: { arrive: '2026-11-09T13:00:00+02:00', durationMin: 60, near: { lat: base.lat, lng: base.lng }, categories: ['restaurant', 'cafe'] } })).json();
+      expect(r.items.length).toBeGreaterThan(0);
+      for (const e of r.items) expect(['restaurant', 'cafe']).toContain(e.category.slug);
+    });
+    it('save, list, share (works without sign-in), and only the owner can change or delete', async () => {
+      const auth = { authorization: `Bearer ${userToken}` };
+      const body = { title: 'Sunday in Limassol', date: '2026-11-09', params: { lat: base.lat, lng: base.lng, start: '10:00', end: '18:00', participants: 2 }, items: [{ kind: 'custom', title: 'Picnic', durationMin: 60 }] };
+      expect((await app.inject({ method: 'POST', url: '/v1/me/plans', payload: body })).statusCode).toBe(401);
+      const { id } = (await app.inject({ method: 'POST', url: '/v1/me/plans', payload: body, headers: auth })).json();
+      expect((await app.inject({ url: '/v1/me/plans', headers: auth })).json().items.some((p: { id: string }) => p.id === id)).toBe(true);
+      const { token } = (await app.inject({ method: 'POST', url: `/v1/me/plans/${id}/share`, headers: auth })).json();
+      const shared = (await app.inject({ url: `/v1/plans/shared/${token}` })).json();
+      expect(shared).toMatchObject({ title: 'Sunday in Limassol', plan: { stops: [{ custom: { title: 'Picnic' }, arriveLabel: '10:00' }] } });
+      const other = { authorization: `Bearer ${adminToken}` };
+      expect((await app.inject({ method: 'PUT', url: `/v1/me/plans/${id}`, payload: body, headers: other })).statusCode).toBe(404);
+      expect((await app.inject({ method: 'DELETE', url: `/v1/me/plans/${id}`, headers: other })).statusCode).toBe(404);
+      expect((await app.inject({ method: 'DELETE', url: `/v1/me/plans/${id}`, headers: auth })).statusCode).toBe(204);
+      expect((await app.inject({ url: `/v1/plans/shared/${token}` })).statusCode).toBe(404);
+    });
+  });
+
   it('anonymous report is accepted', async () => {
     const id = (await pool.query(`SELECT id FROM events LIMIT 1`)).rows[0].id;
     const r = await app.inject({ method: 'POST', url: '/v1/reports', payload: { entityType: 'event', entityId: id, kind: 'cancelled', message: 'Organiser posted that it is cancelled' } });

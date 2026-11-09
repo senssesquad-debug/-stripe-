@@ -109,6 +109,11 @@ export interface Directions {
   transit: { status: 'ok' | 'no_stops_nearby' | 'no_service' | 'no_timetable' | 'unavailable'; options: TransitOption[]; scheduledOnly: true; validUntil: string | null; attribution: string | null };
 }
 
+export type TripType = 'balanced' | 'relaxed' | 'active' | 'culture' | 'family' | 'nightlife' | 'foodie';
+export interface PlanParams { lat?: number; lng?: number; city?: string; date?: string; start: string; end: string; budget?: number | null; participants?: number; mode?: 'walk' | 'drive' | 'auto' }
+export type PlanItem = { kind: 'event' | 'place'; id: string; durationMin?: number } | { kind: 'custom'; title: string; lat?: number | null; lng?: number | null; durationMin: number };
+export interface SavedPlan { id?: string; title: string; date: string; params: PlanParams; items: PlanItem[]; shareToken?: string | null; plan: PlanDayResponse | null }
+
 export interface RouteResult { mode: 'walk' | 'drive'; estimate: boolean; distanceKm: number; durationMin: number; geometry: Array<[number, number]>; attribution: string | null }
 export interface GeocodeItem { label: string; sublabel: string | null; lat: number; lng: number; source: string }
 export interface DeliveryResult { webPush: { sent: number; failed: number }; expo: { sent: number; failed: number } }
@@ -134,7 +139,15 @@ export const api = {
   search: (q: string, p: LocationParams & { interests?: string[] }) => request<SearchResponse>('/v1/search', { method: 'POST', body: { q, ...p, locale: i18n.language }, timeoutMs: 20_000 }),
   recommendations: (p: LocationParams & { interests?: string[] }) => request<{ items: RecommendationDTO[] }>('/v1/recommendations', { query: { ...p } }),
   surprise: (p: LocationParams & { interests?: string[] }) => request<{ items: RecommendationDTO[] }>('/v1/surprise', { method: 'POST', body: { ...p, locale: i18n.language } }),
-  planDay: (b: LocationParams & { start: string; end: string; date?: string; budget?: number | null; interests?: string[]; mode?: 'walk' | 'drive' | 'auto' }) => request<PlanDayResponse>('/v1/plan-day', { method: 'POST', body: { ...b, locale: i18n.language }, timeoutMs: 25_000 }),
+  planDay: (b: PlanParams & { interests?: string[]; tripType?: TripType; maxDistanceKm?: number | null; variants?: number }) => request<PlanDayResponse>('/v1/plan-day', { method: 'POST', body: { ...b, locale: i18n.language }, timeoutMs: 25_000 }),
+  planEvaluate: (b: PlanParams & { items: PlanItem[] }) => request<PlanDayResponse>('/v1/plan-day/evaluate', { method: 'POST', body: { ...b, locale: i18n.language }, timeoutMs: 20_000 }),
+  planAlternatives: (b: { arrive: string; durationMin: number; near: { lat: number; lng: number }; categories?: string[]; exclude?: string[] }) => request<{ items: EntityDTO[] }>('/v1/plan-day/alternatives', { method: 'POST', body: { ...b, locale: i18n.language } }),
+  myPlans: () => request<{ items: Array<{ id: string; title: string; date: string; stops: number; shared: boolean }> }>('/v1/me/plans', { auth: true }),
+  myPlan: (id: string) => request<SavedPlan>(`/v1/me/plans/${id}`, { auth: true }),
+  savePlan: (b: { title: string; date: string; params: Omit<PlanParams, 'date'>; items: PlanItem[] }, id?: string) => request<{ id: string }>(id ? `/v1/me/plans/${id}` : '/v1/me/plans', { method: id ? 'PUT' : 'POST', body: b, auth: true }),
+  deletePlan: (id: string) => request<void>(`/v1/me/plans/${id}`, { method: 'DELETE', auth: true }),
+  sharePlan: (id: string) => request<{ token: string }>(`/v1/me/plans/${id}/share`, { method: 'POST', body: {}, auth: true }),
+  sharedPlan: (token: string) => request<SavedPlan>(`/v1/plans/shared/${token}`),
   report: (b: { entityType: 'event' | 'place'; entityId: string; kind: string; message?: string }) => request<{ id: string }>('/v1/reports', { method: 'POST', body: b }),
   status: () => request<{ integrations: Record<string, boolean>; sources: Array<{ key: string; name: string; lastSuccessAt: string | null }> }>('/v1/status'),
   route: (from: { lat: number; lng: number }, to: { lat: number; lng: number }, mode: 'walk' | 'drive') => request<RouteResult>('/v1/route', { query: { from: `${from.lat},${from.lng}`, to: `${to.lat},${to.lng}`, mode }, timeoutMs: 20_000 }),

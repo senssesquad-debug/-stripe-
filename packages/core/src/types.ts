@@ -187,17 +187,38 @@ export interface SearchResponse {
 }
 
 export interface PlanStopDTO {
-  entity: EntityDTO;
+  /** null for a stop the user added themselves (see `custom`). */
+  entity: EntityDTO | null;
+  custom?: { title: string; lat: number | null; lng: number | null } | null;
   arrive: string;
   depart: string;
   arriveLabel: string;
   departLabel: string;
+  durationMin: number;
   travelMinFromPrev: number;
   travelMode: 'walk' | 'drive';
+  /** To the next stop (null for the last). */
+  distanceToNextKm: number | null;
+  travelToNextMin: number | null;
+  /** Known cost for all participants (null = not listed). */
+  costEur: number | null;
   notes: Array<'meal' | 'hours_unknown' | 'price_unknown' | 'fixed_time'>;
+  /** Problems found when re-checking an edited plan. */
+  issues?: Array<'closed' | 'hours_unknown' | 'event_missed' | 'event_not_started' | 'after_window' | 'over_budget'>;
+}
+
+export interface PlanVariantDTO {
+  stops: PlanStopDTO[];
+  totalKnownCost: number;
+  stopsWithUnknownPrice: number;
+  totalTravelMin: number;
+  freeMinutes: number;
 }
 
 export interface PlanDayResponse {
+  /** Several different plans for the same request (the first is the best match). */
+  variants: PlanVariantDTO[];
+  participants: number;
   stops: PlanStopDTO[];
   totalKnownCost: number;
   stopsWithUnknownPrice: number;

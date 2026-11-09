@@ -1,19 +1,19 @@
-import { createHash } from 'node:crypto';
+import { createHash, randomBytes } from 'node:crypto';
 import {
   CATEGORIES, CITIES, COUNTRIES, GROUP_LABELS, INTEREST_GROUPS, LOCALES, ONBOARDING_INTERESTS, canonicalKey, categoriesInGroup, expandCategories, getCategory,
   correctQuery, navigationLinks, normalizeText, pickText, timeWindow, type EntityDTO, type InterestGroup,
 } from '@passtra/core';
-import type { FastifyInstance } from 'fastify';
+import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { integrationStatus } from '../config';
 import { googleLive, googlePhotos, resolveGooglePlaceId } from '../lib/google';
 import { getWeather } from '../lib/weather';
-import { ApiError, LocationQuery, csv, localeOf, parse } from '../http';
+import { ApiError, LocationQuery, csv, localeOf, parse, requireUser } from '../http';
 import {
   Sql, categoriesWhere, distanceExpr, eventToDTO, geoWhere, getEventRow, getPlaceRow, keywordsWhere, placeToDTO, provenance, queryEvents,
   queryPlaces, resolveMergedId, upcomingWhere, windowWhere,
 } from '../repo/entities';
-import { buildFeed, loadProfile, planMyDay, recommendations, resolveContext, search, surpriseMe } from '../services/discovery';
+import { buildFeed, evaluatePlanItems, loadProfile, planAlternatives, planMyDay, recommendations, resolveContext, search, surpriseMe } from '../services/discovery';
 import type { AppDeps } from '../app';
 
 const Uuid = z.string().uuid();
@@ -304,17 +304,99 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
     return { items: await surpriseMe(db, ctx, profile, b.count) };
   });
 
+  const HHMM = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
+  const PlanParams = z.object({
+    lat: z.number().optional(), lng: z.number().optional(), city: z.string().optional(), locale: z.string().optional(),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), start: HHMM, end: HHMM, budget: z.number().min(0).max(10000).nullable().optional(),
+    participants: z.number().int().min(1).max(20).default(1), mode: z.enum(['walk', 'drive', 'auto']).default('auto'),
+  });
+  const planCtx = (b: z.infer<typeof PlanParams> & { maxDistanceKm?: number | null; radius?: number }, req: FastifyRequest) =>
+    resolveContext({ lat: b.lat, lng: b.lng, city: b.city, radiusKm: b.maxDistanceKm ?? b.radius ?? 15, locale: localeOf(req, b.locale) }, now());
+
   app.post('/v1/plan-day', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (req) => {
-    const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
-    const b = parse(z.object({
-      lat: z.number().optional(), lng: z.number().optional(), city: z.string().optional(), radius: z.number().min(1).max(60).optional(), locale: z.string().optional(),
-      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), start: hhmm, end: hhmm, budget: z.number().min(0).max(10000).nullable().optional(),
-      interests: z.array(z.enum(INTEREST_GROUPS)).optional(), mode: z.enum(['walk', 'drive', 'auto']).default('auto'),
+    const b = parse(PlanParams.extend({
+      radius: z.number().min(1).max(60).optional(), interests: z.array(z.enum(INTEREST_GROUPS)).optional(),
+      tripType: z.enum(['balanced', 'relaxed', 'active', 'culture', 'family', 'nightlife', 'foodie']).default('balanced'),
+      maxDistanceKm: z.number().min(1).max(60).nullable().optional(), variants: z.number().int().min(1).max(3).default(3),
     }), req.body);
-    const locale = localeOf(req, b.locale);
-    const ctx = resolveContext({ lat: b.lat, lng: b.lng, city: b.city, radiusKm: b.radius ?? 15, locale }, now());
+    const ctx = planCtx(b, req);
     const profile = await loadProfile(db, req.user?.id ?? null, { interests: b.interests });
-    return planMyDay(db, ctx, profile, { date: b.date, start: b.start, end: b.end, budget: b.budget ?? null, interests: b.interests, mode: b.mode });
+    return planMyDay(db, ctx, profile, b);
+  });
+
+  // Re-time a plan the user edited (reordered, removed, replaced, added own stops) and report problems per stop.
+  const PlanItems = z.array(z.union([
+    z.object({ kind: z.enum(['event', 'place']), id: Uuid, durationMin: z.number().int().min(10).max(600).optional() }),
+    z.object({ kind: z.literal('custom'), title: z.string().trim().min(1).max(120), lat: z.number().nullable().optional(), lng: z.number().nullable().optional(), durationMin: z.number().int().min(5).max(600) }),
+  ])).min(1).max(15);
+  app.post('/v1/plan-day/evaluate', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (req) => {
+    const b = parse(PlanParams.extend({ items: PlanItems }), req.body);
+    return evaluatePlanItems(db, planCtx(b, req), b);
+  });
+
+  app.post('/v1/plan-day/alternatives', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (req) => {
+    const b = parse(z.object({
+      arrive: z.string().datetime({ offset: true }), durationMin: z.number().int().min(10).max(600), near: z.object({ lat: z.number(), lng: z.number() }),
+      categories: z.array(z.string()).max(30).optional(), exclude: z.array(Uuid).max(30).optional(), locale: z.string().optional(),
+    }), req.body);
+    const ctx = resolveContext({ lat: b.near.lat, lng: b.near.lng, radiusKm: 3, locale: localeOf(req, b.locale) }, now());
+    return { items: await planAlternatives(db, ctx, b) };
+  });
+
+  // Saved plans (account) and read-only shared plans (no sign-in needed).
+  const SavedPlan = z.object({ title: z.string().trim().min(1).max(120), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), params: PlanParams.omit({ date: true }), items: PlanItems });
+  const planView = async (row: { id: string; title: string; date: string; params: z.infer<typeof PlanParams>; items: z.infer<typeof PlanItems>; share_token: string | null }, req: FastifyRequest) => ({
+    id: row.id, title: row.title, date: row.date, params: row.params, items: row.items, shareToken: row.share_token,
+    plan: await evaluatePlanItems(db, planCtx({ ...row.params, date: row.date }, req), { ...row.params, date: row.date, items: row.items }).catch(() => null),
+  });
+  app.get('/v1/me/plans', async (req) => {
+    const user = requireUser(req);
+    const r = await db.query(`SELECT id, title, to_char(date, 'YYYY-MM-DD') AS date, jsonb_array_length(items) AS stops, share_token, updated_at FROM saved_plans WHERE user_id = $1 ORDER BY date DESC, updated_at DESC LIMIT 100`, [user.id]);
+    return { items: r.rows.map((x) => ({ id: x.id, title: x.title, date: x.date, stops: x.stops, shared: !!x.share_token, updatedAt: x.updated_at })) };
+  });
+  app.get('/v1/me/plans/:id', async (req) => {
+    const user = requireUser(req);
+    const { id } = parse(z.object({ id: Uuid }), req.params);
+    const r = await db.query(`SELECT id, title, to_char(date, 'YYYY-MM-DD') AS date, params, items, share_token FROM saved_plans WHERE id = $1 AND user_id = $2`, [id, user.id]);
+    if (!r.rows[0]) throw new ApiError(404, 'not_found', 'Plan not found');
+    return planView(r.rows[0], req);
+  });
+  app.post('/v1/me/plans', async (req) => {
+    const user = requireUser(req);
+    const b = parse(SavedPlan, req.body);
+    const count = await db.query(`SELECT count(*)::int AS n FROM saved_plans WHERE user_id = $1`, [user.id]);
+    if (count.rows[0].n >= 200) throw new ApiError(400, 'limit', 'Too many saved plans');
+    const r = await db.query(`INSERT INTO saved_plans (user_id, title, date, params, items) VALUES ($1,$2,$3,$4,$5) RETURNING id`, [user.id, b.title, b.date, JSON.stringify(b.params), JSON.stringify(b.items)]);
+    return { id: r.rows[0].id };
+  });
+  app.put('/v1/me/plans/:id', async (req) => {
+    const user = requireUser(req);
+    const { id } = parse(z.object({ id: Uuid }), req.params);
+    const b = parse(SavedPlan, req.body);
+    const r = await db.query(`UPDATE saved_plans SET title=$3, date=$4, params=$5, items=$6, updated_at=now() WHERE id = $1 AND user_id = $2`, [id, user.id, b.title, b.date, JSON.stringify(b.params), JSON.stringify(b.items)]);
+    if (!r.rowCount) throw new ApiError(404, 'not_found', 'Plan not found');
+    return { id };
+  });
+  app.delete('/v1/me/plans/:id', async (req, reply) => {
+    const user = requireUser(req);
+    const { id } = parse(z.object({ id: Uuid }), req.params);
+    const r = await db.query(`DELETE FROM saved_plans WHERE id = $1 AND user_id = $2`, [id, user.id]);
+    if (!r.rowCount) throw new ApiError(404, 'not_found', 'Plan not found');
+    return reply.status(204).send();
+  });
+  app.post('/v1/me/plans/:id/share', async (req) => {
+    const user = requireUser(req);
+    const { id } = parse(z.object({ id: Uuid }), req.params);
+    const r = await db.query<{ share_token: string }>(`UPDATE saved_plans SET share_token = COALESCE(share_token, $3) WHERE id = $1 AND user_id = $2 RETURNING share_token`, [id, user.id, randomBytes(12).toString('base64url')]);
+    if (!r.rows[0]) throw new ApiError(404, 'not_found', 'Plan not found');
+    return { token: r.rows[0].share_token };
+  });
+  app.get('/v1/plans/shared/:token', async (req) => {
+    const { token } = parse(z.object({ token: z.string().regex(/^[A-Za-z0-9_-]{8,40}$/) }), req.params);
+    const r = await db.query(`SELECT id, title, to_char(date, 'YYYY-MM-DD') AS date, params, items, share_token FROM saved_plans WHERE share_token = $1`, [token]);
+    if (!r.rows[0]) throw new ApiError(404, 'not_found', 'Plan not found');
+    const v = await planView(r.rows[0], req);
+    return { ...v, id: undefined, shareToken: undefined };
   });
 
   app.get('/v1/weather', async (req) => {

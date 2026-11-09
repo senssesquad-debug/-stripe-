@@ -4,7 +4,7 @@ import { LOCALES } from '../src/locales';
 import { CITIES } from '../src/regions';
 import { mergeFilters, parseQuery, SearchFiltersSchema } from '../src/query-parser';
 import { buildAffinity, explain, isEligible, rank, scoreCandidate, surprise, type Candidate, type UserProfile } from '../src/ranking';
-import { planDay, type PlanCandidate } from '../src/plan-day';
+import { evaluatePlan, planDay, type PlanCandidate } from '../src/plan-day';
 
 describe('taxonomy integrity', () => {
   it('unique slugs, labels in every locale, valid groups', () => {
@@ -221,6 +221,33 @@ describe('planDay', () => {
     for (const st of morning.stops) expect(st.notes).toContain('hours_unknown');
     const evening = planDay({ start: day('18:00'), end: day('22:00'), tz, origin, candidates: sights });
     expect(evening.stops).toHaveLength(0);
+  });
+  it('alternative variants avoid the first plan\'s stops; trip type boosts its categories; far places are skipped', () => {
+    const first = planDay({ start: day('09:00'), end: day('18:00'), tz, origin, candidates: cands });
+    const exclude = new Set(first.stops.map((st) => st.candidateId));
+    const second = planDay({ start: day('09:00'), end: day('18:00'), tz, origin, candidates: cands, exclude });
+    expect(second.stops.some((st) => exclude.has(st.candidateId))).toBe(false);
+    const culture = planDay({ start: day('09:00'), end: day('12:00'), tz, origin, candidates: cands, boost: { museum: 1 } });
+    expect(culture.stops.map((st) => st.candidateId)).toContain('museum');
+    const near = planDay({ start: day('09:00'), end: day('18:00'), tz, origin, candidates: cands, maxDistanceKm: 0.3 });
+    expect(near.stops.map((st) => st.candidateId)).not.toContain('beach'); // ~2 km away
+  });
+  it('re-evaluates a user-ordered plan and reports problems instead of hiding them', () => {
+    const items = [
+      { id: 'museum', title: 'Museum', category: 'museum', location: { lat: 34.674, lng: 33.044 }, openIntervals: open('09:00', '17:00'), price: 4, durationMin: 90 },
+      { id: 'concert', title: 'Concert', category: 'concert', location: { lat: 34.6756, lng: 33.0436 }, startsAt: day('20:30'), endsAt: day('22:00'), price: 25 },
+      { id: 'closed', title: 'Gallery', category: 'art-gallery', location: { lat: 34.675, lng: 33.045 }, openIntervals: [], price: 0 },
+      { id: 'mine', title: 'Meet friends', category: null, location: null, durationMin: 30 },
+    ];
+    const r = evaluatePlan({ start: day('16:30'), end: day('23:59'), tz, origin, items, budget: 20, participants: 2 });
+    const by = Object.fromEntries(r.stops.map((st) => [st.id, st]));
+    expect(by.museum!.issues).toContain('closed'); // 16:3x + 90 min runs past 17:00
+    expect(by.concert!.arrive).toEqual(day('20:30')); // waits for the fixed start
+    expect(by.concert!.price).toBe(50); // 2 people
+    expect(by.concert!.issues).toContain('over_budget'); // 8 + 50 > 2 × 20
+    expect(by.closed!.issues).toContain('closed');
+    expect(by.mine!.issues).toEqual([]); // a custom stop without place data has nothing to check
+    expect(r.stops.map((st) => st.id)).toEqual(['museum', 'concert', 'closed', 'mine']); // order kept
   });
   it('drops paid items over budget', () => {
     const plan = planDay({ start: day('18:00'), end: day('23:00'), tz, origin, candidates: cands, budget: 20 });

@@ -3,7 +3,7 @@ import {
   CATEGORIES, CITIES, GROUP_LABELS, buildAffinity, expandCategories, canonicalKey, categoriesInGroup, cityBySlug, explain, getCategory, haversineKm,
   isValidLatLng, localDate, pickText, planDay, rank, scoreCandidate, surprise, timeWindow, type AgeRange, type Budget, type Candidate, type CityDef,
   type EntityDTO, type EventDTO, type FeedResponse, type FeedSectionDTO, type FeedSectionKey, type InteractionKind, type InterestGroup,
-  correctQuery, type Locale, type PlaceDTO, type PlanCandidate, type PlanDayResponse, type RecommendationDTO, type SearchFilters, type SearchResponse, type UserProfile,
+  correctQuery, evaluatePlan, type EvalItem, type Locale, type PlaceDTO, type PlanCandidate, type PlanDayResponse, type PlanStopDTO, type PlanVariantDTO, type RecommendationDTO, type SearchFilters, type SearchResponse, type UserProfile,
 } from '@passtra/core';
 import { DateTime } from 'luxon';
 import type pg from 'pg';
@@ -388,22 +388,39 @@ export async function surpriseMe(db: pg.Pool, ctx: DiscoveryContext, profile: Pr
 
 // ── Plan my day ────────────────────────────────────────────────────────────
 
-export interface PlanInput {
-  date?: string; // YYYY-MM-DD (local); default today
-  start: string; // HH:mm
-  end: string; // HH:mm (may be after midnight → next day)
-  budget?: number | null;
-  interests?: InterestGroup[];
-  mode?: 'walk' | 'drive' | 'auto';
-}
-
 const DISCLAIMER: Record<Locale, string> = {
   en: 'Travel times are estimates. Opening hours and event times come from the listed sources — check them before you go. Items marked "price unknown" are not counted in the total.',
   el: 'Οι χρόνοι μετακίνησης είναι εκτιμήσεις. Ωράρια και ώρες εκδηλώσεων προέρχονται από τις πηγές — ελέγξτε τα πριν πάτε. Όσα έχουν «άγνωστη τιμή» δεν υπολογίζονται στο σύνολο.',
   ru: 'Время в пути — оценка. Часы работы и время событий взяты из указанных источников — проверьте перед выходом. Позиции с неизвестной ценой не учтены в сумме.',
 };
 
-export async function planMyDay(db: pg.Pool, ctx: DiscoveryContext, profile: Profile, input: PlanInput): Promise<PlanDayResponse> {
+export type TripType = 'balanced' | 'relaxed' | 'active' | 'culture' | 'family' | 'nightlife' | 'foodie';
+
+export interface PlanInput {
+  date?: string; // YYYY-MM-DD (local); default today
+  start: string; // HH:mm
+  end: string; // HH:mm (may be after midnight → next day)
+  budget?: number | null; // per person, EUR
+  interests?: InterestGroup[];
+  mode?: 'walk' | 'drive' | 'auto';
+  participants?: number;
+  tripType?: TripType;
+  maxDistanceKm?: number | null;
+  variants?: number;
+}
+
+/** Trip types reshape scores (categories favoured), visit length and number of stops — never the facts. */
+const TRIP: Record<TripType, { boost: string[]; pace: number; maxStops: number; groups: InterestGroup[] }> = {
+  balanced: { boost: [], pace: 1, maxStops: 7, groups: [] },
+  relaxed: { boost: ['beach', 'park', 'viewpoint', 'cafe', 'marina'], pace: 1.3, maxStops: 5, groups: ['nature', 'food'] },
+  active: { boost: ['hiking', 'diving', 'surfing', 'karting', 'boat-trip', 'escape-room', 'water-park'], pace: 0.9, maxStops: 7, groups: ['adventure', 'sports', 'nature'] },
+  culture: { boost: ['museum', 'historic-site', 'religious-site', 'art-gallery', 'theatre', 'exhibition'], pace: 1, maxStops: 7, groups: ['culture', 'art'] },
+  family: { boost: ['playground', 'zoo-aquarium', 'water-park', 'amusement-park', 'bowling', 'park', 'beach'], pace: 1, maxStops: 6, groups: ['family', 'nature'] },
+  nightlife: { boost: ['bar', 'nightclub', 'pub', 'concert', 'live-music-venue'], pace: 1, maxStops: 6, groups: ['nightlife', 'music', 'food'] },
+  foodie: { boost: ['restaurant', 'cafe', 'bakery', 'winery', 'food-festival'], pace: 1.1, maxStops: 6, groups: ['food'] },
+};
+
+function planWindow(ctx: DiscoveryContext, input: { date?: string; start: string; end: string }) {
   const zone = ctx.tz;
   const day = input.date ? DateTime.fromISO(input.date, { zone }) : DateTime.fromJSDate(ctx.now, { zone }).startOf('day');
   const [sh, sm] = input.start.split(':').map(Number);
@@ -417,25 +434,55 @@ export async function planMyDay(db: pg.Pool, ctx: DiscoveryContext, profile: Pro
   }
   const nowLocal = DateTime.fromJSDate(ctx.now, { zone });
   if (start < nowLocal) start = nowLocal.plus({ minutes: 5 - (nowLocal.minute % 5) }).set({ second: 0, millisecond: 0 });
-  const windowOut = { date: day.toISODate()!, start: start.toFormat('HH:mm'), end: end.toFormat('HH:mm'), endsNextDay: end.toISODate() !== day.toISODate() };
-  const empty = (reason: 'window_passed' | 'nothing_fits') => ({ stops: [], totalKnownCost: 0, stopsWithUnknownPrice: 0, totalTravelMin: 0, freeMinutes: 0, disclaimer: DISCLAIMER[ctx.locale], window: windowOut, reason });
+  return { day, start, end, zone, window: { date: day.toISODate()!, start: start.toFormat('HH:mm'), end: end.toFormat('HH:mm'), endsNextDay: end.toISODate() !== day.toISODate() } };
+}
+
+const planOrigin = (ctx: DiscoveryContext) => ctx.geo ?? (ctx.city ? { lat: ctx.city.lat, lng: ctx.city.lng } : { lat: 34.6786, lng: 33.0413 });
+
+function entityLocation(e: EntityDTO | null): { lat: number; lng: number } | null {
+  if (!e) return null;
+  return e.type === 'place' ? e.location : e.location ? { lat: e.location.lat, lng: e.location.lng } : null;
+}
+
+/** Stop DTOs with distance/time to the next stop and cost for the whole group. */
+function stopDTOs(stops: Array<{ entity: EntityDTO | null; custom?: PlanStopDTO['custom']; arrive: Date; depart: Date; travelMinFromPrev: number; travelMode: 'walk' | 'drive'; price: number | null; notes: PlanStopDTO['notes']; issues?: PlanStopDTO['issues'] }>, zone: string, people: number, mode: 'walk' | 'drive' | 'auto'): PlanStopDTO[] {
+  const fmt = (d: Date) => DateTime.fromJSDate(d, { zone }).toFormat('HH:mm');
+  return stops.map((s, i) => {
+    const here = entityLocation(s.entity) ?? (s.custom?.lat != null && s.custom.lng != null ? { lat: s.custom.lat, lng: s.custom.lng } : null);
+    const nx = stops[i + 1];
+    const there = nx ? entityLocation(nx.entity) ?? (nx.custom?.lat != null && nx.custom.lng != null ? { lat: nx.custom.lat, lng: nx.custom.lng } : null) : null;
+    const km = here && there ? haversineKm(here, there) : null;
+    return {
+      entity: s.entity, custom: s.custom ?? null, arrive: s.arrive.toISOString(), depart: s.depart.toISOString(), arriveLabel: fmt(s.arrive), departLabel: fmt(s.depart),
+      durationMin: Math.round((s.depart.getTime() - s.arrive.getTime()) / 60_000), travelMinFromPrev: s.travelMinFromPrev, travelMode: s.travelMode,
+      distanceToNextKm: km === null ? null : Math.round(km * 10) / 10, travelToNextMin: nx ? nx.travelMinFromPrev : null,
+      costEur: s.price === null ? null : Math.round(s.price * people * 100) / 100, notes: s.notes, ...(s.issues ? { issues: s.issues } : {}),
+    } satisfies PlanStopDTO;
+  });
+}
+
+export async function planMyDay(db: pg.Pool, ctx: DiscoveryContext, profile: Profile, input: PlanInput): Promise<PlanDayResponse> {
+  const { start, end, zone, window: windowOut } = planWindow(ctx, input);
+  const people = Math.max(1, Math.min(20, input.participants ?? 1));
+  const trip = TRIP[input.tripType ?? 'balanced'];
+  const empty = (reason: 'window_passed' | 'nothing_fits'): PlanDayResponse => ({ variants: [], participants: people, stops: [], totalKnownCost: 0, stopsWithUnknownPrice: 0, totalTravelMin: 0, freeMinutes: 0, disclaimer: DISCLAIMER[ctx.locale], window: windowOut, reason });
   if (end.diff(start, 'minutes').minutes < 45) return empty('window_passed');
 
-  const interests = input.interests?.length ? input.interests : profile.interests;
+  const interests = input.interests?.length ? input.interests : trip.groups.length ? trip.groups : profile.interests;
   const interestCats = interests.flatMap((g) => categoriesInGroup(g).map((c) => c.slug));
   // Errands (supermarkets, gyms, bike docks…) are not stops in a day out.
-  const placeCats = [...new Set([...interestCats.filter((s) => getCategory(s)?.kind !== 'event'), 'restaurant', 'cafe', 'bakery', ...(interestCats.length ? [] : LEISURE_PLACE_CATS)])]
-    .filter((s) => !PRACTICAL.includes(s) && !ERRANDS.has(s));
+  const placeCats = [...new Set([...interestCats.filter((s) => getCategory(s)?.kind !== 'event'), 'restaurant', 'cafe', 'bakery', ...trip.boost, ...(interestCats.length ? [] : LEISURE_PLACE_CATS)])]
+    .filter((s) => !PRACTICAL.includes(s) && !ERRANDS.has(s) && getCategory(s)?.kind !== 'event');
+  const radius = input.maxDistanceKm ?? ctx.radiusKm;
   const window = { kind: 'custom' as const, start: start.toJSDate(), end: end.toJSDate(), startDate: start.toISODate()!, endDate: end.minus({ milliseconds: 1 }).toISODate()! };
   const [events, places] = await Promise.all([
-    upcomingEvents(db, ctx, { window, excludeMultiDay: true, categories: interestCats.filter((s) => getCategory(s)?.kind !== 'place'), limit: 60 }),
-    nearbyPlaces(db, ctx, { categories: placeCats, limit: 400 }),
+    upcomingEvents(db, ctx, { window, excludeMultiDay: true, categories: interestCats.filter((s) => getCategory(s)?.kind !== 'place'), radiusKm: radius, limit: 60 }),
+    nearbyPlaces(db, ctx, { categories: placeCats, radiusKm: radius, limit: 500 }),
   ]);
   const placeDTOs = new Map(places.map((r) => [r.id, placeToDTO(r, ctx.locale, ctx.now)]));
   const p2: Profile = { ...profile, interests };
-  const scores = new Map(rank([...events.map(eventCandidate), ...places.map((r) => placeCandidate(r, placeDTOs.get(r.id)!))], p2, { now: start.toJSDate(), tz: zone, radiusKm: ctx.radiusKm }, 400).map((s) => [s.item.id, s.score]));
+  const scores = new Map(rank([...events.map(eventCandidate), ...places.map((r) => placeCandidate(r, placeDTOs.get(r.id)!))], p2, { now: start.toJSDate(), tz: zone, radiusKm: radius }, 500).map((s) => [s.item.id, s.score]));
   const evMap = new Map(events.map((r) => [r.id, r]));
-
   const candidates: PlanCandidate[] = [
     ...events.filter((r) => r.time_precision === 'exact' && r.lat !== null).map((r) => ({
       id: r.id, type: 'event' as const, title: r.title, category: r.primary_category, location: { lat: r.lat!, lng: r.lng! }, score: scores.get(r.id) ?? 0,
@@ -447,23 +494,90 @@ export async function planMyDay(db: pg.Pool, ctx: DiscoveryContext, profile: Pro
       price: r.is_free === true ? 0 : null,
     })),
   ];
-  const origin = ctx.geo ?? (ctx.city ? { lat: ctx.city.lat, lng: ctx.city.lng } : { lat: 34.6786, lng: 33.0413 });
-  const plan = planDay({ start: start.toJSDate(), end: end.toJSDate(), tz: zone, origin, budget: input.budget ?? null, mode: input.mode ?? 'auto', candidates });
-  const fmt = (d: Date) => DateTime.fromJSDate(d, { zone }).toFormat('HH:mm');
-  return {
-    stops: plan.stops.map((s) => ({
-      entity: s.candidateId && evMap.has(s.candidateId) ? eventToDTO(evMap.get(s.candidateId)!, ctx.locale, ctx.now) : (placeDTOs.get(s.candidateId) as EntityDTO),
-      arrive: s.arrive.toISOString(), depart: s.depart.toISOString(), arriveLabel: fmt(s.arrive), departLabel: fmt(s.depart),
-      travelMinFromPrev: s.travelMinFromPrev, travelMode: s.travelMode, notes: s.notes,
-    })),
-    totalKnownCost: plan.totalKnownCost,
-    stopsWithUnknownPrice: plan.stopsWithUnknownPrice,
-    totalTravelMin: plan.totalTravelMin,
-    freeMinutes: plan.freeMinutes,
-    disclaimer: DISCLAIMER[ctx.locale],
-    window: windowOut,
-    reason: plan.stops.length ? null : 'nothing_fits',
-  };
+  const origin = planOrigin(ctx);
+  const boost = Object.fromEntries(trip.boost.map((c) => [c, 0.25]));
+  const variants: PlanVariantDTO[] = [];
+  const used = new Set<string>();
+  for (let v = 0; v < Math.max(1, Math.min(3, input.variants ?? 3)); v++) {
+    const plan = planDay({ start: start.toJSDate(), end: end.toJSDate(), tz: zone, origin, budget: input.budget ?? null, mode: input.mode ?? 'auto', candidates,
+      boost, pace: trip.pace, maxStops: trip.maxStops, maxDistanceKm: radius, exclude: v === 0 ? undefined : new Set(used) });
+    if (plan.stops.length < (v === 0 ? 1 : 2)) break; // an alternative needs at least two new stops
+    plan.stops.forEach((st) => used.add(st.candidateId));
+    variants.push({
+      stops: stopDTOs(plan.stops.map((st) => ({
+        entity: evMap.has(st.candidateId) ? eventToDTO(evMap.get(st.candidateId)!, ctx.locale, ctx.now) : (placeDTOs.get(st.candidateId) as EntityDTO),
+        arrive: st.arrive, depart: st.depart, travelMinFromPrev: st.travelMinFromPrev, travelMode: st.travelMode, price: st.price, notes: st.notes,
+      })), zone, people, input.mode ?? 'auto'),
+      totalKnownCost: Math.round(plan.totalKnownCost * people * 100) / 100, stopsWithUnknownPrice: plan.stopsWithUnknownPrice, totalTravelMin: plan.totalTravelMin, freeMinutes: plan.freeMinutes,
+    });
+  }
+  if (!variants.length) return empty('nothing_fits');
+  const first = variants[0]!;
+  return { variants, participants: people, ...first, disclaimer: DISCLAIMER[ctx.locale], window: windowOut, reason: null };
+}
+
+/** An item of a user-edited plan: a passtra event/place, or the user's own stop. */
+export type PlanItemInput = { kind: 'event' | 'place'; id: string; durationMin?: number } | { kind: 'custom'; title: string; lat?: number | null; lng?: number | null; durationMin: number };
+
+/** Re-time a user-edited plan in the given order and report problems per stop (closed, missed, late, over budget). */
+export async function evaluatePlanItems(db: pg.Pool, ctx: DiscoveryContext, input: { date?: string; start: string; end: string; budget?: number | null; participants?: number; mode?: 'walk' | 'drive' | 'auto'; items: PlanItemInput[] }): Promise<PlanDayResponse> {
+  const { start, end, zone, window: windowOut } = planWindow(ctx, input);
+  const people = Math.max(1, Math.min(20, input.participants ?? 1));
+  const evIds = input.items.filter((i) => i.kind === 'event').map((i) => (i as { id: string }).id);
+  const plIds = input.items.filter((i) => i.kind === 'place').map((i) => (i as { id: string }).id);
+  const byIds = (alias: 'e' | 'p', ids: string[]) => { const q = new Sql(); q.where.push(`${alias}.id = ANY(${q.add(ids)}::uuid[])`); return q; };
+  const evRows = evIds.length ? await queryEvents(db, byIds('e', evIds), 'NULL::float8', 'e.starts_at', 100) : [];
+  const plRows = plIds.length ? await queryPlaces(db, byIds('p', plIds), 'NULL::float8', 'p.name', 100) : [];
+  const evById = new Map(evRows.map((r) => [r.id, r]));
+  const plById = new Map(plRows.map((r) => [r.id, r]));
+  const items: EvalItem[] = [];
+  const entities: Array<{ entity: EntityDTO | null; custom: PlanStopDTO['custom'] }> = [];
+  for (const it of input.items) {
+    if (it.kind === 'custom') {
+      const loc = it.lat != null && it.lng != null ? { lat: it.lat, lng: it.lng } : null;
+      items.push({ id: `custom:${items.length}`, title: it.title, category: null, location: loc, durationMin: it.durationMin });
+      entities.push({ entity: null, custom: { title: it.title, lat: loc?.lat ?? null, lng: loc?.lng ?? null } });
+    } else if (it.kind === 'event' && evById.has(it.id)) {
+      const r = evById.get(it.id)!;
+      items.push({ id: r.id, title: r.title, category: r.primary_category, location: r.lat !== null ? { lat: r.lat, lng: r.lng! } : null, startsAt: r.time_precision === 'exact' ? r.starts_at : undefined, endsAt: r.ends_at, price: r.is_free ? 0 : r.price_min, durationMin: it.durationMin });
+      entities.push({ entity: eventToDTO(r, ctx.locale, ctx.now), custom: null });
+    } else if (it.kind === 'place' && plById.has(it.id)) {
+      const r = plById.get(it.id)!;
+      items.push({ id: r.id, title: r.name, category: r.primary_category, location: { lat: r.lat, lng: r.lng }, price: r.is_free === true ? 0 : null, durationMin: it.durationMin,
+        openIntervals: openIntervals(r.opening_hours?.value, start.startOf('day').toJSDate(), end.endOf('day').toJSDate(), zone, r.lat, r.lng) });
+      entities.push({ entity: placeToDTO(r, ctx.locale, ctx.now), custom: null });
+    }
+  }
+  const ev = evaluatePlan({ start: start.toJSDate(), end: end.toJSDate(), tz: zone, origin: planOrigin(ctx), mode: input.mode ?? 'auto', budget: input.budget ?? null, participants: people, items });
+  const stops = stopDTOs(ev.stops.map((s, i) => ({
+    ...entities[i]!, arrive: s.arrive, depart: s.depart, travelMinFromPrev: s.travelMinFromPrev, travelMode: s.travelMode,
+    price: s.price === null ? null : s.price / people, notes: [...(s.issues.includes('hours_unknown') ? (['hours_unknown'] as const) : []), ...(entities[i]!.entity?.type === 'event' ? (['fixed_time'] as const) : [])],
+    issues: s.issues,
+  })), zone, people, input.mode ?? 'auto');
+  const busy = ev.stops.reduce((a, s) => a + (s.depart.getTime() - s.arrive.getTime()) / 60_000 + s.travelMinFromPrev, 0);
+  const variant: PlanVariantDTO = { stops, totalKnownCost: ev.totalKnownCost, stopsWithUnknownPrice: ev.stopsWithUnknownPrice, totalTravelMin: ev.totalTravelMin, freeMinutes: Math.max(0, Math.round((end.toMillis() - start.toMillis()) / 60_000 - busy)) };
+  return { variants: [variant], participants: people, ...variant, disclaimer: DISCLAIMER[ctx.locale], window: windowOut, reason: stops.length ? null : 'nothing_fits' };
+}
+
+/** Replacements for one stop: places open for the whole visit (or events starting then), near the neighbouring stops. */
+export async function planAlternatives(db: pg.Pool, ctx: DiscoveryContext, input: { arrive: string; durationMin: number; near: { lat: number; lng: number }; categories?: string[]; exclude?: string[]; maxPrice?: number | null }): Promise<EntityDTO[]> {
+  const arrive = new Date(input.arrive);
+  const depart = new Date(arrive.getTime() + input.durationMin * 60_000);
+  const local = { ...ctx, geo: input.near, radiusKm: 3 };
+  const cats = (input.categories?.length ? input.categories : LEISURE_PLACE_CATS).filter((s) => !PRACTICAL.includes(s) && !ERRANDS.has(s));
+  const places = await nearbyPlaces(db, local, { categories: cats, limit: 150, requireHours: false });
+  const zone = ctx.tz;
+  const dayStart = DateTime.fromJSDate(arrive, { zone }).startOf('day');
+  const out: Array<{ dto: EntityDTO; d: number }> = [];
+  for (const r of places) {
+    if (input.exclude?.includes(r.id)) continue;
+    const ivs = openIntervals(r.opening_hours?.value, dayStart.toJSDate(), dayStart.endOf('day').plus({ hours: 6 }).toJSDate(), zone, r.lat, r.lng);
+    if (!ivs || !ivs.some((i) => i.start <= arrive && i.end >= depart)) continue; // only places confirmed open for the visit
+    out.push({ dto: placeToDTO(r, ctx.locale, ctx.now), d: r.distance_km ?? 0 });
+  }
+  const evs = await upcomingEvents(db, local, { window: { kind: 'custom', start: new Date(arrive.getTime() - 30 * 60_000), end: depart, startDate: dayStart.toISODate()!, endDate: dayStart.toISODate()! }, excludeMultiDay: true, limit: 20 });
+  for (const r of evs) if (!input.exclude?.includes(r.id) && r.time_precision === 'exact' && r.starts_at >= new Date(arrive.getTime() - 15 * 60_000) && r.starts_at <= depart) out.push({ dto: eventToDTO(r, ctx.locale, ctx.now), d: r.distance_km ?? 0 });
+  return out.sort((a, b) => a.d - b.d).slice(0, 8).map((x) => x.dto);
 }
 
 export type { EventDTO };

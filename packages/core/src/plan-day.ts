@@ -34,6 +34,14 @@ export interface PlanRequest {
   mode?: TravelMode | 'auto';
   candidates: PlanCandidate[];
   maxStops?: number;
+  /** Candidates not to use (alternative variants leave out the previous variant's stops). */
+  exclude?: Set<string>;
+  /** Score bonus per category (trip type: cultural, active, family…). */
+  boost?: Record<string, number>;
+  /** Stops further than this from the origin are not used. */
+  maxDistanceKm?: number | null;
+  /** Typical visit length multiplier (relaxed days linger longer). */
+  pace?: number;
 }
 
 export type StopNote = 'meal' | 'hours_unknown' | 'price_unknown' | 'fixed_time';
@@ -118,7 +126,18 @@ function isOpenThrough(c: PlanCandidate, from: Date, to: Date): boolean | 'unkno
  *     preferring food during meal windows, honouring opening hours, travel time and budget.
  * Unknown prices are never treated as free; unknown hours are only accepted for outdoor spots.
  */
-export function planDay(req: PlanRequest): DayPlan {
+export function planDay(input: PlanRequest): DayPlan {
+  // Variants, trip type and distance limit only reshape the candidate list; the algorithm is the same.
+  const req: PlanRequest = {
+    ...input,
+    candidates: input.candidates
+      .filter((c) => !input.exclude?.has(c.id) && (!input.maxDistanceKm || haversineKm(input.origin, c.location) <= input.maxDistanceKm))
+      .map((c) => ({
+        ...c,
+        score: c.score + (input.boost?.[c.category] ?? 0),
+        durationMin: c.type === 'place' && input.pace ? Math.round((c.durationMin ?? getCategory(c.category)?.visitMinutes ?? 60) * input.pace) : c.durationMin,
+      })),
+  };
   const maxStops = req.maxStops ?? 7;
   const budget = req.budget ?? Infinity;
   const used = new Set<string>();
@@ -251,5 +270,76 @@ export function planDay(req: PlanRequest): DayPlan {
     stopsWithUnknownPrice: stops.filter((x) => x.price === null).length,
     totalTravelMin: totalTravel,
     freeMinutes: Math.max(0, Math.round((req.end.getTime() - req.start.getTime()) / 60_000 - busy)),
+  };
+}
+
+
+// ── Re-evaluating a user-edited plan ─────────────────────────────────────────
+
+export type StopIssue = 'closed' | 'hours_unknown' | 'event_missed' | 'event_not_started' | 'after_window' | 'over_budget';
+
+export interface EvalItem {
+  id: string;
+  title: string;
+  category: string | null;
+  location: LatLng | null;
+  /** Events: fixed start/end. */
+  startsAt?: Date;
+  endsAt?: Date | null;
+  openIntervals?: Interval[];
+  price?: number | null;
+  durationMin?: number;
+}
+
+export interface EvalStop { id: string; arrive: Date; depart: Date; travelMinFromPrev: number; travelMode: TravelMode; distanceKmFromPrev: number; price: number | null; issues: StopIssue[] }
+
+/**
+ * Times for stops in the user's order: each starts after the previous one plus travel; an event is joined at its
+ * start (waiting if early). Nothing is moved or dropped — problems are reported per stop (closed at that time,
+ * event already over, past the end of the day, over budget) so the user decides.
+ */
+export function evaluatePlan(req: { start: Date; end: Date; tz: string; origin: LatLng; mode?: TravelMode | 'auto'; budget?: number | null; participants?: number; items: EvalItem[] }): { stops: EvalStop[]; totalKnownCost: number; stopsWithUnknownPrice: number; totalTravelMin: number } {
+  let t = req.start;
+  let pos = req.origin;
+  let spent = 0;
+  let travelTotal = 0;
+  const people = Math.max(1, req.participants ?? 1);
+  const stops: EvalStop[] = [];
+  for (const it of req.items) {
+    const loc = it.location ?? pos;
+    const km = haversineKm(pos, loc);
+    const tr = travel(pos, loc, req.mode);
+    let arrive = addMin(t, it.location ? tr.min : 0);
+    const issues: StopIssue[] = [];
+    let depart: Date;
+    if (it.startsAt) {
+      if (arrive < it.startsAt) arrive = it.startsAt;
+      const end = it.endsAt ?? addMin(it.startsAt, it.durationMin ?? getCategory(it.category ?? '')?.visitMinutes ?? 120);
+      if (arrive >= end) issues.push('event_missed');
+      depart = it.endsAt && it.endsAt > arrive ? it.endsAt : addMin(arrive, it.durationMin ?? 120);
+    } else {
+      depart = addMin(arrive, it.durationMin ?? getCategory(it.category ?? '')?.visitMinutes ?? 60);
+      if (it.category) {
+        const open = isOpenThrough({ id: it.id, type: 'place', title: it.title, category: it.category, location: loc, score: 0, openIntervals: it.openIntervals }, arrive, depart);
+        if (open === false) issues.push('closed');
+        if (open === 'unknown') issues.push('hours_unknown');
+      }
+    }
+    if (depart > req.end) issues.push('after_window');
+    const price = it.price === null || it.price === undefined ? null : it.price * people;
+    if (price !== null) {
+      spent += price;
+      if (req.budget !== null && req.budget !== undefined && spent > req.budget * people) issues.push('over_budget');
+    }
+    travelTotal += it.location ? tr.min : 0;
+    stops.push({ id: it.id, arrive, depart, travelMinFromPrev: it.location ? tr.min : 0, travelMode: tr.mode, distanceKmFromPrev: Math.round(km * 10) / 10, price, issues });
+    t = depart;
+    pos = loc;
+  }
+  return {
+    stops,
+    totalKnownCost: Math.round(stops.reduce((s, x) => s + (x.price ?? 0), 0) * 100) / 100,
+    stopsWithUnknownPrice: stops.filter((x) => x.price === null).length,
+    totalTravelMin: travelTotal,
   };
 }
