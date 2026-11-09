@@ -1,0 +1,232 @@
+<title>passtra: отчёт о тестировании</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column; a status strip up top, then sections that read like an engineering report. */
+:root {
+  --bg: #F6F7FB;
+  --surface: #FFFFFF;
+  --fg: #0E1230;
+  --muted: #565D7A;
+  --line: #DFE2EE;
+  --brand: #0009A9;
+  --brand-soft: #E7E8FA;
+  --ok: #0B7A55;
+  --ok-soft: #E3F4EC;
+  --warn: #9A5B00;
+  --warn-soft: #FDF1DC;
+  --bad: #B3261E;
+  --bad-soft: #FBE6E4;
+  --font-body: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0B0D1C; --surface: #141832; --fg: #E9EBF7; --muted: #A2A8C6; --line: #2A2F52;
+  --brand: #9BA2FF; --brand-soft: #1E2350; --ok: #5FD3A2; --ok-soft: #12302A; --warn: #F2B65A; --warn-soft: #33270F;
+  --bad: #FF8A80; --bad-soft: #3A1A1A; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0B0D1C; --surface: #141832; --fg: #E9EBF7; --muted: #A2A8C6; --line: #2A2F52;
+  --brand: #9BA2FF; --brand-soft: #1E2350; --ok: #5FD3A2; --ok-soft: #12302A; --warn: #F2B65A; --warn-soft: #33270F;
+  --bad: #FF8A80; --bad-soft: #3A1A1A; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 40px 72px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 44px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 16px; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--brand); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 3px; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+code { background: var(--brand-soft); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); }
+section { display: grid; gap: 16px; min-width: 0; }
+.lede { color: var(--muted); font-size: 16px; }
+header { display: grid; gap: 14px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--muted); font-size: 13px; }
+
+.strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+.strip > div { padding: 16px 18px; display: grid; gap: 2px; border-left: 1px solid var(--line); min-width: 0; }
+.strip > div:first-child { border-left: 0; }
+.strip b { font-family: var(--font-mono); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.strip span { font-size: 13px; color: var(--muted); }
+@media (max-width: 640px) { .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } .strip > div:nth-child(3) { border-left: 0; } .strip > div:nth-child(n+3) { border-top: 1px solid var(--line); } }
+
+.list { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.row { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 4px 20px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.row > :first-child { font-weight: 700; }
+.row p { color: var(--fg); }
+.row p + p { margin-top: 4px; }
+@media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.n { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+
+.callout { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 16px 18px; display: grid; gap: 8px; }
+.callout.warn { border-color: color-mix(in srgb, var(--warn) 40%, var(--line)); background: var(--warn-soft); }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+li { max-width: 70ch; }
+.small { font-size: 13px; color: var(--muted); }
+.keys { display: grid; gap: 12px; }
+.key { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 6px; min-width: 0; }
+.key-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; justify-content: space-between; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">passtra · Critical Development Update</div>
+    <h1>Отчёт о тестировании</h1>
+    <p class="lede">Все 12 разделов задания выполнены в заданном порядке. Ниже: что исправлено, что сделано, какие проверки прошли и какие нет, и что нужно подключить с вашей стороны.</p>
+    <div class="meta">
+      <span>9 ноября 2026</span>
+      <span>Ветка <code>claude/fervent-maxwell-r7hhj0</code>, коммит <code>34d73d4</code></span>
+      <span><a href="https://passtra.onrender.com" target="_blank" rel="noopener">passtra.onrender.com</a> · <a href="https://passtra.onrender.com/admin/" target="_blank" rel="noopener">админка</a></span>
+    </div>
+  </header>
+
+  <div class="strip" role="list" aria-label="Итоги проверок">
+    <div role="listitem"><b>312</b><span>автотестов прошло (API 145 + ядро 167)</span></div>
+    <div role="listitem"><b>34</b><span>браузерных сценария прошли</span></div>
+    <div role="listitem"><b>0</b><span>упавших тестов</span></div>
+    <div role="listitem"><b>23</b><span>ошибки строгого линтера (не влияют на работу)</span></div>
+  </div>
+
+  <section>
+    <h2>Главное, что нужно знать</h2>
+    <div class="callout warn">
+      <h3>На живом сайте сейчас нельзя оставить отзыв</h3>
+      <p>Отзыв требует подтверждённого email или телефона, а на сервере не заданы ключи отправки писем и SMS. Коды не имитируются, поэтому подтвердить контакт сейчас нельзя. Нужен <code>RESEND_API_KEY</code> (письма) и/или ключи Twilio (SMS). Подробности в разделе «Что нужно от вас».</p>
+    </div>
+    <div class="callout">
+      <h3>Каталог мест ещё наполняется</h3>
+      <p>Импорт OpenStreetMap идёт частями по 8 минут и продолжается после каждого пробуждения сервера. Сейчас в базе 3 903 места. Пока импорт не дошёл до всех категорий, часть запросов в Лимасоле пустая (аптеки, пляжи), и поиск предлагает расширить радиус. Бесплатный Render засыпает через 15 минут без запросов, и импорт на это время останавливается.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Что исправлено</h2>
+    <div class="list">
+      <div class="row"><div>Поиск: «нет результатов»</div><div><p>Причина была в пустой базе: импорт OSM целиком падал на ошибках Overpass (503/504). Теперь импорт идёт по кварталам острова и категориям, переживает перезапуски и переключается на резервный сервер Overpass.</p></div></div>
+      <div class="row"><div>Поиск блюд</div><div><p>«pizza», «πίτσα», «пицца», «sushi», «burger», «kebab» искали только фастфуд, а пиццерии в OSM почти всегда отмечены как рестораны. Теперь ищутся оба типа с фильтром по кухне: на живом сайте «pizza» в Лимасоле даёт 12 мест вместо 0.</p></div></div>
+      <div class="row"><div>План дня не создавался</div><div><p>Одинаковые начало и конец превращались в 24-часовое окно. Прошедшее сегодняшнее окно не обрабатывалось. Время устройства путалось с кипрским. Ночью план предлагал велопарковки и музеи в 5 утра. Всё исправлено: есть понятная причина и кнопка «Спланировать на завтра».</p></div></div>
+      <div class="row"><div>Фото</div><div><p>Wikimedia перенесла миниатюры на новый домен, и картинки не масштабировались. Добавлена замена при ошибке загрузки, а Google Places Photos подключаются по серверному ключу.</p></div></div>
+      <div class="row"><div>Геолокация</div><div><p>В веб-версии бралась кешированная позиция без ограничения возраста. Теперь запрашивается свежая точка с таймаутом. Показываются точность, время обновления и предупреждения о слабом или устаревшем сигнале.</p></div></div>
+      <div class="row"><div>Транспорт</div><div><p>Расписания не находились (статус <code>no_timetable</code>) из-за формата дат в базе. Исправлено, на живом сайте маршрут строится по реальным автобусам EMEL.</p></div></div>
+      <div class="row"><div>Часы работы</div><div><p>Ночные интервалы не склеивались, последний день недели считался неверно, многодневные события показывали «73 ч» вместо дат.</p></div></div>
+      <div class="row"><div>Сервер</div><div><p>Ограничитель запросов считал статические файлы. Отсутствующие файлы отдавались как HTML. Напоминания ждали окончания импорта: теперь у них отдельный цикл.</p></div></div>
+      <div class="row"><div>Отзывы</div><div><p>Старый маршрут отзывов перекрывал новый. Фильтр ссылок пропускал <code>t.me</code> и другие короткие домены.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Что реализовано</h2>
+    <div class="list">
+      <div class="row"><div>1. Поиск</div><div><p>Исправление опечаток, синонимы на английском, греческом и русском, автодополнение, история запросов, «рядом / в городе», выбор радиуса с подсказкой «в 25 км найдено N». Описания мест, кухни и названия городов на трёх языках участвуют в поиске.</p></div></div>
+      <div class="row"><div>2. Фото</div><div><p>Свои фото и фото Wikimedia с лицензией, фото Google Places с указанием автора (ключ остаётся на сервере, фото не сохраняются). Галерея с полноэкранным просмотром, замена при ошибке загрузки.</p></div></div>
+      <div class="row"><div>3. Маршруты и GPS</div><div><p>Четыре режима: пешком, велосипед/самокат, авто, транспорт. Для каждого есть расстояние, время, прибытие и пошаговые повороты на трёх языках.</p><p>Транспорт строится по официальным расписаниям Motion (7 операторов): пересадки, время отправления, ожидание, цена. Если автобуса нет, приложение так и пишет, а не придумывает рейс. Для GPS показываются точность, «обновлено N с назад», слежение, кнопка обновления и предупреждения о слабом, устаревшем или потерянном сигнале.</p></div></div>
+      <div class="row"><div>4. План дня</div><div><p>Параметры: город или GPS, дата, начало и конец, бюджет, интересы, участники, тип поездки, максимальная дистанция, транспорт. До трёх вариантов плана.</p><p>У каждой остановки есть фото, описание, адрес, время, длительность, путь до следующей и цена. Остановку можно заменить, удалить, добавить свою или переставить, после чего план пересчитывается. План сохраняется и публикуется по ссылке.</p></div></div>
+      <div class="row"><div>5. Карточки</div><div><p>Технические блоки «откуда данные» убраны из приложения и остались в админке. Ссылка «сообщить об ошибке» сохранена. Полные карточки событий: площадка, билеты, возраст, организатор.</p><p>Краткие AI-описания строятся только из подтверждённых фактов: если в тексте есть число, которого нет в данных, он отбрасывается.</p></div></div>
+      <div class="row"><div>6. Расписания</div><div><p>Часы работы на 7 дней вперёд, перерывы, кипрские праздники, «открыто / закрыто сейчас». Для событий есть открытие дверей, начало, окончание и многодневность. Время везде в часовом поясе Europe/Nicosia.</p></div></div>
+      <div class="row"><div>7. Вкладка событий</div><div><p>Разделы по типам, фильтры (дата, цена, возраст, бесплатные), календарь месяца и раздел «Скоро рядом с вами». Если подходящих событий нет, это честно сообщается.</p></div></div>
+      <div class="row"><div>8. Отзывы</div><div><p>Оценка от 1 до 5 звёзд, текст, редактирование и удаление своего отзыва, «полезно», жалобы. Рейтинг passtra считается отдельно от Google.</p><p>Модерация: правила на трёх языках с учётом контекста, скрытие телефонов и email, необязательная AI-проверка. После трёх жалоб или при угрозе отзыв уходит в ручную очередь в админке.</p></div></div>
+      <div class="row"><div>9. Аватары и адреса</div><div><p>12 готовых аватаров или своё фото: обрезка на устройстве, сервер пересжимает до 512 px и удаляет метаданные. Аватар показывается рядом с отзывами.</p><p>Адреса мест проверяются геокодированием в фоне (Google при наличии ключа, иначе Nominatim). Статусы: подтверждён (до 250 м), примерно (до 1,5 км), не подтверждён. Список проблемных адресов есть в админке.</p></div></div>
+      <div class="row"><div>10. Подтверждение</div><div><p>Отзывы доступны только с подтверждённым email или телефоном. Коды отправляются по-настоящему; тестовый показ кода возможен только вне продакшена.</p><p>Защита кодов: хеширование, 5 попыток на код, повторная отправка не чаще раза в 60 секунд, не больше 5 кодов на адрес или номер в сутки.</p></div></div>
+      <div class="row"><div>11. Имена</div><div><p>Не меньше 3 букв, допустимые символы, проверки на спам, оскорбления и выдачу себя за администрацию. Проверка работает и в форме, и на сервере.</p></div></div>
+      <div class="row"><div>Админка</div><div><p>Вход по email и паролю. Роль администратора выдаётся через <code>ADMIN_EMAILS</code> (только подтверждённый email) или <code>ADMIN_USER_IDS</code>. Есть очередь модерации отзывов и список проверки адресов.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Какие тесты пройдены</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Набор</th><th>Что проверяет</th><th>Итог</th></tr></thead>
+        <tbody>
+          <tr><td>Ядро</td><td>Понимание запросов на 3 языках, опечатки, блюда, ранжирование, время Кипра, планировщик дня, правила имён</td><td class="n"><span class="pill ok">167 / 167</span></td></tr>
+          <tr><td>API</td><td>Поиск и расширение радиуса, план дня и варианты, календарь событий, фото, транспорт по GTFS, карточки и расписания, отзывы и модерация, аватары, проверка адресов, аккаунты и лимиты кодов, импорт OSM с продолжением</td><td class="n"><span class="pill ok">145 / 145</span></td></tr>
+          <tr><td>Браузер: основное</td><td>Ссылки на объекты, «поделиться», карта, маршрут от своей точки и от GPS, «Мои события» с напоминанием, подтверждение email кодом, телефон не привязывается без кода, сессия после перезагрузки, уведомления, выход</td><td class="n"><span class="pill ok">15 / 15</span></td></tr>
+          <tr><td>Браузер: план дня</td><td>Создание на 2 человек, удаление, перестановка и замена остановки, своя остановка, сохранение после входа, ссылка, «Мои планы»</td><td class="n"><span class="pill ok">7 / 7</span></td></tr>
+          <tr><td>Браузер: отзывы</td><td>Отзывы видны без входа; неподтверждённому просят подтвердить контакт; публикация со скрытием телефона; правка и удаление</td><td class="n"><span class="pill ok">4 / 4</span></td></tr>
+          <tr><td>Браузер: профиль</td><td>Короткое имя отклоняется в форме и на сервере, готовый аватар, загрузка и обрезка фото</td><td class="n"><span class="pill ok">4 / 4</span></td></tr>
+          <tr><td>Браузер: проверки</td><td>Фото (9 из 9 загружены, галерея открывается); 4 режима маршрута и реальные рейсы; предупреждение о слабом GPS; карточка без блоков источников; вкладка событий и календарь</td><td class="n"><span class="pill ok">4 / 4</span></td></tr>
+          <tr><td>Живой сайт</td><td>Поиск «кафе», «кофе», «pizza», «пицца», «museum»; маршрут на автобусе EMEL №9 с ценой €2,50; статус источников</td><td class="n"><span class="pill ok">пройдено</span></td></tr>
+          <tr><td>Типы</td><td>TypeScript во всех 5 пакетах</td><td class="n"><span class="pill ok">без ошибок</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Что не пройдено или не проверено</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Пункт</th><th>Состояние</th><th>Почему</th></tr></thead>
+        <tbody>
+          <tr><td>Реальная доставка email и SMS</td><td><span class="pill bad">не проверено</span></td><td>Ключей Resend и Twilio нет. Код отправки готов и покрыт тестами, но живое письмо или SMS не отправлялось.</td></tr>
+          <tr><td>Отзыв на живом сайте</td><td><span class="pill bad">недоступно</span></td><td>Следует из пункта выше: без доставки кода нельзя подтвердить контакт.</td></tr>
+          <tr><td>Фото Google и проверка адресов через Google</td><td><span class="pill warn">не активно</span></td><td>Нужен <code>GOOGLE_MAPS_API_KEY</code>. Пока работают фото Wikimedia и проверка адресов через Nominatim.</td></tr>
+          <tr><td>AI-поиск, AI-описания, AI-модерация</td><td><span class="pill warn">не активно</span></td><td>Нужен <code>ANTHROPIC_API_KEY</code>. Пока работают правила: поиск, описания из фактов и модерация по фильтрам с ручной очередью.</td></tr>
+          <tr><td>Полнота каталога мест</td><td><span class="pill warn">в процессе</span></td><td>Импорт OSM ещё идёт: 3 903 места. В Лимасоле пока не найдены аптеки, найдены не все пляжи и суши.</td></tr>
+          <tr><td>Опоздания автобусов в реальном времени</td><td><span class="pill warn">не подключено</span></td><td>Фид GTFS-Realtime Кипра доступен только по HTTP на IP-адресе без документации. Показывается расписание с пометкой «по расписанию».</td></tr>
+          <tr><td>Строгий линтер React</td><td><span class="pill warn">23 ошибки</span></td><td>Правила React Compiler (обращение к ref и setState в эффектах), в основном в давно работающих компонентах. На работу не влияют, исправлю отдельным проходом.</td></tr>
+          <tr><td>Нативные iOS и Android</td><td><span class="pill warn">не проверено</span></td><td>Всё проверялось в веб-версии. Для сборок нужны аккаунты Apple и Google Play и EAS.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Что нужно от вас</h2>
+    <p class="small">Всё вводится в Render → сервис passtra → Environment. Ключи остаются на сервере и не попадают в приложение.</p>
+    <div class="keys">
+      <div class="key"><div class="key-head"><h3>Отправка писем</h3><span class="pill bad">сначала это</span></div><p><code>RESEND_API_KEY</code> и <code>EMAIL_FROM</code>. Аккаунт на resend.com и подтверждённый домен отправителя (записи SPF/DKIM). Без них не работают подтверждение email, сброс пароля и, как следствие, отзывы. До 3 000 писем в месяц бесплатно.</p></div>
+      <div class="key"><div class="key-head"><h3>Администратор</h3><span class="pill bad">сначала это</span></div><p><code>ADMIN_EMAILS</code>: ваш email. Роль появится после подтверждения email кодом, поэтому нужен и Resend.</p></div>
+      <div class="key"><div class="key-head"><h3>Google Maps Platform</h3><span class="pill warn">рекомендуется</span></div><p><code>GOOGLE_MAPS_API_KEY</code> с включёнными Places API (New) и Geocoding API. Даёт фото мест из Google, рейтинг и часы Google, точную проверку адресов. Бесплатная квота около 5–10 тыс. запросов в месяц на тип.</p></div>
+      <div class="key"><div class="key-head"><h3>Anthropic</h3><span class="pill warn">рекомендуется</span></div><p><code>ANTHROPIC_API_KEY</code>: понимание свободных запросов, краткие описания карточек, AI-модерация отзывов и аватаров.</p></div>
+      <div class="key"><div class="key-head"><h3>SMS</h3><span class="pill warn">по желанию</span></div><p><code>TWILIO_ACCOUNT_SID</code>, <code>TWILIO_AUTH_TOKEN</code>, <code>TWILIO_FROM</code>: подтверждение телефона. Примерно $0,05–0,10 за SMS на Кипр.</p></div>
+      <div class="key"><div class="key-head"><h3>Хостинг</h3><span class="pill warn">рекомендуется</span></div><p>Платный инстанс Render Starter ($7/мес) или внешний пинг <code>/v1/health</code> каждые 10 минут. Иначе сервер засыпает: первый запрос ждёт около минуты, импорт и напоминания останавливаются.</p></div>
+      <div class="key"><div class="key-head"><h3>События: Ticketmaster, Eventbrite</h3><span class="pill warn">по желанию</span></div><p><code>TICKETMASTER_API_KEY</code> (бесплатно) и <code>EVENTBRITE_TOKEN</code> с ID организаторов. Сейчас события приходят от Visit Cyprus.</p></div>
+      <div class="key"><div class="key-head"><h3>Магазины приложений</h3><span class="pill warn">к релизу</span></div><p>Apple Developer ($99/год), Google Play Console ($25 разово), аккаунт Expo для сборок.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Instagram и Facebook</h2>
+    <p>Брать события напрямую с сайтов Instagram и Facebook нельзя: их условия запрещают автоматический сбор. Легальный путь есть только через Meta Graph API, и он ограничен.</p>
+    <div class="list">
+      <div class="row"><div>Instagram</div><div><p>Функция Business Discovery отдаёт публичные посты других бизнес-аккаунтов (подпись, фото, дата). Готовых событий там нет, поэтому афиши придётся извлекать из подписей AI-разбором, а каждое такое событие должен проверить модератор.</p><p>Нужно: Instagram Professional-аккаунт passtra, привязанный к Facebook-странице; приложение в Meta for Developers; проверка App Review (права <code>instagram_basic</code>, <code>pages_read_engagement</code>).</p></div></div>
+      <div class="row"><div>Facebook</div><div><p>События чужих страниц доступны только с функцией Page Public Content Access. Meta выдаёт её отдельно и редко. Реальный путь: организатор сам подключает свою страницу к passtra.</p></div></div>
+      <div class="row"><div>Предложение</div><div><p>Подключение организаторов и Business Discovery → AI-разбор постов → очередь модерации в админке → публикация. Для старта нужны ваши аккаунты Meta (бизнес-страница, Instagram Professional, приложение разработчика).</p></div></div>
+    </div>
+    <p class="small">Источники: <a href="https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/business_discovery" target="_blank" rel="noopener">IG User Business Discovery</a> · <a href="https://developers.facebook.com/documentation/instagram-platform/instagram-api-with-facebook-login/business-discovery" target="_blank" rel="noopener">Business Discovery (Facebook Login)</a> · <a href="https://developers.facebook.com/docs/graph-api/reference/page/" target="_blank" rel="noopener">Graph API: Page</a></p>
+  </section>
+
+  <section>
+    <h2>Данные и источники</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Источник</th><th>Записей</th><th>Состояние</th></tr></thead>
+        <tbody>
+          <tr><td>OpenStreetMap (места)</td><td class="n">3 903</td><td><span class="pill warn">импорт идёт</span></td></tr>
+          <tr><td>Wikidata + Wikimedia Commons (достопримечательности, фото)</td><td class="n">196</td><td><span class="pill ok">работает</span></td></tr>
+          <tr><td>Visit Cyprus (события)</td><td class="n">19</td><td><span class="pill ok">работает</span></td></tr>
+          <tr><td>Расписания автобусов Motion (GTFS, 7 операторов, CC BY 4.0)</td><td class="n">—</td><td><span class="pill ok">работает</span></td></tr>
+          <tr><td>Ticketmaster, Eventbrite</td><td class="n">0</td><td><span class="pill warn">нет ключа</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small">Расписания: <a href="https://traffic4cyprus.org.cy/dataset/publictransportstatic" target="_blank" rel="noopener">traffic4cyprus.org.cy</a>, <a href="https://mobilitydatabase.org/feeds/gtfs/mdb-2901" target="_blank" rel="noopener">Mobility Database</a>. Цифры сняты с <code>/v1/status</code> живого сервера 9 ноября 2026.</p>
+  </section>
+</div>
