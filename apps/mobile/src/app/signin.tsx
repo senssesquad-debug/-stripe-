@@ -1,3 +1,4 @@
+import { validateDisplayName } from '@passtra/core';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +36,8 @@ export default function SignIn() {
   const close = () => { cancelSignIn(); if (router.canGoBack()) router.back(); else router.replace('/'); };
 
   const emailOk = EMAIL.test(email.trim());
+  const nameCheck = mode === 'register' && name.trim() ? validateDisplayName(name) : null;
+  const nameError = nameCheck && !nameCheck.ok ? t(`auth.name_${nameCheck.error}`) : null;
   const pwOk = password.length >= 8;
   const run = async (fn: () => Promise<void>) => {
     setBusy(true);
@@ -64,7 +67,7 @@ export default function SignIn() {
 
   const title = mode === 'signin' ? t('auth.signInTitle') : mode === 'register' ? t('auth.registerTitle') : t('auth.resetTitle');
   const action = mode === 'signin' ? t('auth.signIn') : mode === 'register' ? t('auth.register') : resetSent ? t('auth.setPassword') : t('auth.sendResetCode');
-  const disabled = !emailOk || (mode !== 'reset' && !pwOk) || (mode === 'reset' && !!resetSent && (!/^\d{6}$/.test(code) || !pwOk));
+  const disabled = !!nameError || !emailOk || (mode !== 'reset' && !pwOk) || (mode === 'reset' && !!resetSent && (!/^\d{6}$/.test(code) || !pwOk));
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -73,7 +76,8 @@ export default function SignIn() {
         <Txt v="title" accessibilityRole="header">{title}</Txt>
         {reason ? <Banner icon="account-lock-outline" text={t(`auth.reason_${reason}`)} /> : <Txt v="callout" tone="secondary">{t('auth.browseFree')}</Txt>}
 
-        {mode === 'register' ? <Field label={t('auth.name')} value={name} onChangeText={setName} autoComplete="name" textContentType="name" maxLength={80} /> : null}
+        {mode === 'register' ? <Field label={t('auth.name')} value={name} onChangeText={setName} autoComplete="name" textContentType="name" maxLength={40}
+          error={nameError} hint={t('auth.nameRules')} /> : null}
         <Field label={t('auth.email')} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoCorrect={false}
           autoComplete="email" textContentType="username" editable={!(mode === 'reset' && resetSent)} />
         {mode === 'reset' && resetSent ? (

@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Avatar } from '@/components/avatar';
 import { Badge, Button, Chip, Divider, Row, Txt } from '@/components/ui';
 import { LANGUAGE_NAMES } from '@/i18n';
 import { api } from '@/lib/api';
@@ -39,7 +40,10 @@ export default function Profile() {
       <View style={{ padding: 16, borderRadius: th.radius.lg, backgroundColor: th.c.surface, gap: 10 }}>
         {session ? (
           <>
-            <Txt v="headline">{session.user.name || session.user.email}</Txt>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <Avatar name={session.user.name ?? session.user.email ?? '?'} url={session.user.avatarUrl} preset={session.user.avatarPreset} size={48} />
+              <Txt v="headline" style={{ flex: 1 }}>{session.user.name || session.user.email}</Txt>
+            </View>
             {session.user.name && session.user.email ? <Txt v="callout" tone="secondary">{session.user.email}</Txt> : null}
             {session.user.email && !session.user.emailVerified ? <Badge label={t('profile.emailNotConfirmed')} tone="warning" icon="alert-outline" /> : null}
             <Button title={t('profile.account')} kind="secondary" compact icon="account-cog-outline" onPress={() => router.push('/account')} style={{ alignSelf: 'flex-start' }} />

@@ -15,6 +15,7 @@ import { authRoutes } from './routes/auth';
 import { myEventsRoutes } from './routes/my-events';
 import { makeIndexHandler, webRoutes } from './routes/web';
 import { reviewRoutes } from './routes/reviews';
+import { avatarRoutes } from './routes/avatars';
 import { meRoutes } from './routes/me';
 import { publicRoutes } from './routes/public';
 import { QueryInterpreter } from './services/ai';
@@ -94,6 +95,7 @@ export async function buildApp(config: AppConfig, db: Db, overrides: Partial<App
   await app.register(async (r) => myEventsRoutes(r, deps));
   await app.register(async (r) => webRoutes(r, deps));
   await app.register(async (r) => reviewRoutes(r, deps));
+  await app.register(async (r) => avatarRoutes(r, deps));
   await app.register(async (r) => adminRoutes(r, deps));
 
   if (config.ADMIN_STATIC_DIR && existsSync(config.ADMIN_STATIC_DIR)) {

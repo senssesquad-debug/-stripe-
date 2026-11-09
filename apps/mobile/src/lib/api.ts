@@ -76,6 +76,7 @@ export interface Profile {
   phone: string | null; phoneVerified: boolean; pendingPhone: string | null;
   hasPassword: boolean; locale: string | null; interests: string[] | null; ageRange: string | null; budget: string | null;
   homeCity: string | null; personalizationEnabled: boolean; notificationPrefs: Record<string, unknown> | null; createdAt: string;
+  avatarUrl: string | null; avatarPreset: string | null;
 }
 
 export interface AuthResponse { token: string; user: Profile; emailVerification?: { sent: boolean; devCode?: string; reason?: string } }
@@ -159,6 +160,9 @@ export const api = {
   deleteReview: (id: string) => request<void>(`/v1/reviews/${id}`, { method: 'DELETE', auth: true }),
   helpful: (id: string, on: boolean) => request<unknown>(`/v1/reviews/${id}/helpful`, { method: on ? 'POST' : 'DELETE', body: {}, auth: true }),
   reportReview: (id: string, reason: string) => request<unknown>(`/v1/reviews/${id}/report`, { method: 'POST', body: { reason } }),
+  setAvatarPreset: (preset: string | null) => request<unknown>('/v1/me/avatar', { method: 'PUT', body: { preset }, auth: true }),
+  uploadAvatar: (base64: string) => request<{ avatarUrl: string }>('/v1/me/avatar/photo', { method: 'POST', body: { image: base64 }, auth: true, timeoutMs: 30_000 }),
+  removeAvatarPhoto: () => request<void>('/v1/me/avatar/photo', { method: 'DELETE', auth: true }),
   myPlans: () => request<{ items: Array<{ id: string; title: string; date: string; stops: number; shared: boolean }> }>('/v1/me/plans', { auth: true }),
   myPlan: (id: string) => request<SavedPlan>(`/v1/me/plans/${id}`, { auth: true }),
   savePlan: (b: { title: string; date: string; params: Omit<PlanParams, 'date'>; items: PlanItem[] }, id?: string) => request<{ id: string }>(id ? `/v1/me/plans/${id}` : '/v1/me/plans', { method: id ? 'PUT' : 'POST', body: b, auth: true }),

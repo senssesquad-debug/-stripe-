@@ -7,6 +7,7 @@ import { deliverDueReminders } from '../services/reminders';
 import { runMaintenance } from './maintenance';
 import { tick } from './scheduler';
 import { refreshGtfs } from '../transit/gtfs';
+import { runAddressChecks } from '../services/address-check';
 import type { Logger } from './types';
 
 /**
@@ -39,6 +40,7 @@ export function startBackground(pool: pg.Pool, config: AppConfig, log: Logger): 
   })();
   let lastMaintenance = 0;
   let lastNotifications = 0;
+  let lastAddressChecks = 0;
   const done = (async () => {
     while (!stopping) {
       try {
@@ -47,6 +49,10 @@ export function startBackground(pool: pg.Pool, config: AppConfig, log: Logger): 
         if (Date.now() - lastMaintenance > 30 * 60_000) {
           lastMaintenance = Date.now();
           await runMaintenance(pool, log);
+        }
+        if (Date.now() - lastAddressChecks > 10 * 60_000) {
+          lastAddressChecks = Date.now();
+          await runAddressChecks(pool, deps, log);
         }
         if (Date.now() - lastNotifications > 30 * 60_000) {
           lastNotifications = Date.now();

@@ -38,7 +38,7 @@ export const PLACE_COLUMNS = (dist: string) => `
   ST_Y(p.location::geometry) AS lat, ST_X(p.location::geometry) AS lng, p.location_precision, p.address,
   c.slug AS city_slug, c.name AS city_name, c.timezone AS city_tz, p.phone, p.website, p.opening_hours, p.price_level, p.is_free,
   p.user_rating_avg, p.user_rating_count, p.age_min, p.status, p.images, p.verification_status, p.confidence,
-  p.last_verified_at, p.external_ids, p.is_demo, p.popularity, p.source_count, p.description_i18n, p.about_source, p.tags,
+  p.last_verified_at, p.external_ids, p.is_demo, p.popularity, p.source_count, p.description_i18n, p.about_source, p.tags, p.address_check,
   ${dist} AS distance_km`;
 
 export function distanceExpr(q: Sql, alias: 'e' | 'p', geo: { lat: number; lng: number } | null): string {
@@ -105,6 +105,7 @@ export interface PlaceRow extends pg.QueryResultRow {
   verification_status: PlaceDTO['verification']['status']; confidence: number; last_verified_at: Date | null;
   external_ids: Record<string, string>; is_demo: boolean; popularity: number; source_count: number; distance_km: number | null;
   tags: string[];
+  address_check: { status: string; checkedAt: string } | null;
   description_i18n: Record<string, string> | null; about_source: { name: string; url: string | null; license: string | null; urls?: Record<string, string> } | null;
 }
 
@@ -209,6 +210,7 @@ export function placeToDTO(r: PlaceRow, locale: Locale, now: Date, extra?: { sou
     sponsored: false,
     isDemo: r.is_demo,
     about: aboutOf(r, locale),
+    addressCheck: r.address_check ? { status: r.address_check.status as NonNullable<PlaceDTO['addressCheck']>['status'], checkedAt: r.address_check.checkedAt } : null,
   };
 }
 

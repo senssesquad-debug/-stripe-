@@ -283,26 +283,48 @@ function Audit() {
 // ── Shell ──────────────────────────────────────────────────────────────────
 
 function Login({ onDone }: { onDone: () => void }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [token, setToken] = useState('');
+  const [advanced, setAdvanced] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const tryToken = async (t: string) => {
+    auth.set(t);
+    try {
+      await call('/v1/admin/stats');
+      onDone();
+    } catch (e) {
+      const me = await call<{ id: string; email: string | null }>('/v1/me').catch(() => null);
+      auth.clear();
+      setErr(e instanceof AdminError && e.status === 403
+        ? `Signed in as ${me?.email ?? 'this account'}, which is not an admin. Add its user id ${me?.id ?? ''} to ADMIN_USER_IDS, or its confirmed e-mail to ADMIN_EMAILS, on the server.`
+        : (e as Error).message);
+    }
+  };
   return (
     <div style={{ maxWidth: 440, margin: '12vh auto', padding: 24 }} className="card">
       <div className="brand"><span className="logo"><img src="/admin/favicon.png" width={30} height={30} alt="" /></span>passtra admin</div>
-      <p className="muted small">Sign in with an admin access token (Supabase session JWT of a user listed in <code>ADMIN_USER_IDS</code> or with role admin/moderator).</p>
-      <label>Access token</label>
-      <textarea rows={4} value={token} onChange={(e) => setToken(e.target.value.trim())} />
+      <p className="muted small">Sign in with your passtra account. Admin rights come from ADMIN_USER_IDS or a confirmed e-mail in ADMIN_EMAILS.</p>
+      <label>Email</label>
+      <input value={email} onChange={(e) => setEmail(e.target.value.trim())} autoComplete="username" />
+      <label>Password</label>
+      <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" />
+      {advanced ? (<><label>Access token</label><textarea rows={3} value={token} onChange={(e) => setToken(e.target.value.trim())} /></>) : null}
       {err ? <p style={{ color: 'var(--danger)' }}>{err}</p> : null}
       <div className="row" style={{ marginTop: 12 }}>
         <button className="btn" onClick={async () => {
-          auth.set(token);
+          setErr(null);
+          if (advanced && token) return tryToken(token);
           try {
-            await call('/v1/admin/stats');
-            onDone();
+            const r = await fetch('/v1/auth/login', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ email, password }) });
+            const j = await r.json();
+            if (!r.ok) { setErr(j?.error?.message ?? 'Sign-in failed'); return; }
+            await tryToken(j.token);
           } catch (e) {
-            auth.clear();
-            setErr(e instanceof AdminError && e.status === 403 ? 'This account is not an admin or moderator.' : (e as Error).message);
+            setErr((e as Error).message);
           }
         }}>Sign in</button>
+        <button className="btn ghost" onClick={() => setAdvanced(!advanced)}>{advanced ? 'Use email' : 'Use a token'}</button>
       </div>
     </div>
   );

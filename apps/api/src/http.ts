@@ -1,3 +1,4 @@
+import { validateDisplayName } from '@passtra/core';
 import { resolveLocale, type Locale } from '@passtra/core';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { createRemoteJWKSet, jwtVerify, type JWTPayload } from 'jose';
@@ -42,6 +43,7 @@ export function createAuth(config: AppConfig, db: Db) {
   const jwks = config.AUTH_JWKS_URL ? createRemoteJWKSet(new URL(config.AUTH_JWKS_URL)) : null;
   const secret = config.AUTH_JWT_SECRET ? new TextEncoder().encode(config.AUTH_JWT_SECRET) : null;
   const admins = new Set(config.ADMIN_USER_IDS);
+  const adminEmails = config.ADMIN_EMAILS.map((e) => e.toLowerCase());
 
   async function verify(token: string): Promise<JWTPayload> {
     const opts = { audience: config.AUTH_AUDIENCE, issuer: config.AUTH_ISSUER };
@@ -75,9 +77,10 @@ export function createAuth(config: AppConfig, db: Db) {
     // Lazily create the user row (no personal data stored beyond the auth subject id).
     const r = await db.query<{ role: AuthUser['role'] }>(
       `INSERT INTO users (id, role) VALUES ($1, $2)
-       ON CONFLICT (id) DO UPDATE SET last_seen_at = now(), role = CASE WHEN $2 = 'admin' THEN 'admin' ELSE users.role END
+       ON CONFLICT (id) DO UPDATE SET last_seen_at = now(), role = CASE
+         WHEN $2 = 'admin' OR (lower(users.email) = ANY($3::text[]) AND users.email_verified_at IS NOT NULL) THEN 'admin' ELSE users.role END
        RETURNING role`,
-      [payload.sub, admins.has(payload.sub) ? 'admin' : 'user'],
+      [payload.sub, admins.has(payload.sub) ? 'admin' : 'user', adminEmails],
     );
     req.user = { id: payload.sub, role: r.rows[0]!.role };
   }
@@ -111,3 +114,16 @@ export const LocationQuery = z.object({
 
 export const csv = <T extends string>(values: readonly T[]) =>
   z.string().max(400).optional().transform((s) => (s ? (s.split(',').map((x) => x.trim()).filter((x) => (values as readonly string[]).includes(x)) as T[]) : undefined));
+
+/** A display name that passes the shared rules (3+ letters, no insults, no staff impersonation…); 400 otherwise. */
+export function checkedName(input: string | null | undefined): string | null {
+  if (input === null || input === undefined || input.trim() === '') return null;
+  const r = validateDisplayName(input);
+  if (!r.ok) throw new ApiError(400, 'invalid_name', NAME_MESSAGES[r.error] ?? 'Invalid name', { reason: r.error });
+  return r.name;
+}
+const NAME_MESSAGES: Record<string, string> = {
+  too_short: 'The name must have at least 3 letters.', too_long: 'The name can have at most 40 characters.',
+  invalid_chars: 'Use letters, spaces, hyphens and apostrophes only.', spam: 'This does not look like a name.',
+  offensive: 'This name is not allowed.', reserved: 'This name is reserved.',
+};

@@ -3,7 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import type { AppDeps } from '../app';
 import { tx } from '../db';
-import { ApiError, localeOf, parse, requireUser } from '../http';
+import { ApiError, checkedName, localeOf, parse, requireUser } from '../http';
 import { eventToDTO, getEventRow, getPlaceRow, placeToDTO } from '../repo/entities';
 import { profileOf } from './auth';
 
@@ -31,7 +31,7 @@ export async function meRoutes(app: FastifyInstance, deps: AppDeps) {
   app.patch('/v1/me', async (req) => {
     const user = requireUser(req);
     const b = parse(z.object({
-      name: z.string().trim().max(80).nullable().optional(),
+      name: z.string().max(200).nullable().optional(),
       locale: z.enum(LOCALES).optional(),
       interests: z.array(z.enum([...INTEREST_GROUPS, 'other'] as [string, ...string[]])).max(13).optional(),
       ageRange: z.enum(['under_18', '18_24', '25_34', '35_44', '45_54', '55_plus']).nullable().optional(),
@@ -46,7 +46,7 @@ export async function meRoutes(app: FastifyInstance, deps: AppDeps) {
       params.push(v);
       sets.push(`${col} = $${params.length}${cast}`);
     };
-    if (b.name !== undefined) set('name', b.name || null);
+    if (b.name !== undefined) set('name', checkedName(b.name));
     if (b.locale) set('locale', b.locale);
     if (b.interests) set('interests', b.interests.flatMap((i) => (i === 'other' ? ['wellness', 'practical'] : [i])));
     if (b.ageRange !== undefined) set('age_range', b.ageRange);

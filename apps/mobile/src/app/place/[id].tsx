@@ -105,7 +105,7 @@ export default function PlaceScreen() {
         <View style={{ gap: 14 }}>
           <Txt v="headline">{t('place.practical')}</Txt>
           <InfoLine icon="map-marker-outline" label={t('detail.where')} value={where || p.category.label}
-            sub={[p.location.precision === 'approximate' ? t('detail.approxLocation') : null, distanceLabel(p.distanceKm)].filter(Boolean).join(' · ') || null} />
+            sub={[p.location.precision === 'approximate' ? t('detail.approxLocation') : null, p.addressCheck ? t(`addr.${p.addressCheck.status}`) : null, distanceLabel(p.distanceKm)].filter(Boolean).join(' · ') || null} />
           {p.free.isFree !== null || p.priceLevel !== null ? <InfoLine icon="ticket-outline" label={t('detail.price')} value={p.free.isFree ? (p.free.basis === 'typical' ? t('common.usuallyFree') : t('common.free')) : p.priceLevel ? '€'.repeat(p.priceLevel) : t('common.priceUnknown')} /> : null}
           {p.phone ? <InfoLine icon="phone-outline" label={t('place.phone')} value={p.phone} /> : null}
           <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>

@@ -32,6 +32,11 @@ services:
         sync: false
       - key: TICKETMASTER_API_KEY
         sync: false
+      # Admins: user ids, and/or e-mails (an e-mail counts only once it is confirmed).
+      - key: ADMIN_USER_IDS
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false
       # Public address used in shared links and link previews.
       - key: PUBLIC_WEB_URL
         value: https://passtra.onrender.com

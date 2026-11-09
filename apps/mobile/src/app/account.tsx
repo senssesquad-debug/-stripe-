@@ -1,7 +1,9 @@
+import { validateDisplayName } from '@passtra/core';
 import { Redirect, router } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
+import { AvatarEditor } from '@/components/avatar-editor';
 import { Card, Field } from '@/components/form';
 import { Badge, Banner, Button, Txt } from '@/components/ui';
 import { api, type Profile } from '@/lib/api';
@@ -106,10 +108,12 @@ function NameCard({ user }: { user: Profile }) {
   const [name, setName] = useState(user.name ?? '');
   const [busy, setBusy] = useState(false);
   const dirty = name.trim() !== (user.name ?? '');
+  const check = name.trim() ? validateDisplayName(name) : null;
+  const nameError = dirty && check && !check.ok ? t(`auth.name_${check.error}`) : null;
   return (
     <Card>
-      <Field label={t('account.name')} value={name} onChangeText={setName} placeholder={t('account.namePlaceholder')} autoComplete="name" maxLength={80} />
-      <Button title={t('account.saveName')} compact disabled={!dirty} loading={busy} style={{ alignSelf: 'flex-start' }} onPress={async () => {
+      <Field label={t('account.name')} value={name} onChangeText={setName} placeholder={t('account.namePlaceholder')} autoComplete="name" maxLength={40} error={nameError} hint={t('auth.nameRules')} />
+      <Button title={t('account.saveName')} compact disabled={!dirty || !!nameError} loading={busy} style={{ alignSelf: 'flex-start' }} onPress={async () => {
         setBusy(true);
         try {
           await setProfile(await api.updateMe({ name: name.trim() || null }));
@@ -171,6 +175,7 @@ export default function Account() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: th.c.background }} contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 48, maxWidth: 640, width: '100%', alignSelf: 'center' }} keyboardShouldPersistTaps="handled">
       <Txt v="title" accessibilityRole="header">{t('account.title')}</Txt>
+      <AvatarEditor />
       <NameCard key={user.id} user={user} />
       <Contact channel="email" user={user} />
       <Contact channel="phone" user={user} />

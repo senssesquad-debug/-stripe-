@@ -143,6 +143,8 @@ export interface PlaceDTO {
   isDemo: boolean;
   /** Longer text about the place (localized), with its source and licence. */
   about: { text: string; source: string; url: string | null; license: string | null } | null;
+  /** Geocoder check of the address (null = not checked yet). Only 'verified' means confirmed. */
+  addressCheck: { status: 'verified' | 'approximate' | 'mismatch' | 'city_mismatch' | 'not_found'; checkedAt: string } | null;
 }
 
 export type EntityDTO = EventDTO | PlaceDTO;

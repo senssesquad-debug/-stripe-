@@ -22,6 +22,14 @@ export async function adminRoutes(app: FastifyInstance, deps: AppDeps) {
   const audit = (actor: string, action: string, entityType: string | null, entityId: string | null, before: unknown, after: unknown) =>
     db.query('INSERT INTO admin_audit_log (actor_id, action, entity_type, entity_id, before, after) VALUES ($1,$2,$3,$4,$5,$6)', [actor, action, entityType, entityId, before ? JSON.stringify(before) : null, after ? JSON.stringify(after) : null]);
 
+  // Venues whose address could not be confirmed by geocoding (wrong city, far from the pin, not found).
+  app.get('/v1/admin/address-checks', async (req) => {
+    staff(req);
+    const r = await db.query(`SELECT id, name, address, address_check FROM places WHERE merged_into IS NULL AND address_check->>'status' IN ('mismatch','city_mismatch','not_found')
+      ORDER BY (address_check->>'checkedAt') DESC LIMIT 200`);
+    return { items: r.rows };
+  });
+
   app.get('/v1/admin/stats', async (req) => {
     staff(req);
     const one = async (sql: string) => Number((await db.query<{ n: number }>(sql)).rows[0]?.n ?? 0);

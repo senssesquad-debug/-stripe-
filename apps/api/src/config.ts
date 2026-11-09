@@ -22,6 +22,7 @@ const Schema = z.object({
   AUTH_ISSUER: optional,
   AUTH_AUDIENCE: z.string().default('authenticated'),
   ADMIN_USER_IDS: list, // bootstrap admins (auth subject ids)
+  ADMIN_EMAILS: list, // admins by e-mail — only once that e-mail is confirmed
 
   // External services (all optional — features degrade gracefully and say so)
   GOOGLE_MAPS_API_KEY: optional,

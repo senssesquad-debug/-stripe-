@@ -37,6 +37,36 @@ async function register(email: string, server = app) {
   return r.json<{ token: string; user: { id: string; emailVerified: boolean }; emailVerification: { sent: boolean; devCode?: string; reason?: string } }>();
 }
 
+
+
+describe('code delivery limits', () => {
+  it('at most 5 codes per address per day, across accounts', async () => {
+    const target = `bomb${Date.now()}@example.com`;
+    const r = (await app.inject({ method: 'POST', url: '/v1/auth/register', payload: { email: 'fresh' + Date.now() + '@example.com', password: 'correct horse 42' } })).json();
+    for (let i = 0; i < 5; i++) {
+      await pool.query(`INSERT INTO verification_codes (user_id, purpose, target, code_hash, expires_at) VALUES ($1, 'verify_email', $2, 'x', now() + interval '10 minutes')`, [r.user.id, target]);
+    }
+    const res = await app.inject({ method: 'POST', url: '/v1/me/contact/start', payload: { channel: 'email', email: target }, headers: { authorization: `Bearer ${r.token}` } });
+    expect(res.statusCode).toBe(429);
+    expect(res.json().error.code).toBe('too_many_codes');
+  });
+});
+
+describe('display name rules (server-side)', () => {
+  it('rejects short, offensive and staff-impersonating names; collapses spaces', async () => {
+    const reg = (name: string) => app.inject({ method: 'POST', url: '/v1/auth/register', payload: { email: `n${Math.random().toString(36).slice(2)}@example.com`, password: 'correct horse 42', name } });
+    const short = await reg('Al');
+    expect(short.statusCode).toBe(400);
+    expect(short.json().error).toMatchObject({ code: 'invalid_name', details: { reason: 'too_short' } });
+    expect((await reg('Admin')).json().error.details.reason).toBe('reserved');
+    expect((await reg('Модератор')).json().error.details.reason).toBe('reserved');
+    const ok = (await reg('  Anna    Maria ')).json();
+    expect(ok.user.name).toBe('Anna Maria');
+    const patch = await app.inject({ method: 'PATCH', url: '/v1/me', payload: { name: 'сука' }, headers: { authorization: `Bearer ${ok.token}` } });
+    expect(patch.json().error.details.reason).toBe('offensive');
+  });
+});
+
 describe('registration, sign-in, sign-out', () => {
   it('without an email service the account works, but the email stays unconfirmed and the reason is explicit', async () => {
     const r = await register('nobody@example.com', prodLike);

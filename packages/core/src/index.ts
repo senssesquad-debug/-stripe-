@@ -12,3 +12,4 @@ export * from './ranking';
 export * from './plan-day';
 export * from './query-parser';
 export * from './types';
+export * from './names';

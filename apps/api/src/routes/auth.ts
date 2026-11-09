@@ -6,13 +6,14 @@ import { z } from 'zod';
 import type { AppDeps } from '../app';
 import type { AppConfig } from '../config';
 import type { Db } from '../db';
-import { ApiError, parse, requireUser } from '../http';
+import { ApiError, checkedName, parse, requireUser } from '../http';
 import { DeliveryUnavailableError, sendEmail, sendSms } from '../lib/messaging';
 
 const scrypt = promisify(scryptCb) as (pw: string, salt: Buffer, len: number) => Promise<Buffer>;
 const SESSION_DAYS = 60;
 const CODE_TTL_MIN = 10;
 const MAX_ATTEMPTS = 5;
+const MAX_CODES_PER_TARGET_DAY = 5;
 const RESEND_AFTER_S = 60;
 
 export async function hashPassword(pw: string): Promise<string> {
@@ -52,6 +53,9 @@ const Phone = z.string().trim().regex(/^\+[1-9]\d{6,14}$/, 'Use international fo
 
 async function sendCode(deps: AppDeps, userId: string, purpose: 'verify_email' | 'verify_phone' | 'reset_password', target: string): Promise<{ sent: true; devCode?: string }> {
   const { db, config } = deps;
+  // One address/number can't be flooded with codes, whichever account asks (SMS/e-mail bombing).
+  const perTarget = await db.query<{ n: number }>(`SELECT count(*)::int AS n FROM verification_codes WHERE lower(target) = lower($1) AND created_at > now() - interval '24 hours'`, [target]);
+  if ((perTarget.rows[0]?.n ?? 0) >= MAX_CODES_PER_TARGET_DAY) throw new ApiError(429, 'too_many_codes', 'Too many codes were sent to this address today. Try again tomorrow.');
   const last = await db.query<{ created_at: Date }>(
     `SELECT created_at FROM verification_codes WHERE user_id = $1 AND purpose = $2 AND consumed_at IS NULL ORDER BY created_at DESC LIMIT 1`, [userId, purpose]);
   if (last.rows[0] && Date.now() - last.rows[0].created_at.getTime() < RESEND_AFTER_S * 1000) {
@@ -100,7 +104,7 @@ async function checkCode(deps: AppDeps, userId: string, purpose: string, code: s
 export async function profileOf(db: Db, userId: string) {
   const r = await db.query(
     `SELECT u.id, u.role, u.name, u.email, u.email_verified_at, u.phone, u.phone_verified_at, u.password_hash IS NOT NULL AS has_password,
-            u.locale, u.interests, u.age_range, u.budget, c.slug AS home_city, u.personalization_enabled, u.notification_prefs, u.is_premium, u.created_at,
+            u.locale, u.interests, u.age_range, u.budget, c.slug AS home_city, u.avatar_url, u.avatar_preset, u.personalization_enabled, u.notification_prefs, u.is_premium, u.created_at,
             (SELECT target FROM verification_codes v WHERE v.user_id = u.id AND v.purpose = 'verify_email' AND v.consumed_at IS NULL AND v.expires_at > now() ORDER BY created_at DESC LIMIT 1) AS pending_email,
             (SELECT target FROM verification_codes v WHERE v.user_id = u.id AND v.purpose = 'verify_phone' AND v.consumed_at IS NULL AND v.expires_at > now() ORDER BY created_at DESC LIMIT 1) AS pending_phone
        FROM users u LEFT JOIN cities c ON c.id = u.home_city_id WHERE u.id = $1`,
@@ -113,6 +117,7 @@ export async function profileOf(db: Db, userId: string) {
     phone: u.phone, phoneVerified: !!u.phone_verified_at, pendingPhone: u.pending_phone, hasPassword: u.has_password,
     locale: u.locale, interests: u.interests, ageRange: u.age_range, budget: u.budget, homeCity: u.home_city,
     personalizationEnabled: u.personalization_enabled, notificationPrefs: u.notification_prefs, isPremium: u.is_premium, createdAt: u.created_at,
+    avatarUrl: u.avatar_url, avatarPreset: u.avatar_preset,
   };
 }
 
@@ -122,11 +127,12 @@ export async function authRoutes(app: FastifyInstance, deps: AppDeps) {
   const strict = { config: { rateLimit: { max: config.NODE_ENV === 'test' ? 1000 : 10, timeWindow: '15 minutes' } } };
 
   app.post('/v1/auth/register', strict, async (req) => {
-    const b = parse(z.object({ email: Email, password: Password, name: z.string().trim().min(1).max(80).optional(), locale: z.enum(['en', 'el', 'ru']).optional() }), req.body);
+    const b = parse(z.object({ email: Email, password: Password, name: z.string().max(200).optional(), locale: z.enum(['en', 'el', 'ru']).optional() }), req.body);
     const exists = await db.query('SELECT 1 FROM users WHERE lower(email) = $1', [b.email]);
     if (exists.rowCount) throw new ApiError(409, 'email_taken', 'An account with this email already exists. Sign in instead.');
     const id = randomUUID();
-    await db.query(`INSERT INTO users (id, email, password_hash, name, locale) VALUES ($1,$2,$3,$4,$5)`, [id, b.email, await hashPassword(b.password), b.name ?? null, b.locale ?? 'en']);
+    const name = checkedName(b.name);
+    await db.query(`INSERT INTO users (id, email, password_hash, name, locale) VALUES ($1,$2,$3,$4,$5)`, [id, b.email, await hashPassword(b.password), name, b.locale ?? 'en']);
     const token = await issueSession(db, config, id, req);
     // Send the confirmation code right away; the account works even if email delivery is not configured yet.
     let emailVerification: { sent: boolean; devCode?: string; reason?: string };
