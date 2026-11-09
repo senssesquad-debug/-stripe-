@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { RefreshControl, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Section } from '@/components/verification';
+import { WhatToDo } from '@/components/what-to-do';
 import { Banner, Button, EmptyState, ErrorState, Icon, Skeleton, Tap, Txt } from '@/components/ui';
 import { useDiscoveryParams } from '@/lib/location';
 import { useFeed } from '@/lib/queries';
@@ -91,6 +92,7 @@ export default function Today() {
         {feed.data?.fromCache ? <Banner icon="wifi-off" tone="warning" text={t('common.offlineCached', { time: new Date(feed.data.generatedAt).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }) })} action={{ label: t('common.retry'), onPress: () => void feed.refetch() }} /> : null}
       </View>
 
+      <WhatToDo />
       {feed.isLoading ? <FeedSkeleton /> : null}
       {feed.isError && !feed.data ? <ErrorState error={feed.error} onRetry={() => void feed.refetch()} /> : null}
       {feed.data ? (

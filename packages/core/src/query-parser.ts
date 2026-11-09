@@ -203,14 +203,15 @@ export function parseQuery(query: string): SearchFilters {
 
   // Category & group keywords, longest phrase first, each token consumed once.
   const toks = nq.split(' ').filter(Boolean);
-  const consumed = new Array(toks.length).fill(false);
+  // Which phrase consumed each token: the same phrase in several categories ("tennis": a match or a court) adds all of them.
+  const consumed: Array<string | false> = new Array(toks.length).fill(false);
   const cats = new Set<string>();
   const groups = new Set<InterestGroup>();
   const dishWords: string[] = [];
   toks.forEach((tok, i) => {
     const d = DISHES.find((x) => x.stems.some((st) => tok === st || (st.length >= 4 && tok.startsWith(st))));
     if (!d) return;
-    consumed[i] = true;
+    consumed[i] = 'dish';
     for (const c of DISH_CATS) cats.add(c);
     if (!dishWords.includes(d.cuisine)) dishWords.push(d.cuisine);
   });
@@ -220,13 +221,13 @@ export function parseQuery(query: string): SearchFilters {
       for (let j = 0; j < m.words.length; j++) {
         const tok = toks[i + j]!;
         const kw = m.words[j]!;
-        if (consumed[i + j] || !(tok === kw || (kw.length >= 3 && tok.startsWith(kw)) || (kw.length < 3 && tok === kw))) {
+        if ((consumed[i + j] && consumed[i + j] !== m.words.join(' ')) || !(tok === kw || (kw.length >= 3 && tok.startsWith(kw)) || (kw.length < 3 && tok === kw))) {
           ok = false;
           break;
         }
       }
       if (!ok) continue;
-      for (let j = 0; j < m.words.length; j++) consumed[i + j] = true;
+      for (let j = 0; j < m.words.length; j++) consumed[i + j] = m.words.join(' ');
       if (m.target.kind === 'category') cats.add(m.target.slug);
       else groups.add(m.target.group);
     }

@@ -62,7 +62,17 @@ export interface CategoryDef {
   /** Typically free to visit (beaches, viewpoints, parks). Never used as a fact for a specific place. */
   usuallyFree?: boolean;
   outdoor?: boolean;
+  /** What kind of outing it is, for "What can I do?" filters. */
+  vibes?: Vibe[];
+  /** Section of the balanced home feed this category counts towards. */
+  bucket?: FeedBucket;
+  /** Usually operates only in these months (1–12). Shown as "usually seasonal", never as a fact about a place. */
+  seasonMonths?: [number, number];
 }
+
+export type Vibe = 'indoor' | 'outdoor' | 'extreme' | 'relaxing' | 'sports' | 'adventure' | 'social' | 'family';
+export const VIBES: Vibe[] = ['indoor', 'outdoor', 'extreme', 'relaxing', 'sports', 'adventure', 'social', 'family'];
+export type FeedBucket = 'food' | 'active' | 'entertainment' | 'events_nightlife' | 'nature' | 'sports' | 'shopping' | 'culture';
 
 const c = (
   slug: string,
@@ -227,7 +237,7 @@ export const CATEGORIES: CategoryDef[] = [
     [['spa', 'massage', 'sauna', 'hammam'], ['σπα', 'μασαζ', 'σαουν', 'χαμαμ'], ['спа', 'массаж', 'саун', 'хамам']],
     { osm: [{ leisure: 'sauna' }, { shop: 'massage' }, { amenity: 'spa' }], google: ['spa', 'massage'], visitMinutes: 90 }),
   c('gym', 'place', 'sports', 'dumbbell', ['Gyms & fitness', 'Γυμναστήρια', 'Фитнес-центры'],
-    [['gym', 'fitness', 'crossfit', 'workout', 'yoga studio'], ['γυμναστηρ', 'fitness', 'κροσφιτ'], ['спортзал', 'фитнес', 'тренажер', 'кроссфит', 'качалк']],
+    [['gym', 'fitness', 'workout'], ['γυμναστηρ', 'fitness'], ['спортзал', 'фитнес', 'тренажер', 'качалк']],
     { osm: [{ leisure: 'fitness_centre' }, { leisure: 'sports_centre' }], google: ['gym', 'fitness_center'], visitMinutes: 75 }),
   c('coworking', 'place', 'technology', 'laptop', ['Coworking', 'Coworking', 'Коворкинги'],
     [['coworking', 'co-working', 'workspace', 'work from'], ['coworking', 'χωρος εργασιας'], ['коворкинг', 'поработать']],
@@ -256,9 +266,9 @@ export const CATEGORIES: CategoryDef[] = [
     [['cinema', 'movie', 'movies', 'film'], ['σινεμ', 'κινηματογραφ', 'ταινι'], ['кино', 'кинотеатр', 'фильм']],
     { osm: [{ amenity: 'cinema' }], google: ['movie_theater'], visitMinutes: 140, dayParts: EVENING }),
   c('boat-trip', 'place', 'adventure', 'boat', ['Boat trips', 'Κρουαζιέρες & βάρκες', 'Морские прогулки'],
-    [['boat trip', 'boat tour', 'boat ride', 'boat', 'cruise', 'yacht', 'catamaran', 'boat rental', 'glass bottom', 'sailing', 'pirate ship', 'fishing trip', 'fishing'],
-      ['κρουαζιερ', 'βαρκ', 'σκαφ', 'γιοτ', 'ιστιοπλο', 'ψαρεμ'],
-      ['морск прогулк', 'прогулк на лодк', 'прогулк на яхт', 'прогулк на катер', 'яхт', 'катер', 'катамаран', 'лодк', 'круиз', 'парусн', 'рыбалк']],
+    [['boat trip', 'boat tour', 'boat ride', 'boat', 'cruise', 'yacht', 'catamaran', 'boat rental', 'glass bottom', 'pirate ship', 'sunset cruise'],
+      ['κρουαζιερ', 'βαρκ', 'σκαφ', 'γιοτ'],
+      ['морск прогулк', 'прогулк на лодк', 'прогулк на яхт', 'прогулк на катер', 'яхт', 'катер', 'катамаран', 'лодк', 'круиз']],
     { osm: [{ amenity: 'boat_rental' }, { shop: 'boat_rental' }, { tourism: 'attraction', boat: 'yes' }], visitMinutes: 180, outdoor: true, dayParts: DAYTIME }),
   c('diving', 'place', 'adventure', 'diving', ['Diving & snorkelling', 'Καταδύσεις', 'Дайвинг'],
     [['diving', 'scuba', 'snorkel', 'dive'], ['καταδυσ', 'scuba'], ['дайвинг', 'снорк', 'погружен']],
@@ -268,8 +278,8 @@ export const CATEGORIES: CategoryDef[] = [
       ['σερφ', 'θαλασσια σπορ', 'καγιακ', 'τζετ σκι'],
       ['серф', 'кайт', 'виндсерф', 'сап', 'водн спорт', 'водн развлечен', 'гидроцикл', 'парасейл', 'парашют над мор', 'каяк', 'байдарк', 'вейкборд', 'водн лыж', 'банан лодк']],
     { osm: [{ sport: 'surfing' }, { sport: 'kitesurfing' }, { sport: 'windsurfing' }, { sport: 'water_ski' }, { sport: 'canoe' }, { shop: 'surf' }], visitMinutes: 150, outdoor: true, dayParts: DAYTIME }),
-  c('tours', 'place', 'adventure', 'compass', ['Tours & safaris', 'Εκδρομές & σαφάρι', 'Экскурсии и сафари'],
-    [['guided tour', 'day tour', 'tours', 'excursion', 'safari', 'jeep', 'quad', 'buggy', 'day trip', 'segway'],
+  c('tours', 'place', 'adventure', 'compass', ['Tours, safaris & off-road', 'Εκδρομές, σαφάρι & off-road', 'Экскурсии, сафари и офф-роуд'],
+    [['guided tour', 'day tour', 'tours', 'excursion', 'safari', 'jeep', 'quad', 'atv', 'buggy', 'off road', 'offroad', 'day trip', 'segway'],
       ['εκδρομ', 'σαφαρι', 'ξεναγ', 'τζιπ'],
       ['экскурс', 'сафари', 'джип', 'квадроцикл', 'багги', 'сигвей']],
     { osm: [{ office: 'guide' }], visitMinutes: 240, outdoor: true, dayParts: DAYTIME }),
@@ -284,7 +294,7 @@ export const CATEGORIES: CategoryDef[] = [
     { osm: [{ natural: 'beach' }], osmRequireAny: ['name'], google: ['beach'], visitMinutes: 150, outdoor: true, usuallyFree: true, dayParts: DAYTIME }),
   c('park', 'place', 'nature', 'tree', ['Parks & nature', 'Πάρκα & φύση', 'Парки и природа'],
     [['park', 'nature', 'garden', 'forest', 'nature reserve', 'national park'], ['παρκο', 'κηπ', 'δασ', 'φυσ'], ['парк', 'природ', 'сад', 'лес', 'заповедник']],
-    { osm: [{ leisure: 'park' }, { leisure: 'nature_reserve' }, { boundary: 'national_park' }, { leisure: 'garden', garden_type: 'botanical' }], osmRequireAny: ['name'], google: ['park', 'national_park', 'botanical_garden'], visitMinutes: 60, outdoor: true, usuallyFree: true }),
+    { osm: [{ leisure: 'park' }], osmRequireAny: ['name'], google: ['park', 'national_park', 'botanical_garden'], visitMinutes: 60, outdoor: true, usuallyFree: true }),
   c('viewpoint', 'place', 'nature', 'binoculars', ['Viewpoints', 'Θέες', 'Смотровые площадки'],
     [['viewpoint', 'view', 'lookout', 'sunset', 'panorama', 'scenic'], ['θεα', 'ηλιοβασιλεμ', 'πανοραμα'], ['смотров', 'вид', 'закат', 'панорам']],
     { osm: [{ tourism: 'viewpoint' }], google: ['observation_deck'], visitMinutes: 30, outdoor: true, usuallyFree: true }),
@@ -312,6 +322,107 @@ export const CATEGORIES: CategoryDef[] = [
   c('campsite', 'place', 'nature', 'tent', ['Camping', 'Κάμπινγκ', 'Кемпинги'],
     [['camping', 'campsite', 'campground', 'picnic'], ['καμπινγκ', 'κατασκην', 'πικνικ'], ['кемпинг', 'палатк', 'пикник']],
     { osm: [{ tourism: 'camp_site' }, { tourism: 'picnic_site' }], osmRequireAny: ['name'], google: ['campground'], visitMinutes: 120, outdoor: true }),
+
+  // ── More things to do: adventure, water, sports, outdoors, entertainment, social, shopping, family ──────
+  c('paintball', 'place', 'adventure', 'target', ['Paintball & airsoft', 'Paintball & airsoft', 'Пейнтбол и страйкбол'],
+    [['paintball', 'airsoft'], ['πεϊντμπολ', 'πειντμπολ', 'αιρσοφτ'], ['пейнтбол', 'страйкбол', 'эйрсофт']],
+    { osm: [{ sport: 'paintball' }, { sport: 'airsoft' }], visitMinutes: 120, outdoor: true, dayParts: DAYTIME }),
+  c('laser-tag', 'place', 'adventure', 'laser', ['Laser tag', 'Laser tag', 'Лазертаг'],
+    [['laser tag', 'lasertag', 'laser game'], ['λειζερ ταγκ'], ['лазертаг', 'лазерн бой']],
+    { osm: [{ sport: 'laser_tag' }], visitMinutes: 75 }),
+  c('climbing', 'place', 'adventure', 'climb', ['Climbing & bouldering', 'Αναρρίχηση', 'Скалолазание и боулдеринг'],
+    [['climbing', 'bouldering', 'climbing wall', 'rock climbing'], ['αναρριχ'], ['скалолаз', 'боулдеринг', 'скалодром']],
+    { osm: [{ sport: 'climbing' }], osmRequireAny: ['name'], visitMinutes: 120 }),
+  c('zipline', 'place', 'adventure', 'zip', ['Ziplines & rope parks', 'Zipline & σχοινοπάρκα', 'Зиплайны и верёвочные парки'],
+    [['zipline', 'zip line', 'rope park', 'ropes course', 'adventure park', 'treetop'], ['ζιπλαιν', 'περιπετειας παρκο', 'σχοινοπαρκ'], ['зиплайн', 'тарзанк', 'веревочн парк', 'верёвочн парк', 'парк приключен']],
+    { osm: [{ aerialway: 'zip_line' }, { sport: 'climbing_adventure' }], visitMinutes: 150, outdoor: true, dayParts: DAYTIME }),
+  c('horse-riding', 'place', 'adventure', 'horse', ['Horse riding', 'Ιππασία', 'Конные прогулки'],
+    [['horse riding', 'horseback', 'equestrian', 'pony'], ['ιππασ', 'αλογ'], ['конн', 'верхов езд', 'лошад', 'пони']],
+    { osm: [{ leisure: 'horse_riding' }, { sport: 'equestrian' }, { route: 'horse' }], osmRequireAny: ['name'], visitMinutes: 120, outdoor: true, dayParts: DAYTIME }),
+  c('air-sports', 'place', 'adventure', 'paraglide', ['Paragliding & skydiving', 'Αλεξίπτωτο πλαγιάς & ελεύθερη πτώση', 'Параглайдинг и прыжки с парашютом'],
+    [['paragliding', 'paraglide', 'skydiving', 'skydive', 'parachute', 'tandem flight'], ['αλεξιπτωτ', 'πτωση με αλεξιπτωτο'], ['параглайд', 'парашют', 'скайдайв', 'полет на параплан', 'параплан']],
+    { osm: [{ sport: 'free_flying' }, { sport: 'paragliding' }, { sport: 'skydiving' }, { sport: 'parachuting' }], visitMinutes: 180, outdoor: true, dayParts: DAYTIME }),
+  c('fishing', 'place', 'nature', 'fish', ['Fishing', 'Ψάρεμα', 'Рыбалка'],
+    [['fishing', 'fishing trip', 'angling'], ['ψαρεμ'], ['рыбалк', 'рыбн ловл']],
+    { osm: [{ leisure: 'fishing' }], osmRequireAny: ['name'], visitMinutes: 180, outdoor: true, usuallyFree: true }),
+  c('swimming-pool', 'place', 'sports', 'swim', ['Swimming pools', 'Πισίνες', 'Бассейны'],
+    [['swimming pool', 'pool', 'swimming', 'lap swimming'], ['πισιν', 'κολυμβητηρ'], ['бассейн', 'плаван']],
+    { osm: [{ leisure: 'swimming_pool' }, { leisure: 'sports_centre', sport: 'swimming' }], osmRequireAny: ['name'], visitMinutes: 90 }),
+  c('sailing', 'place', 'adventure', 'sail', ['Sailing', 'Ιστιοπλοΐα', 'Парусный спорт'],
+    [['sailing', 'sailing club', 'regatta'], ['ιστιοπλο'], ['парусн', 'регат']],
+    { osm: [{ sport: 'sailing' }, { club: 'sailing' }], osmRequireAny: ['name'], visitMinutes: 180, outdoor: true, dayParts: DAYTIME }),
+  c('martial-arts', 'place', 'sports', 'karate', ['Martial arts & boxing', 'Πολεμικές τέχνες & πυγμαχία', 'Единоборства и бокс'],
+    [['martial arts', 'karate', 'judo', 'taekwondo', 'boxing', 'kickboxing', 'mma', 'jiu jitsu', 'muay thai'], ['πολεμικ τεχν', 'καρατε', 'τζουντο', 'πυγμαχ', 'μποξ'], ['единоборств', 'карате', 'дзюдо', 'тхэквондо', 'бокс', 'кикбоксинг', 'мма', 'джиу', 'тайский бокс']],
+    { osm: [{ sport: 'martial_arts' }, { sport: 'karate' }, { sport: 'judo' }, { sport: 'taekwondo' }, { sport: 'boxing' }, { sport: 'kickboxing' }, { sport: 'mixed_martial_arts' }], osmRequireAny: ['name'], visitMinutes: 90 }),
+  c('crossfit', 'place', 'sports', 'dumbbell', ['CrossFit', 'CrossFit', 'Кроссфит'],
+    [['crossfit', 'functional training'], ['κροσφιτ'], ['кроссфит', 'функциональн тренир']],
+    { osm: [{ sport: 'crossfit' }], visitMinutes: 75 }),
+  c('racket-sports', 'place', 'sports', 'tennis', ['Tennis & padel', 'Τένις & padel', 'Теннис и падел'],
+    [['tennis', 'padel', 'squash', 'badminton', 'table tennis'], ['τενις', 'πανελ', 'σκουος', 'μπαντμιντον'], ['теннис', 'падел', 'сквош', 'бадминтон', 'пинг понг']],
+    { osm: [{ sport: 'tennis' }, { sport: 'padel' }, { sport: 'squash' }, { sport: 'badminton' }], osmRequireAny: ['name'], visitMinutes: 90 }),
+  c('sports-courts', 'place', 'sports', 'ball', ['Sports courts & pitches', 'Γήπεδα', 'Спортплощадки'],
+    [['basketball', 'football', 'soccer', 'futsal', 'volleyball', 'beach volleyball', 'sports court', 'pitch'], ['μπασκετ', 'ποδοσφαιρ', 'βολει', 'γηπεδ'], ['баскетбол', 'футбол', 'мини футбол', 'волейбол', 'пляжн волейбол', 'спортплощадк', 'поле']],
+    { osm: [{ sport: 'basketball' }, { sport: 'soccer' }, { sport: 'volleyball' }, { sport: 'beachvolleyball' }, { sport: 'futsal' }, { sport: 'multi' }], osmRequireAny: ['name'], visitMinutes: 90, outdoor: true }),
+  c('skatepark', 'place', 'sports', 'skate', ['Skateparks', 'Skateparks', 'Скейт-парки'],
+    [['skatepark', 'skate park', 'skateboard', 'bmx'], ['σκειτ'], ['скейт', 'скейтпарк', 'бмх', 'роллер']],
+    { osm: [{ sport: 'skateboard' }, { leisure: 'skatepark' }, { sport: 'bmx' }], visitMinutes: 90, outdoor: true, usuallyFree: true }),
+  c('yoga-studio', 'place', 'wellness', 'lotus', ['Yoga & pilates studios', 'Στούντιο γιόγκα & πιλάτες', 'Студии йоги и пилатеса'],
+    [['yoga studio', 'yoga class', 'pilates studio'], ['στουντιο γιογκα'], ['студи йог', 'йог студи', 'занят йог', 'студи пилатес']],
+    { osm: [{ sport: 'yoga' }, { leisure: 'fitness_centre', sport: 'yoga' }, { sport: 'pilates' }], osmRequireAny: ['name'], visitMinutes: 75 }),
+  c('dance-studio', 'place', 'culture', 'dance', ['Dance studios', 'Σχολές χορού', 'Танцевальные студии'],
+    [['dance studio', 'dance school', 'dance class', 'salsa', 'bachata', 'tango'], ['σχολη χορου', 'σαλσα', 'ταγκο'], ['танц студи', 'школ танц', 'сальс', 'бачат', 'танго']],
+    { osm: [{ leisure: 'dance' }, { amenity: 'dancing_school' }], osmRequireAny: ['name'], visitMinutes: 90, dayParts: EVENING }),
+  c('sports-club', 'place', 'sports', 'run', ['Sports clubs', 'Αθλητικοί σύλλογοι', 'Спортивные клубы'],
+    [['running club', 'cycling club', 'sports club', 'triathlon'], ['αθλητικ ομιλ', 'συλλογ δρομ'], ['беговой клуб', 'бегов клуб', 'велоклуб', 'спортклуб', 'спортивн клуб', 'триатлон']],
+    { osm: [{ club: 'sport' }], osmRequireAny: ['name'], visitMinutes: 90 }),
+  c('nature-reserve', 'place', 'nature', 'terrain', ['Nature reserves & national parks', 'Φυσικά καταφύγια & εθνικά πάρκα', 'Заповедники и нацпарки'],
+    [['nature reserve', 'national park', 'forest park', 'protected area', 'nature park'], ['εθνικ δρυμ', 'εθνικ παρκ', 'φυσικ καταφυγ', 'δασικ παρκ'], ['заповедник', 'нацпарк', 'национальн парк', 'природн парк', 'лесопарк']],
+    { osm: [{ leisure: 'nature_reserve' }, { boundary: 'national_park' }, { boundary: 'protected_area' }], osmRequireAny: ['name'], visitMinutes: 150, outdoor: true, usuallyFree: true, dayParts: DAYTIME }),
+  c('waterfall', 'place', 'nature', 'waterfall', ['Waterfalls', 'Καταρράκτες', 'Водопады'],
+    [['waterfall', 'falls'], ['καταρρακτ'], ['водопад']],
+    { osm: [{ waterway: 'waterfall' }], osmRequireAny: ['name'], visitMinutes: 90, outdoor: true, usuallyFree: true, dayParts: DAYTIME }),
+  c('cave', 'place', 'nature', 'cave', ['Caves', 'Σπηλιές', 'Пещеры'],
+    [['cave', 'caves', 'grotto'], ['σπηλ'], ['пещер', 'грот']],
+    { osm: [{ natural: 'cave_entrance' }], osmRequireAny: ['name'], visitMinutes: 60, outdoor: true, usuallyFree: true, dayParts: DAYTIME }),
+  c('garden', 'place', 'nature', 'flower', ['Botanical gardens', 'Βοτανικοί κήποι', 'Ботанические сады'],
+    [['botanical garden', 'botanic garden', 'garden'], ['βοτανικ κηπ', 'κηπ'], ['ботаническ сад', 'сад']],
+    { osm: [{ leisure: 'garden', 'garden:type': 'botanical' }], osmRequireAny: ['name'], visitMinutes: 75, outdoor: true, dayParts: DAYTIME }),
+  c('birdwatching', 'place', 'nature', 'bird', ['Bird watching', 'Παρατήρηση πουλιών', 'Наблюдение за птицами'],
+    [['bird watching', 'birdwatching', 'bird hide', 'flamingo'], ['παρατηρηση πουλ', 'φλαμινγκ'], ['наблюден за птиц', 'птиц', 'фламинго']],
+    { osm: [{ leisure: 'bird_hide' }], visitMinutes: 60, outdoor: true, usuallyFree: true, dayParts: DAYTIME }),
+  c('picnic', 'place', 'nature', 'picnic', ['Picnic sites', 'Χώροι πικνίκ', 'Места для пикника'],
+    [['picnic', 'picnic site', 'bbq area'], ['πικνικ', 'χωρος αναψυχ'], ['пикник', 'зон отдых', 'мангал']],
+    { osm: [{ tourism: 'picnic_site' }, { leisure: 'picnic_site' }], osmRequireAny: ['name'], visitMinutes: 120, outdoor: true, usuallyFree: true, dayParts: DAYTIME }),
+  c('arcade', 'place', 'family', 'gamepad', ['Arcades & gaming', 'Ηλεκτρονικά παιχνίδια & gaming', 'Игровые залы и гейминг'],
+    [['arcade', 'gaming center', 'game center', 'esports', 'playstation'], ['ηλεκτρονικ παιχνιδ', 'gaming'], ['игров зал', 'игровой клуб', 'компьютерн клуб', 'киберспорт', 'аркад']],
+    { osm: [{ leisure: 'amusement_arcade' }], osmRequireAny: ['name'], visitMinutes: 90 }),
+  c('trampoline-park', 'place', 'family', 'jump', ['Trampoline parks', 'Πάρκα τραμπολίνο', 'Батутные парки'],
+    [['trampoline', 'trampoline park', 'jump park'], ['τραμπολ'], ['батут']],
+    { osm: [{ leisure: 'trampoline_park' }, { sport: 'trampoline' }], osmRequireAny: ['name'], visitMinutes: 90 }),
+  c('performing-arts', 'place', 'culture', 'masks', ['Theatres & concert halls', 'Θέατρα & αίθουσες συναυλιών', 'Театры и концертные залы'],
+    [['theatre venue', 'concert hall', 'amphitheatre', 'arts centre', 'comedy club', 'stand up'], ['θεατρ', 'αιθουσ συναυλι', 'αμφιθεατρ', 'πολιτιστικ κεντρ'], ['театр', 'концертн зал', 'амфитеатр', 'арт центр', 'стендап', 'камеди клуб']],
+    { osm: [{ amenity: 'theatre' }, { amenity: 'concert_hall' }, { amenity: 'arts_centre' }, { amenity: 'events_venue' }], osmRequireAny: ['name'], visitMinutes: 150, dayParts: EVENING }),
+  c('board-games', 'place', 'food', 'dice', ['Board game cafés', 'Καφέ επιτραπέζιων', 'Антикафе и настольные игры'],
+    [['board game', 'board games', 'boardgame', 'game cafe'], ['επιτραπεζ'], ['настольн игр', 'антикафе']],
+    { visitMinutes: 120, dayParts: ['afternoon', 'evening'] }),
+  c('community-centre', 'place', 'culture', 'people', ['Community & social centres', 'Πολιτιστικά & κοινωνικά κέντρα', 'Культурные и социальные центры'],
+    [['community centre', 'community center', 'social club', 'language exchange', 'cultural centre'], ['κοινοτικ κεντρ', 'πολιτιστικ συλλογ'], ['культурн центр', 'социальн клуб', 'языков обмен', 'разговорн клуб', 'общин']],
+    { osm: [{ amenity: 'community_centre' }, { amenity: 'social_centre' }], osmRequireAny: ['name'], visitMinutes: 90 }),
+  c('creative-workshop', 'place', 'art', 'brush', ['Creative workshops', 'Δημιουργικά εργαστήρια', 'Творческие мастерские'],
+    [['pottery', 'ceramics', 'art class', 'painting class', 'craft workshop', 'atelier'], ['κεραμικ', 'αγγειοπλαστ', 'εργαστηρ ζωγραφ'], ['гончар', 'керамик', 'мастер класс', 'урок живопис', 'творческ мастерск']],
+    { osm: [{ craft: 'pottery' }, { craft: 'ceramics' }], osmRequireAny: ['name'], visitMinutes: 120 }),
+  c('second-hand', 'place', 'shopping', 'hanger', ['Vintage & second-hand', 'Vintage & μεταχειρισμένα', 'Винтаж и секонд-хенд'],
+    [['vintage', 'thrift', 'second hand', 'secondhand', 'charity shop', 'flea market', 'antiques', 'antique'], ['μεταχειρισμ', 'παλαιοπωλ', 'αντικ'], ['винтаж', 'секонд', 'комиссион', 'блошин', 'барахолк', 'антиквар']],
+    { osm: [{ shop: 'second_hand' }, { shop: 'charity' }, { shop: 'antiques' }], osmRequireAny: ['name'], visitMinutes: 45 }),
+  c('local-shops', 'place', 'shopping', 'store', ['Local boutiques & crafts', 'Τοπικά καταστήματα & χειροτεχνία', 'Местные бутики и ремёсла'],
+    [['boutique', 'gift shop', 'souvenir', 'handmade', 'crafts', 'local designer'], ['μπουτικ', 'δωρα', 'σουβενιρ', 'χειροτεχν'], ['бутик', 'подарк', 'сувенир', 'ручн работ', 'ремесл']],
+    { osm: [{ shop: 'boutique' }, { shop: 'gift' }, { shop: 'craft' }, { shop: 'art' }], osmRequireAny: ['name'], visitMinutes: 30 }),
+  c('kids-play', 'place', 'family', 'child', ['Kids activity centres', 'Παιδότοποι', 'Детские игровые центры'],
+    [['kids club', 'soft play', 'indoor playground', 'play centre', 'kids activities'], ['παιδοτοπ', 'παιδικ'], ['детск игров', 'детск центр', 'игров комнат', 'для детей']],
+    { osm: [{ leisure: 'indoor_play' }, { leisure: 'playground', indoor: 'yes' }], osmRequireAny: ['name'], visitMinutes: 90 }),
+  c('science-centre', 'place', 'family', 'atom', ['Science & discovery centres', 'Κέντρα επιστήμης', 'Научные и познавательные центры'],
+    [['science centre', 'science center', 'planetarium', 'observatory', 'discovery centre'], ['κεντρ επιστημ', 'πλανηταρ', 'αστεροσκοπ'], ['научн центр', 'планетари', 'обсерватор', 'познавательн']],
+    { osm: [{ amenity: 'planetarium' }, { tourism: 'museum', museum: 'science' }, { man_made: 'observatory', tourism: 'attraction' }], osmRequireAny: ['name'], visitMinutes: 120 }),
 
   // ── Everyday services ────────────────────────────────────────────────────
   c('pharmacy', 'place', 'practical', 'pill', ['Pharmacies', 'Φαρμακεία', 'Аптеки'],
@@ -407,6 +518,16 @@ const NAME_RULES: Array<[slug: string, re: RegExp]> = [
   ['diving', /\b(div(e|ing) (cent(er|re)|school|club)|scuba|snorkel)/i],
   ['surfing', /\b(water ?sports?|jet ?skis?|parasail|kayak|canoe|wakeboard|kite ?surf|windsurf|paddle ?board)/i],
   ['tours', /\b(safaris?|jeep|quad|buggy|excursions?|guided tours?|day tours?)\b|σαφάρι|σαφαρι|экскурс|сафари/i],
+  ['laser-tag', /\blaser ?(tag|game|arena)\b|лазертаг/i],
+  ['zipline', /\bzip ?line|\bropes? (park|course)\b|\badventure park\b|tree ?top/i],
+  ['paintball', /\bpaintball|\bairsoft/i],
+  ['escape-room', /\bescape ?rooms?\b|\bquest room\b|квест/i],
+  ['board-games', /\bboard ?games?\b|\bgame caf[eé]\b|επιτραπέζι|настольн|антикафе/i],
+  ['trampoline-park', /\btrampoline|батут/i],
+  ['karting', /\bkarting\b|\bgo[- ]?karts?\b/i],
+  ['horse-riding', /\b(horse ?riding|riding (centre|center|school|club)|equestrian|stables?)\b|ιππασ/i],
+  ['air-sports', /\bparaglid|\bskydiv|\btandem flights?\b/i],
+  ['kids-play', /\b(soft play|kids? (club|zone|world|land|park)|play ?(centre|center|land|zone))\b|παιδότοπ|παιδοτοπ/i],
 ];
 const BUSINESS_KEYS = ['tourism', 'leisure', 'shop', 'office', 'amenity', 'sport', 'club', 'craft'];
 
@@ -451,4 +572,45 @@ export const CATEGORY_UMBRELLAS: Record<string, string[]> = {
 /** Expand umbrella categories ("concert" → also classical, jazz, rock …). */
 export function expandCategories(slugs: readonly string[]): string[] {
   return [...new Set(slugs.flatMap((s) => [s, ...(CATEGORY_UMBRELLAS[s] ?? [])]))];
+}
+
+// ── Vibes, feed buckets, seasons ───────────────────────────────────────────
+
+const V: Record<string, Vibe[]> = {
+  karting: ['outdoor', 'extreme', 'adventure', 'social'], paintball: ['outdoor', 'extreme', 'adventure', 'social'], 'laser-tag': ['indoor', 'adventure', 'social', 'family'],
+  climbing: ['indoor', 'sports', 'adventure', 'extreme'], zipline: ['outdoor', 'extreme', 'adventure', 'family'], 'horse-riding': ['outdoor', 'adventure', 'relaxing', 'family'],
+  'air-sports': ['outdoor', 'extreme', 'adventure'], 'escape-room': ['indoor', 'adventure', 'social'], 'vr-arcade': ['indoor', 'social'], tours: ['outdoor', 'adventure', 'social'],
+  'boat-trip': ['outdoor', 'relaxing', 'social', 'family'], diving: ['outdoor', 'adventure', 'sports', 'extreme'], surfing: ['outdoor', 'sports', 'adventure', 'extreme'], sailing: ['outdoor', 'sports', 'adventure'],
+  fishing: ['outdoor', 'relaxing'], 'water-park': ['outdoor', 'family', 'social'], 'swimming-pool': ['sports', 'relaxing', 'family'], marina: ['outdoor', 'relaxing'],
+  gym: ['indoor', 'sports'], crossfit: ['indoor', 'sports'], 'martial-arts': ['indoor', 'sports'], 'racket-sports': ['sports', 'social'], 'sports-courts': ['outdoor', 'sports', 'social'],
+  skatepark: ['outdoor', 'sports', 'extreme'], 'yoga-studio': ['indoor', 'relaxing', 'sports'], 'dance-studio': ['indoor', 'social', 'sports'], 'sports-club': ['sports', 'social'], cycling: ['outdoor', 'sports'],
+  hiking: ['outdoor', 'sports', 'adventure'], beach: ['outdoor', 'relaxing', 'family'], park: ['outdoor', 'relaxing', 'family'], viewpoint: ['outdoor', 'relaxing'], campsite: ['outdoor', 'adventure'],
+  'nature-reserve': ['outdoor', 'relaxing', 'adventure'], waterfall: ['outdoor', 'adventure', 'relaxing'], cave: ['outdoor', 'adventure'], garden: ['outdoor', 'relaxing', 'family'],
+  birdwatching: ['outdoor', 'relaxing'], picnic: ['outdoor', 'relaxing', 'family', 'social'], bowling: ['indoor', 'social', 'family'], billiards: ['indoor', 'social'], arcade: ['indoor', 'social', 'family'],
+  'trampoline-park': ['indoor', 'family', 'sports'], 'amusement-park': ['outdoor', 'family', 'social'], cinema: ['indoor', 'relaxing', 'social'], 'live-music-venue': ['indoor', 'social'],
+  'performing-arts': ['indoor', 'social'], nightclub: ['indoor', 'social'], 'board-games': ['indoor', 'social', 'relaxing'], 'community-centre': ['indoor', 'social'],
+  'creative-workshop': ['indoor', 'social', 'relaxing'], spa: ['indoor', 'relaxing'], 'zoo-aquarium': ['family', 'relaxing'], playground: ['outdoor', 'family'], 'kids-play': ['indoor', 'family'],
+  'science-centre': ['indoor', 'family'], museum: ['indoor', 'relaxing'], 'art-gallery': ['indoor', 'relaxing'], 'historic-site': ['outdoor', 'relaxing'], 'religious-site': ['relaxing'],
+  winery: ['relaxing', 'social'], 'farmers-market': ['outdoor', 'social'], 'second-hand': ['indoor'], 'local-shops': ['indoor'], 'shopping-mall': ['indoor', 'family'],
+};
+const B: Partial<Record<InterestGroup, FeedBucket>> = {
+  food: 'food', nightlife: 'events_nightlife', music: 'events_nightlife', adventure: 'active', nature: 'nature', sports: 'sports', shopping: 'shopping',
+  culture: 'culture', art: 'culture', family: 'entertainment', technology: 'entertainment', wellness: 'sports',
+};
+const BUCKET_OVERRIDE: Record<string, FeedBucket> = {
+  bowling: 'entertainment', billiards: 'entertainment', cinema: 'entertainment', casino: 'entertainment', 'performing-arts': 'entertainment', 'board-games': 'entertainment',
+  'escape-room': 'active', 'laser-tag': 'active', 'water-park': 'active', 'amusement-park': 'entertainment', 'trampoline-park': 'entertainment', arcade: 'entertainment', 'vr-arcade': 'entertainment',
+  marina: 'nature', fishing: 'nature', 'swimming-pool': 'sports', spa: 'culture', 'beauty-salon': 'shopping', barbershop: 'shopping',
+};
+const SEASON: Record<string, [number, number]> = { 'water-park': [5, 10], 'boat-trip': [4, 11], surfing: [5, 10], sailing: [4, 11], 'air-sports': [3, 11], zipline: [3, 11] };
+for (const def of CATEGORIES) {
+  def.vibes = V[def.slug];
+  def.bucket = def.kind === 'event' && ['music', 'nightlife'].includes(def.group) ? 'events_nightlife' : BUCKET_OVERRIDE[def.slug] ?? B[def.group];
+  if (SEASON[def.slug]) def.seasonMonths = SEASON[def.slug];
+}
+
+/** True when a seasonal category is outside its usual months on this date (Cyprus). */
+export function outOfSeason(slug: string, month: number): boolean {
+  const m = getCategory(slug)?.seasonMonths;
+  return !!m && (month < m[0] || month > m[1]);
 }

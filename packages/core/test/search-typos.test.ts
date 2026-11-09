@@ -72,7 +72,7 @@ describe('dishes search restaurants and takeaways by cuisine', () => {
 describe('activities', () => {
   it.each([
     ['boat trip', 'boat-trip'], ['катание на лодке', 'boat-trip'], ['прогулка на яхте', 'boat-trip'], ['морская прогулка', 'boat-trip'],
-    ['βαρκάδα', 'boat-trip'], ['рыбалка', 'boat-trip'], ['sunset cruise', 'boat-trip'],
+    ['βαρκάδα', 'boat-trip'], ['рыбалка', 'fishing'], ['sunset cruise', 'boat-trip'],
     ['jet ski', 'surfing'], ['гидроцикл', 'surfing'], ['kayak', 'surfing'], ['parasailing', 'surfing'],
     ['jeep safari', 'tours'], ['квадроциклы', 'tours'], ['экскурсия', 'tours'], ['εκδρομή', 'tours'],
     ['snorkeling', 'diving'],
@@ -100,5 +100,20 @@ describe('activities recognised by name on the map', () => {
   it('streets and buildings are not activities', () => {
     expect(categoriesForOsmName({ highway: 'residential', name: 'Cruise Street' })).toEqual([]);
     expect(categoriesForOsmName({ building: 'yes', name: 'Safari House' })).toEqual([]);
+  });
+});
+
+describe('things to do beyond food', () => {
+  it.each([
+    ['картинг', 'karting'], ['paintball', 'paintball'], ['страйкбол', 'paintball'], ['laser tag', 'laser-tag'], ['скалодром', 'climbing'], ['bouldering', 'climbing'],
+    ['zipline', 'zipline'], ['верёвочный парк', 'zipline'], ['horse riding', 'horse-riding'], ['конные прогулки', 'horse-riding'], ['paragliding', 'air-sports'], ['прыжок с парашютом', 'air-sports'],
+    ['квадроциклы', 'tours'], ['off road', 'tours'], ['бассейн', 'swimming-pool'], ['sailing', 'sailing'], ['бокс', 'martial-arts'], ['karate', 'martial-arts'], ['crossfit', 'crossfit'],
+    ['padel', 'racket-sports'], ['теннис', 'racket-sports'], ['basketball', 'sports-courts'], ['волейбол', 'sports-courts'], ['skatepark', 'skatepark'],
+    ['йога студия', 'yoga-studio'], ['сальса', 'dance-studio'], ['беговой клуб', 'sports-club'], ['national park', 'nature-reserve'], ['заповедник', 'nature-reserve'],
+    ['водопад', 'waterfall'], ['καταρράκτης', 'waterfall'], ['пещера', 'cave'], ['botanical garden', 'garden'], ['фламинго', 'birdwatching'], ['пикник', 'picnic'],
+    ['arcade', 'arcade'], ['батут', 'trampoline-park'], ['концертный зал', 'performing-arts'], ['настольные игры', 'board-games'], ['языковой обмен', 'community-centre'],
+    ['гончарный мастер класс', 'creative-workshop'], ['винтаж', 'second-hand'], ['flea market', 'second-hand'], ['сувениры', 'local-shops'], ['soft play', 'kids-play'], ['планетарий', 'science-centre'],
+  ])('%s → %s', (q, slug) => {
+    expect(parseQuery(q).categories).toContain(slug);
   });
 });

@@ -106,6 +106,10 @@ export type TransitLeg =
       departure: string; arrival: string; stops: number; waitMin: number; fareEur: number | null; fromPoint: [number, number]; toPoint: [number, number];
       stopList?: Array<{ name: string; at: string; point: [number, number] }> };
 export interface TransitOption { departAt: string; arriveAt: string; durationMin: number; transfers: number; walkMin: number; fareEur: number | null; fareComplete: boolean; legs: TransitLeg[] }
+export type ActivityWhen = 'now' | 'today' | 'evening' | 'tomorrow' | 'weekend';
+export type Availability = 'open' | 'on' | 'unconfirmed' | 'seasonal';
+export interface ActivityGroup { key: string; label: string; icon: string; vibes: string[]; total: number; available: number; nearestKm: number | null; options: Array<{ entity: EntityDTO; availability: Availability }> }
+export interface ActivitiesResponse { when: ActivityWhen; window: { start: string; end: string }; ideas: ActivityGroup[] }
 export interface Directions {
   departAt: string; walk: StreetRoute; bike: StreetRoute; drive: StreetRoute;
   transit: { status: 'ok' | 'no_stops_nearby' | 'no_service' | 'no_timetable' | 'unavailable'; options: TransitOption[]; scheduledOnly: true; validUntil: string | null; attribution: string | null };
@@ -152,6 +156,8 @@ export const api = {
   suggest: (q: string, p: { lat?: number; lng?: number }) => request<{ suggestions: Suggestion[]; didYouMean: string | null }>('/v1/search/suggest', { query: { q, ...p }, timeoutMs: 6_000 }),
   search: (q: string, p: LocationParams & { interests?: string[] }) => request<SearchResponse>('/v1/search', { method: 'POST', body: { q, ...p, locale: i18n.language }, timeoutMs: 20_000 }),
   recommendations: (p: LocationParams & { interests?: string[] }) => request<{ items: RecommendationDTO[] }>('/v1/recommendations', { query: { ...p } }),
+  activities: (p: LocationParams & { when: ActivityWhen; vibes?: string[]; cost?: 'any' | 'free' | 'paid'; idea?: string; interests?: string[] }) =>
+    request<ActivitiesResponse>('/v1/activities', { query: { ...p, vibes: p.vibes?.length ? p.vibes.join(',') : undefined } }),
   surprise: (p: LocationParams & { interests?: string[] }) => request<{ items: RecommendationDTO[] }>('/v1/surprise', { method: 'POST', body: { ...p, locale: i18n.language } }),
   planDay: (b: PlanParams & { interests?: string[]; tripType?: TripType; maxDistanceKm?: number | null; variants?: number }) => request<PlanDayResponse>('/v1/plan-day', { method: 'POST', body: { ...b, locale: i18n.language }, timeoutMs: 25_000 }),
   planEvaluate: (b: PlanParams & { items: PlanItem[] }) => request<PlanDayResponse>('/v1/plan-day/evaluate', { method: 'POST', body: { ...b, locale: i18n.language }, timeoutMs: 20_000 }),

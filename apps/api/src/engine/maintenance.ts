@@ -53,7 +53,7 @@ export async function runMaintenance(pool: pg.Pool, log: Logger, now = new Date(
 }
 
 /** Bump when the content of search documents changes; existing rows are rebuilt once at start-up. */
-export const SEARCH_DOC_VERSION = 3; // 3: "Water sports" label, tours category
+export const SEARCH_DOC_VERSION = 4; // 4: activity categories
 
 /** Rebuild places/events search documents in batches (after the indexed content changed). */
 export async function reindexSearch(pool: pg.Pool, log: Logger): Promise<number> {

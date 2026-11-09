@@ -3,7 +3,7 @@ import {
   CATEGORIES, CITIES, GROUP_LABELS, buildAffinity, expandCategories, canonicalKey, categoriesInGroup, cityBySlug, explain, getCategory, haversineKm,
   isValidLatLng, localDate, pickText, planDay, rank, scoreCandidate, surprise, timeWindow, type AgeRange, type Budget, type Candidate, type CityDef,
   type EntityDTO, type EventDTO, type FeedResponse, type FeedSectionDTO, type FeedSectionKey, type InteractionKind, type InterestGroup,
-  correctQuery, evaluatePlan, isDishKeyword, type EvalItem, type Locale, type PlaceDTO, type PlanCandidate, type PlanDayResponse, type PlanStopDTO, type PlanVariantDTO, type RecommendationDTO, type SearchFilters, type SearchResponse, type UserProfile,
+  ACTIVITY_IDEAS, balance, correctQuery, evaluatePlan, isDishKeyword, outOfSeason, type Vibe, type WindowKind, type EvalItem, type Locale, type PlaceDTO, type PlanCandidate, type PlanDayResponse, type PlanStopDTO, type PlanVariantDTO, type RecommendationDTO, type SearchFilters, type SearchResponse, type UserProfile,
 } from '@passtra/core';
 import { DateTime } from 'luxon';
 import type pg from 'pg';
@@ -99,6 +99,18 @@ const PRACTICAL = CATEGORIES.filter((c) => c.group === 'practical').map((c) => c
 const ERRANDS = new Set(['supermarket', 'clothing-store', 'sports-store', 'electronics-store', 'beauty-salon', 'barbershop', 'gym', 'coworking', 'cycling']);
 const LEISURE_PLACE_CATS = CATEGORIES.filter((c) => c.kind !== 'event' && c.group !== 'practical').map((c) => c.slug);
 const FEED_PLACE_CATS = LEISURE_PLACE_CATS.filter((s) => !ERRANDS.has(s));
+/** Places to eat are by far the most numerous; they get their own, smaller share of the pool so the nearest
+ *  hundreds of cafés can't crowd out every activity a few kilometres away. */
+const FOOD_CATS = FEED_PLACE_CATS.filter((s) => getCategory(s)?.bucket === 'food');
+const ACTIVITY_CATS = FEED_PLACE_CATS.filter((s) => getCategory(s)?.bucket !== 'food');
+
+async function feedPlaces(db: pg.Pool, ctx: DiscoveryContext, total: number): Promise<PlaceRow[]> {
+  const [food, other] = await Promise.all([
+    nearbyPlaces(db, ctx, { categories: FOOD_CATS, limit: Math.round(total * 0.25) }),
+    nearbyPlaces(db, ctx, { categories: ACTIVITY_CATS, limit: total }),
+  ]);
+  return [...other, ...food];
+}
 
 async function upcomingEvents(db: pg.Pool, ctx: DiscoveryContext, opts: { window?: ReturnType<typeof timeWindow>; excludeMultiDay?: boolean; categories?: string[]; free?: boolean; keywords?: string[]; radiusKm?: number; limit?: number; order?: string }): Promise<EventRow[]> {
   const q = new Sql();
@@ -174,7 +186,7 @@ export async function buildFeed(deps: FeedDeps, ctx: DiscoveryContext, profile: 
     upcomingEvents(db, ctx, { window: timeWindow('tonight', ctx.now, ctx.tz), excludeMultiDay: true, limit: 30 }),
     upcomingEvents(db, ctx, { window: timeWindow('weekend', ctx.now, ctx.tz), limit: 40 }),
     upcomingEvents(db, ctx, { window: timeWindow('next_7_days', ctx.now, ctx.tz), free: true, limit: 30 }),
-    nearbyPlaces(db, ctx, { categories: FEED_PLACE_CATS, limit: 600 }),
+    feedPlaces(db, ctx, 600),
     ctx.geo ? getWeather(db, deps.http, ctx.geo.lat, ctx.geo.lng, L, ctx.now).catch(() => null) : Promise.resolve(null),
   ]);
   const placeDTOs = new Map(places.map((r) => [r.id, placeToDTO(r, L, ctx.now)]));
@@ -184,7 +196,7 @@ export async function buildFeed(deps: FeedDeps, ctx: DiscoveryContext, profile: 
   if (profile.interests.length || Object.keys(profile.affinity).length) {
     const evRows = [...today, ...weekend];
     const evMap = new Map(evRows.map((r) => [r.id, r]));
-    const ranked = rank([...[...evMap.values()].map(eventCandidate), ...placeCands], profile, rankCtx, 10);
+    const ranked = balance(rank([...[...evMap.values()].map(eventCandidate), ...placeCands], profile, rankCtx, 200), 10, profile.interests);
     const items = ranked.map((s) => (s.item.type === 'event' ? toE(evMap.get(s.item.id)!) : placeDTOs.get(s.item.id)!));
     if (items.length) sections.push(section('for_you', L, take(items, 10)));
   }
@@ -192,7 +204,7 @@ export async function buildFeed(deps: FeedDeps, ctx: DiscoveryContext, profile: 
   // "Happening today": everything on today (incl. ongoing multi-day events).
   // "Right now": timed events in progress + places open now.
   const inProgress = today.filter((r) => r.time_precision === 'exact' && r.starts_at <= ctx.now);
-  const openPlaces = rank(placeCands.filter((c) => c.openNow === true), profile, rankCtx, 48).map((s) => placeDTOs.get(s.item.id)!);
+  const openPlaces = balance(rank(placeCands.filter((c) => c.openNow === true && !used.has(c.id)), profile, rankCtx, 300), 48, profile.interests).map((s) => placeDTOs.get(s.item.id)!);
   sections.push(section('happening_today', L, take(today.filter((r) => !inProgress.includes(r)).map(toE), 12)));
   sections.push(section('right_now', L, take([...inProgress.map(toE), ...openPlaces], 12)));
 
@@ -203,12 +215,12 @@ export async function buildFeed(deps: FeedDeps, ctx: DiscoveryContext, profile: 
     const ivs = openIntervals(r.opening_hours?.value, ctx.now > evening ? ctx.now : evening, new Date((ctx.now > evening ? ctx.now : evening).getTime() + 3 * 3_600_000), tz, r.lat, r.lng);
     return !!ivs?.length;
   });
-  sections.push(section('tonight', L, take([...tonight.map(toE), ...rank(openTonight.map((r) => placeCandidate(r, placeDTOs.get(r.id)!)), profile, rankCtx, 40).map((s) => placeDTOs.get(s.item.id)!)].slice(0, 40), 12)));
+  sections.push(section('tonight', L, take([...tonight.map(toE), ...balance(rank(openTonight.filter((r) => !used.has(r.id)).map((r) => placeCandidate(r, placeDTOs.get(r.id)!)), profile, rankCtx, 300), 40, profile.interests).map((s) => placeDTOs.get(s.item.id)!)].slice(0, 40), 12)));
   sections.push(section('this_weekend', L, take(weekend.map(toE), 12)));
 
   if (ctx.geo) {
     const near = places.filter((r) => (r.distance_km ?? 99) <= Math.min(ctx.radiusKm, 3) && !PRACTICAL.includes(r.primary_category));
-    sections.push(section('near_you', L, take(rank(near.map((r) => placeCandidate(r, placeDTOs.get(r.id)!)), profile, { ...rankCtx, radiusKm: 3 }, 48).map((s) => placeDTOs.get(s.item.id)!), 12)));
+    sections.push(section('near_you', L, take(balance(rank(near.filter((r) => !used.has(r.id)).map((r) => placeCandidate(r, placeDTOs.get(r.id)!)), profile, { ...rankCtx, radiusKm: 3 }, 300), 48, profile.interests).map((s) => placeDTOs.get(s.item.id)!), 12)));
   }
 
   const freePlaces = [...placeDTOs.values()].filter((p) => p.free.isFree === true && ['beach', 'park', 'viewpoint', 'hiking', 'historic-site', 'playground', 'marina'].includes(p.category.slug));
@@ -360,7 +372,7 @@ async function searchWith(db: pg.Pool, query: string, filters: SearchFilters, en
 async function recommendationPool(db: pg.Pool, ctx: DiscoveryContext): Promise<{ events: EventRow[]; places: PlaceRow[]; placeDTOs: Map<string, PlaceDTO> }> {
   const [events, places] = await Promise.all([
     upcomingEvents(db, ctx, { window: timeWindow('next_7_days', ctx.now, ctx.tz), limit: 200 }),
-    nearbyPlaces(db, ctx, { categories: FEED_PLACE_CATS, limit: 500 }),
+    feedPlaces(db, ctx, 500),
   ]);
   return { events, places, placeDTOs: new Map(places.map((r) => [r.id, placeToDTO(r, ctx.locale, ctx.now)])) };
 }
@@ -370,7 +382,7 @@ export async function recommendations(db: pg.Pool, ctx: DiscoveryContext, profil
   const evMap = new Map(pool.events.map((r) => [r.id, r]));
   const cands = [...pool.events.map(eventCandidate), ...pool.places.map((r) => placeCandidate(r, pool.placeDTOs.get(r.id)!))];
   const groupLabel = (g: string) => pickText(GROUP_LABELS[g as InterestGroup] ?? { en: g }, ctx.locale).toLowerCase();
-  return rank(cands, profile, { now: ctx.now, tz: ctx.tz, radiusKm: ctx.radiusKm }, limit).map((s) => ({
+  return balance(rank(cands, profile, { now: ctx.now, tz: ctx.tz, radiusKm: ctx.radiusKm }, 400), limit, profile.interests).map((s) => ({
     entity: s.item.type === 'event' ? eventToDTO(evMap.get(s.item.id)!, ctx.locale, ctx.now) : pool.placeDTOs.get(s.item.id)!,
     score: s.score,
     reason: explain(s.reasons, ctx.locale, groupLabel),
@@ -391,6 +403,76 @@ export async function surpriseMe(db: pg.Pool, ctx: DiscoveryContext, profile: Pr
     score: s.score,
     reason: explain(s.reasons, ctx.locale, groupLabel),
   }));
+}
+
+// ── What can I do? ─────────────────────────────────────────────────────────
+
+export type ActivityWhen = 'now' | 'today' | 'evening' | 'tomorrow' | 'weekend';
+/** open: opening hours say it's open in the chosen time; on: an event takes place then; unconfirmed: no reliable hours;
+ *  seasonal: usually closed at this time of year (still listed, never as available). */
+export type Availability = 'open' | 'on' | 'unconfirmed' | 'seasonal';
+export interface ActivityOptionDTO { entity: EntityDTO; availability: Availability }
+export interface ActivityGroupDTO { key: string; label: string; icon: string; vibes: Vibe[]; total: number; available: number; nearestKm: number | null; options: ActivityOptionDTO[] }
+
+const WHEN_WINDOW: Record<ActivityWhen, WindowKind> = { now: 'now', today: 'today', evening: 'tonight', tomorrow: 'tomorrow', weekend: 'weekend' };
+const AVAIL_RANK: Record<Availability, number> = { open: 0, on: 0, unconfirmed: 1, seasonal: 2 };
+
+export async function whatToDo(db: pg.Pool, ctx: DiscoveryContext, profile: Profile, opts: { when: ActivityWhen; vibes: Vibe[]; cost: 'any' | 'free' | 'paid'; idea?: string; perIdea?: number }): Promise<{ when: ActivityWhen; window: { start: string; end: string }; ideas: ActivityGroupDTO[] }> {
+  const L = ctx.locale;
+  const window = timeWindow(WHEN_WINDOW[opts.when], ctx.now, ctx.tz);
+  const ideas = ACTIVITY_IDEAS.filter((i) => (opts.idea ? i.key === opts.idea : opts.vibes.every((v) => i.vibes.includes(v))));
+  const cats = [...new Set(ideas.flatMap((i) => i.categories))];
+  const placeCats = cats.filter((c) => getCategory(c)?.kind !== 'event');
+  const eventCats = cats.filter((c) => getCategory(c)?.kind !== 'place');
+  const [places, events] = await Promise.all([
+    placeCats.length ? nearbyPlaces(db, ctx, { categories: placeCats, limit: 1500 }) : Promise.resolve([] as PlaceRow[]),
+    eventCats.length ? upcomingEvents(db, ctx, { window, categories: eventCats, limit: 400 }) : Promise.resolve([] as EventRow[]),
+  ]);
+  const month = DateTime.fromJSDate(window.start, { zone: ctx.tz }).month;
+  const usuallyFree = (slugs: string[]) => slugs.some((c) => getCategory(c)?.usuallyFree);
+  const costOk = (isFree: boolean | null, slugs: string[]) => {
+    if (opts.cost === 'any') return true;
+    const free = isFree ?? (usuallyFree(slugs) ? true : null);
+    return opts.cost === 'free' ? free === true : free !== true;
+  };
+
+  type Opt = { slugs: string[]; km: number | null; availability: Availability; dto: () => EntityDTO };
+  const pool: Opt[] = [];
+  for (const r of places) {
+    if (!costOk(r.is_free, r.categories)) continue;
+    let availability: Availability;
+    if (r.categories.some((c) => outOfSeason(c, month))) availability = 'seasonal';
+    else if (!r.opening_hours?.value) availability = 'unconfirmed';
+    else {
+      const ivs = openIntervals(r.opening_hours.value, window.start, window.end, ctx.tz, r.lat, r.lng);
+      if (ivs === undefined) availability = 'unconfirmed';
+      else if (!ivs.length) continue; // closed for the whole chosen time: not shown
+      else availability = 'open';
+    }
+    pool.push({ slugs: r.categories, km: r.distance_km, availability, dto: () => placeToDTO(r, L, ctx.now) });
+  }
+  for (const r of events) {
+    if (!costOk(r.is_free, r.categories)) continue;
+    pool.push({ slugs: r.categories, km: r.distance_km ?? null, availability: 'on', dto: () => eventToDTO(r, L, ctx.now) });
+  }
+
+  const interestCats = new Set(profile.interests.flatMap((g) => categoriesInGroup(g).map((c) => c.slug)));
+  const groups: Array<ActivityGroupDTO & { score: number }> = [];
+  for (const idea of ideas) {
+    const mine = pool.filter((o) => o.slugs.some((c) => idea.categories.includes(c)))
+      .sort((a, b) => AVAIL_RANK[a.availability] - AVAIL_RANK[b.availability] || (a.km ?? 999) - (b.km ?? 999));
+    if (!mine.length) continue;
+    const available = mine.filter((o) => o.availability === 'open' || o.availability === 'on').length;
+    const nearestKm = mine.reduce<number | null>((m, o) => (o.km === null ? m : m === null ? o.km : Math.min(m, o.km)), null);
+    const interest = idea.categories.some((c) => interestCats.has(c)) ? 1 : 0;
+    const score = (available ? 2 : 0) + interest + 1 / (1 + (nearestKm ?? 20) / 5) - (mine.every((o) => o.availability === 'seasonal') ? 2 : 0);
+    groups.push({
+      key: idea.key, label: pickText(idea.label, L), icon: idea.icon, vibes: idea.vibes, total: mine.length, available, nearestKm: nearestKm === null ? null : Math.round(nearestKm * 10) / 10,
+      options: mine.slice(0, opts.perIdea ?? 3).map((o) => ({ entity: o.dto(), availability: o.availability })), score,
+    });
+  }
+  groups.sort((a, b) => b.score - a.score);
+  return { when: opts.when, window: { start: window.start.toISOString(), end: window.end.toISOString() }, ideas: groups.map(({ score: _s, ...g }) => g) };
 }
 
 // ── Plan my day ────────────────────────────────────────────────────────────
@@ -420,9 +502,9 @@ export interface PlanInput {
 const TRIP: Record<TripType, { boost: string[]; pace: number; maxStops: number; groups: InterestGroup[] }> = {
   balanced: { boost: [], pace: 1, maxStops: 7, groups: [] },
   relaxed: { boost: ['beach', 'park', 'viewpoint', 'cafe', 'marina'], pace: 1.3, maxStops: 5, groups: ['nature', 'food'] },
-  active: { boost: ['hiking', 'diving', 'surfing', 'karting', 'boat-trip', 'escape-room', 'water-park'], pace: 0.9, maxStops: 7, groups: ['adventure', 'sports', 'nature'] },
+  active: { boost: ['hiking', 'diving', 'surfing', 'karting', 'boat-trip', 'escape-room', 'water-park', 'paintball', 'laser-tag', 'climbing', 'zipline', 'horse-riding', 'tours', 'racket-sports', 'nature-reserve', 'waterfall'], pace: 0.9, maxStops: 7, groups: ['adventure', 'sports', 'nature'] },
   culture: { boost: ['museum', 'historic-site', 'religious-site', 'art-gallery', 'theatre', 'exhibition'], pace: 1, maxStops: 7, groups: ['culture', 'art'] },
-  family: { boost: ['playground', 'zoo-aquarium', 'water-park', 'amusement-park', 'bowling', 'park', 'beach'], pace: 1, maxStops: 6, groups: ['family', 'nature'] },
+  family: { boost: ['playground', 'zoo-aquarium', 'water-park', 'amusement-park', 'bowling', 'park', 'beach', 'kids-play', 'trampoline-park', 'science-centre'], pace: 1, maxStops: 6, groups: ['family', 'nature'] },
   nightlife: { boost: ['bar', 'nightclub', 'pub', 'concert', 'live-music-venue'], pace: 1, maxStops: 6, groups: ['nightlife', 'music', 'food'] },
   foodie: { boost: ['restaurant', 'cafe', 'bakery', 'winery', 'food-festival'], pace: 1.1, maxStops: 6, groups: ['food'] },
 };

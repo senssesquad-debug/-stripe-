@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto';
 import {
-  CATEGORIES, CITIES, COUNTRIES, GROUP_LABELS, INTEREST_GROUPS, LOCALES, ONBOARDING_INTERESTS, canonicalKey, categoriesInGroup, expandCategories, getCategory,
+  CATEGORIES, CITIES, VIBES, type Vibe, COUNTRIES, GROUP_LABELS, INTEREST_GROUPS, LOCALES, ONBOARDING_INTERESTS, canonicalKey, categoriesInGroup, expandCategories, getCategory,
   correctQuery, navigationLinks, normalizeText, pickText, timeWindow, type EntityDTO, type InterestGroup,
 } from '@passtra/core';
 import type { FastifyInstance, FastifyRequest } from 'fastify';
@@ -15,7 +15,7 @@ import {
   Sql, categoriesWhere, distanceExpr, eventToDTO, geoWhere, getEventRow, getPlaceRow, keywordsWhere, placeToDTO, provenance, queryEvents,
   queryPlaces, resolveMergedId, upcomingWhere, windowWhere,
 } from '../repo/entities';
-import { buildFeed, evaluatePlanItems, loadProfile, planAlternatives, planMyDay, recommendations, resolveContext, search, surpriseMe } from '../services/discovery';
+import { buildFeed, evaluatePlanItems, loadProfile, planAlternatives, planMyDay, recommendations, resolveContext, search, surpriseMe, whatToDo } from '../services/discovery';
 import type { AppDeps } from '../app';
 
 const Uuid = z.string().uuid();
@@ -331,6 +331,23 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
     return { items: await recommendations(db, ctx, profile, q.limit) };
   });
 
+  // "What can I do?": concrete activities with real options nearby, for a time (now, today, evening, tomorrow,
+  // weekend) and kind of outing. Places closed for the whole chosen time are left out; places without reliable
+  // hours are listed as "hours not confirmed", never as available.
+  app.get('/v1/activities', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (req) => {
+    const q = parse(LocationQuery.extend({
+      when: z.enum(['now', 'today', 'evening', 'tomorrow', 'weekend']).default('today'),
+      vibes: z.string().optional().transform((v) => (v ? v.split(',').filter((x): x is Vibe => (VIBES as string[]).includes(x)) : [])),
+      cost: z.enum(['any', 'free', 'paid']).default('any'),
+      idea: z.string().max(40).optional(),
+      interests: InterestsParam,
+    }), req.query);
+    const locale = localeOf(req, q.locale);
+    const ctx = resolveContext({ lat: q.lat, lng: q.lng, city: q.city, radiusKm: q.radius, locale }, now());
+    const profile = await loadProfile(db, req.user?.id ?? null, { interests: q.interests as InterestGroup[] | undefined });
+    return whatToDo(db, ctx, profile, { when: q.when, vibes: q.vibes, cost: q.cost, idea: q.idea, perIdea: q.idea ? 60 : 3 });
+  });
+
   app.post('/v1/surprise', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (req) => {
     const b = parse(z.object({ lat: z.number().optional(), lng: z.number().optional(), city: z.string().optional(), radius: z.number().min(0.5).max(100).optional(), locale: z.string().optional(), interests: z.array(z.enum(INTEREST_GROUPS)).optional(), count: z.number().int().min(1).max(8).default(4) }), req.body ?? {});
     const locale = localeOf(req, b.locale);
@@ -487,6 +504,44 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
   });
 
   // Integration status (no secrets) — useful for the app's "about data" screen.
+  // Coverage: how many real places and upcoming events each category has (no demo data), with how many have photos,
+  // a confirmed address and opening hours. Public so anyone can judge how complete the data is.
+  app.get('/v1/coverage', { config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async () => {
+    const places = await db.query<{ slug: string; total: number; photos: number; verified_address: number; hours: number; primary_count: number }>(
+      `SELECT c AS slug, count(*)::int AS total,
+              count(*) FILTER (WHERE jsonb_array_length(coalesce(p.images, '[]'::jsonb)) > 0)::int AS photos,
+              count(*) FILTER (WHERE p.address_check->>'status' = 'verified')::int AS verified_address,
+              count(*) FILTER (WHERE p.opening_hours IS NOT NULL)::int AS hours,
+              count(*) FILTER (WHERE p.primary_category = c)::int AS primary_count
+         FROM places p, unnest(p.categories) AS c
+        WHERE p.merged_into IS NULL AND p.status = 'active' AND NOT p.is_demo
+        GROUP BY c`);
+    const events = await db.query<{ slug: string; total: number }>(
+      `SELECT c AS slug, count(*)::int AS total FROM events e, unnest(e.categories) AS c
+        WHERE e.merged_into IS NULL AND e.status NOT IN ('cancelled', 'unlisted') AND NOT e.is_demo AND coalesce(e.ends_at, e.starts_at) >= now()
+        GROUP BY c`);
+    const totals = await db.query<{ places: number; photos: number; verified_address: number; hours: number; events: number }>(
+      `SELECT (SELECT count(*) FROM places WHERE merged_into IS NULL AND status = 'active' AND NOT is_demo)::int AS places,
+              (SELECT count(*) FROM places WHERE merged_into IS NULL AND status = 'active' AND NOT is_demo AND jsonb_array_length(coalesce(images, '[]'::jsonb)) > 0)::int AS photos,
+              (SELECT count(*) FROM places WHERE merged_into IS NULL AND status = 'active' AND NOT is_demo AND address_check->>'status' = 'verified')::int AS verified_address,
+              (SELECT count(*) FROM places WHERE merged_into IS NULL AND status = 'active' AND NOT is_demo AND opening_hours IS NOT NULL)::int AS hours,
+              (SELECT count(*) FROM events WHERE merged_into IS NULL AND status NOT IN ('cancelled', 'unlisted') AND NOT is_demo AND coalesce(ends_at, starts_at) >= now())::int AS events`);
+    const byPlace = new Map(places.rows.map((r) => [r.slug, r]));
+    const byEvent = new Map(events.rows.map((r) => [r.slug, r.total]));
+    const categories = CATEGORIES.map((c) => {
+      const p = byPlace.get(c.slug);
+      return { slug: c.slug, label: c.label.en, group: c.group, bucket: c.bucket ?? null, places: p?.total ?? 0, primary: p?.primary_count ?? 0, withPhotos: p?.photos ?? 0, verifiedAddress: p?.verified_address ?? 0, withHours: p?.hours ?? 0, upcomingEvents: byEvent.get(c.slug) ?? 0 };
+    });
+    const buckets: Record<string, { places: number; events: number }> = {};
+    for (const c of categories) {
+      if (!c.bucket) continue;
+      buckets[c.bucket] ??= { places: 0, events: 0 };
+      buckets[c.bucket]!.places += c.primary;
+      buckets[c.bucket]!.events += c.upcomingEvents;
+    }
+    return { generatedAt: new Date().toISOString(), totals: totals.rows[0], buckets, categories };
+  });
+
   app.get('/v1/status', async () => {
     // Public sources only: the last run's outcome lets anyone see whether data is fresh and why an import failed.
     const r = await db.query<{ key: string; name: string; last_success_at: Date | null; next_run_at: Date | null; run_status: string | null; run_started: Date | null; run_finished: Date | null; fetched: number | null; created: number | null; error_message: string | null; places: number }>(
