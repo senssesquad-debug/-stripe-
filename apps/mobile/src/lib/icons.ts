@@ -13,7 +13,7 @@ export const CATEGORY_ICON: Record<string, IconName> = {
   dice: 'dice-5-outline', billiards: 'billiards', mic: 'microphone-variant', bag: 'shopping-outline', cart: 'cart-outline', basket: 'basket-outline',
   shirt: 'tshirt-crew-outline', sneaker: 'shoe-sneaker', book: 'book-open-variant', phone: 'cellphone', sparkle: 'shimmer', scissors: 'content-cut',
   dumbbell: 'dumbbell', laptop: 'laptop', flag: 'flag-checkered', bowling: 'bowling', water: 'waves', ferris: 'ferris-wheel', key: 'key-variant',
-  vr: 'virtual-reality', boat: 'sail-boat', diving: 'diving-scuba', surf: 'surfing', hiking: 'hiking', bike: 'bike', beach: 'beach', tree: 'pine-tree',
+  vr: 'virtual-reality', boat: 'sail-boat', compass: 'compass-outline', diving: 'diving-scuba', surf: 'surfing', hiking: 'hiking', bike: 'bike', beach: 'beach', tree: 'pine-tree',
   binoculars: 'binoculars', museum: 'bank-outline', columns: 'pillar', church: 'church', palette: 'palette-outline', fish: 'fish', swing: 'seesaw',
   anchor: 'anchor', pill: 'pill', hospital: 'hospital-box-outline', stethoscope: 'stethoscope', tooth: 'tooth-outline', cash: 'cash-multiple',
   bank: 'bank', carwash: 'car-wash', fuel: 'gas-station', bolt: 'ev-station', mail: 'email-outline', shield: 'shield-outline', paw: 'paw',

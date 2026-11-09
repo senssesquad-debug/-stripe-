@@ -1,17 +1,23 @@
-import { CATEGORIES, categoriesForOsmTags, COUNTRIES, getCategory, INTEREST_GROUPS, type InterestGroup } from '@passtra/core';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { CATEGORIES, categoriesForOsmName, categoriesForOsmTags, COUNTRIES, getCategory, INTEREST_GROUPS, type InterestGroup } from '@passtra/core';
 import { HttpError } from '../../lib/http';
+import { readPbf } from '../../lib/osm-pbf';
 import type { Connector, ConnectorContext, NormalizedPlace, RawRecord } from '../types';
 
 /**
  * OpenStreetMap places (ODbL — attribution "© OpenStreetMap contributors" is shown in the app).
  *
- * mode "overpass" (production): one Overpass query per interest group and bounding-box tile of the country
+ * mode "pbf" (default): the whole country as one Geofabrik extract (updated daily, no rate limits), read in-process;
+ *   every place is found in one download, including activities recognised by name. Ingestion is resumable.
+ * mode "overpass": one Overpass query per category and bounding-box tile of the country
  *   (small, independent requests: one failure doesn't stop the rest, and memory stays low on small hosts).
  *   OVERPASS_URL may list several instances separated by commas; each request tries them in turn.
  * mode "osm_api_tiles" (development only): small bbox tiles from api.openstreetmap.org — the same
  *   element format; used where Overpass is unreachable. Not for production (OSM API usage policy).
  *
- * Config: { mode?, countryIso?, groups?, tiles?: [south, west, north, east][] }
+ * Config: { mode?, url? (pbf), countryIso?, groups?, tiles?: [south, west, north, east][] }
  */
 export interface OsmElement {
   type: 'node' | 'way' | 'relation';
@@ -79,6 +85,120 @@ async function overpass(ctx: ConnectorContext, query: string): Promise<OsmElemen
   throw last;
 }
 
+export const GEOFABRIK: Record<string, string> = { CY: 'https://download.geofabrik.de/europe/cyprus-latest.osm.pbf' };
+
+/** Categories of an OSM object: by its tags, then by a telling name (activities). */
+export function osmCategories(t: Record<string, string>): string[] {
+  const out = categoriesForOsmTags(t).map((c) => c.slug);
+  for (const c of categoriesForOsmName(t)) if (!out.includes(c.slug)) out.push(c.slug);
+  return out;
+}
+
+const priorityOf = (slug: string | undefined) => (slug ? PRIORITY.indexOf(slug) + 1 || 99 : 99);
+
+/**
+ * Every place-like object in a PBF extract, with a centre point: nodes directly; ways and relations from the
+ * average of their nodes (a relation uses its first way). Sorted so the most searched categories come first.
+ */
+export async function placesFromPbf(file: Uint8Array): Promise<OsmElement[]> {
+  const nodes: OsmElement[] = [];
+  const ways = new Map<number, OsmElement & { refs: number[] }>();
+  const rels: Array<OsmElement & { wayRef: number }> = [];
+  await readPbf(file, {
+    taggedNodesOnly: true,
+    node: (n) => { if (n.tags && osmCategories(n.tags).length) nodes.push({ type: 'node', id: n.id, lat: n.lat, lon: n.lon, tags: n.tags }); },
+    way: (w) => { if (w.tags && osmCategories(w.tags).length) ways.set(w.id, { type: 'way', id: w.id, tags: w.tags, refs: w.refs.slice(0, 400) }); },
+    relation: (r) => {
+      if (!r.tags || !osmCategories(r.tags).length) return;
+      const first = r.members.find((m) => m.type === 'way' && (m.role === 'outer' || m.role === '')) ?? r.members.find((m) => m.type === 'way');
+      if (first) rels.push({ type: 'relation', id: r.id, tags: r.tags, wayRef: first.ref });
+    },
+  });
+  // Relations need their first way's nodes.
+  const memberWays = new Map<number, number[]>();
+  if (rels.length) {
+    const wanted = new Set(rels.map((r) => r.wayRef).filter((id) => !ways.has(id)));
+    if (wanted.size) await readPbf(file, { way: (w) => { if (wanted.has(w.id)) memberWays.set(w.id, w.refs.slice(0, 400)); } });
+    for (const r of rels) { const own = ways.get(r.wayRef); if (own) memberWays.set(r.wayRef, own.refs); }
+  }
+  const needed = new Set<number>();
+  for (const w of ways.values()) for (const id of w.refs) needed.add(id);
+  for (const refs of memberWays.values()) for (const id of refs) needed.add(id);
+  const coords = new Map<number, [number, number]>();
+  if (needed.size) await readPbf(file, { node: (n) => { if (needed.has(n.id)) coords.set(n.id, [n.lat, n.lon]); } });
+  const centre = (refs: number[]) => {
+    const pts = refs.map((id) => coords.get(id)).filter((p): p is [number, number] => !!p);
+    if (!pts.length) return undefined;
+    return { lat: pts.reduce((a, p) => a + p[0], 0) / pts.length, lon: pts.reduce((a, p) => a + p[1], 0) / pts.length };
+  };
+  const out: OsmElement[] = [...nodes];
+  for (const w of ways.values()) { const c = centre(w.refs); if (c) out.push({ type: 'way', id: w.id, tags: w.tags, center: c }); }
+  for (const r of rels) { const refs = memberWays.get(r.wayRef); const c = refs ? centre(refs) : undefined; if (c) out.push({ type: 'relation', id: r.id, tags: r.tags, center: c }); }
+  const key = (e: OsmElement) => priorityOf(osmCategories(e.tags!)[0]);
+  return out.sort((a, b) => key(a) - key(b) || (a.type < b.type ? -1 : a.type > b.type ? 1 : a.id - b.id));
+}
+
+type PbfCycle = { stamp: string; offset: number; startedAt: string };
+
+/** Downloaded extract, kept in the temp folder so a resumed run doesn't download it again. */
+const extractPath = (key: string) => join(tmpdir(), 'passtra-osm', `${key}.pbf`);
+
+/** The extract's places, read once per download and kept next to it, so resumed runs skip the parsing. */
+async function placesOf(ctx: ConnectorContext, loaded: { file: Uint8Array | null; stamp: string }): Promise<OsmElement[]> {
+  const cache = `${extractPath(ctx.source.key)}.places.json`;
+  const cached = await readFile(cache, 'utf8').then((t) => JSON.parse(t) as { stamp: string; places: OsmElement[] }).catch(() => null);
+  if (cached?.stamp === loaded.stamp) return cached.places;
+  const file = loaded.file ?? new Uint8Array(await readFile(extractPath(ctx.source.key)));
+  const places = await placesFromPbf(file);
+  await writeFile(cache, JSON.stringify({ stamp: loaded.stamp, places })).catch(() => undefined);
+  return places;
+}
+
+async function loadExtract(ctx: ConnectorContext, url: string, cycle: PbfCycle | null): Promise<{ file: Uint8Array | null; stamp: string } | 'unchanged'> {
+  const path = extractPath(ctx.source.key);
+  const dir = join(tmpdir(), 'passtra-osm');
+  if (cycle) {
+    const stamp = await readFile(`${path}.stamp`, 'utf8').catch(() => null);
+    if (stamp === cycle.stamp) return { file: null, stamp }; // read lazily (the parsed places are usually cached)
+  }
+  const last = cycle ? null : await ctx.state.get<string>('osm_pbf_imported');
+  const res = await ctx.http.bytes(url, { lastModified: last, timeoutMs: 300_000 });
+  if (res.notModified || !res.data) return 'unchanged';
+  const stamp = res.lastModified ?? new Date().toUTCString();
+  await mkdir(dir, { recursive: true });
+  await writeFile(path, res.data);
+  await writeFile(`${path}.stamp`, stamp);
+  return { file: res.data, stamp };
+}
+
+async function* fetchPbf(ctx: ConnectorContext, url: string): AsyncIterable<RawRecord> {
+  let cycle = await ctx.state.get<PbfCycle>('osm_pbf_cycle');
+  const loaded = await loadExtract(ctx, url, cycle);
+  if (loaded === 'unchanged') {
+    ctx.snapshot.unchanged = true; // nothing new since the last full import
+    return;
+  }
+  if (!cycle || cycle.stamp !== loaded.stamp) cycle = { stamp: loaded.stamp, offset: 0, startedAt: cycle?.startedAt ?? ctx.now.toISOString() };
+  const places = await placesOf(ctx, loaded);
+  ctx.log.info({ source: ctx.source.key, places: places.length, from: cycle.offset }, 'osm extract read');
+  let i = cycle.offset;
+  for (; i < places.length; i++) {
+    if (Date.now() > ctx.deadline) break;
+    const el = places[i]!;
+    const id = `${el.type}/${el.id}`;
+    yield { externalId: id, url: `https://www.openstreetmap.org/${id}`, payload: el };
+    if (i % 100 === 99) await ctx.state.set('osm_pbf_cycle', { ...cycle, offset: i + 1 });
+  }
+  if (i < places.length) {
+    await ctx.state.set('osm_pbf_cycle', { ...cycle, offset: i });
+    ctx.snapshot.complete = false;
+    return;
+  }
+  ctx.snapshot.since = new Date(cycle.startedAt);
+  await ctx.state.set('osm_pbf_cycle', null);
+  await ctx.state.set('osm_pbf_imported', loaded.stamp);
+}
+
 const PRACTICAL_UNNAMED_OK = new Set(['atm', 'fuel', 'ev-charging', 'pharmacy', 'post-office', 'police', 'car-wash', 'hospital']);
 
 function addressOf(t: Record<string, string>): string | null {
@@ -93,7 +213,14 @@ export const osmConnector: Connector = {
   fullSnapshot: true,
 
   async *fetch(ctx: ConnectorContext): AsyncIterable<RawRecord> {
-    const cfg = ctx.source.config as { mode?: string; countryIso?: string; groups?: InterestGroup[]; tiles?: Array<[number, number, number, number]> };
+    const cfg = ctx.source.config as { mode?: string; url?: string; countryIso?: string; groups?: InterestGroup[]; tiles?: Array<[number, number, number, number]> };
+    if (!cfg.mode || cfg.mode === 'pbf') {
+      const iso = cfg.countryIso ?? ctx.source.country_code ?? 'CY';
+      const url = cfg.url ?? GEOFABRIK[iso];
+      if (!url) throw new Error(`No OpenStreetMap extract configured for ${iso}`);
+      yield* fetchPbf(ctx, url);
+      return;
+    }
     if (cfg.mode === 'osm_api_tiles') {
       if (ctx.config.NODE_ENV === 'production') throw new Error('osm_api_tiles mode is for development only; use Overpass in production.');
       for (const [s, w, n, e] of cfg.tiles ?? []) {
@@ -170,7 +297,7 @@ export const osmConnector: Connector = {
     const lat = el.lat ?? el.center?.lat;
     const lng = el.lon ?? el.center?.lon;
     if (lat === undefined || lng === undefined) return null;
-    const cats = categoriesForOsmTags(t).map((c) => c.slug);
+    const cats = osmCategories(t);
     if (!cats.length) return null;
 
     const primary = cats[0]!;

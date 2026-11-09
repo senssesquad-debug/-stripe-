@@ -71,7 +71,7 @@ Business Discovery отдаёт публичные посты других би�
 
 | Что | Зачем |
 |---|---|
-| Свой **Overpass** (`OVERPASS_URL`) или импорт PBF Geofabrik | Публичный overpass-api.de имеет лимиты; для всей страны и частых обновлений — свой инстанс |
+| Места OpenStreetMap | Импортируются из ежедневного файла Geofabrik (`download.geofabrik.de/europe/cyprus-latest.osm.pbf`, ODbL), одна загрузка в сутки, без ключа. Режим Overpass (`config.mode = "overpass"`, `OVERPASS_URL`) оставлен запасным |
 | Свой **Nominatim** (`NOMINATIM_URL`) | Публичный — не более 1 запроса/сек |
 | `EXPO_ACCESS_TOKEN` | Усиленная защита push (Expo → Access tokens → enhanced security) |
 | Redis | Распределённый rate limiting при нескольких экземплярах API |

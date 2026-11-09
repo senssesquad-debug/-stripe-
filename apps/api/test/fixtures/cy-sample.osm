@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="passtra-test">
+  <node id="1001" version="1" lat="34.6712000" lon="33.0445000"><tag k="amenity" v="boat_rental"/><tag k="name" v="Limassol Boat Hire"/><tag k="phone" v="+357 25 000000"/></node>
+  <node id="1002" version="1" lat="34.6705000" lon="33.0431000"><tag k="tourism" v="attraction"/><tag k="name" v="Blue Lagoon Cruise"/><tag k="name:ru" v="Круиз Голубая лагуна"/></node>
+  <node id="1003" version="1" lat="34.9876543" lon="34.0001234"><tag k="amenity" v="pharmacy"/><tag k="name" v="Φαρμακείο Ζήνωνος"/></node>
+  <node id="1004" version="1" lat="34.6800000" lon="33.0400000"/>
+  <node id="1005" version="1" lat="34.6810000" lon="33.0400000"/>
+  <node id="1006" version="1" lat="34.6810000" lon="33.0420000"/>
+  <node id="1007" version="1" lat="34.6800000" lon="33.0420000"/>
+  <node id="1008" version="1" lat="34.6500000" lon="32.9000000"/>
+  <node id="1009" version="1" lat="34.6520000" lon="32.9000000"/>
+  <node id="1010" version="1" lat="34.6520000" lon="32.9040000"/>
+  <node id="1011" version="1" lat="34.7000000" lon="33.1000000"><tag k="shop" v="travel_agency"/><tag k="name" v="Jeep Safari Troodos"/></node>
+  <node id="1012" version="1" lat="34.7001000" lon="33.1001000"><tag k="name" v="Untagged Somewhere"/></node>
+  <node id="-5" version="1" lat="-1.5" lon="-2.25"/>
+  <way id="2001" version="1"><nd ref="1004"/><nd ref="1005"/><nd ref="1006"/><nd ref="1007"/><nd ref="1004"/><tag k="leisure" v="marina"/><tag k="name" v="Limassol Marina"/></way>
+  <way id="2002" version="1"><nd ref="1008"/><nd ref="1009"/><nd ref="1010"/></way>
+  <relation id="3001" version="1"><member type="way" ref="2002" role="outer"/><tag k="type" v="multipolygon"/><tag k="natural" v="beach"/><tag k="name" v="Kourion Beach"/></relation>
+</osm>

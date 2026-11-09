@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { correctQuery, editDistance, parseQuery } from '../src/query-parser';
+import { categoriesForOsmName } from '../src/categories';
 
 const cats = (q: string) => parseQuery(q).categories;
 
@@ -65,5 +66,39 @@ describe('dishes search restaurants and takeaways by cuisine', () => {
   it('plain fast food stays a category only', () => {
     expect(parseQuery('fast food').categories).toEqual(['fast-food']);
     expect(parseQuery('fast food').keywords).toEqual([]);
+  });
+});
+
+describe('activities', () => {
+  it.each([
+    ['boat trip', 'boat-trip'], ['катание на лодке', 'boat-trip'], ['прогулка на яхте', 'boat-trip'], ['морская прогулка', 'boat-trip'],
+    ['βαρκάδα', 'boat-trip'], ['рыбалка', 'boat-trip'], ['sunset cruise', 'boat-trip'],
+    ['jet ski', 'surfing'], ['гидроцикл', 'surfing'], ['kayak', 'surfing'], ['parasailing', 'surfing'],
+    ['jeep safari', 'tours'], ['квадроциклы', 'tours'], ['экскурсия', 'tours'], ['εκδρομή', 'tours'],
+    ['snorkeling', 'diving'],
+  ])('%s → %s', (q, slug) => {
+    expect(parseQuery(q).categories).toContain(slug);
+  });
+  it('a walk is not a hike unless it says so', () => {
+    expect(parseQuery('прогулка на яхте').categories).not.toContain('hiking');
+    expect(parseQuery('пешая прогулка').categories).toContain('hiking');
+  });
+  it('tourist does not mean tours', () => {
+    expect(parseQuery('tourist attractions').categories).not.toContain('tours');
+  });
+});
+
+describe('activities recognised by name on the map', () => {
+  it.each([
+    [{ tourism: 'attraction', name: 'Blue Lagoon Cruise' }, 'boat-trip'],
+    [{ shop: 'travel_agency', name: 'Jeep Safari Troodos' }, 'tours'],
+    [{ leisure: 'sports_centre', name: 'Coral Bay Water Sports' }, 'surfing'],
+    [{ shop: 'sports', name: 'Paphos Dive Centre' }, 'diving'],
+  ])('%o → %s', (tags, slug) => {
+    expect(categoriesForOsmName(tags).map((c) => c.slug)).toContain(slug);
+  });
+  it('streets and buildings are not activities', () => {
+    expect(categoriesForOsmName({ highway: 'residential', name: 'Cruise Street' })).toEqual([]);
+    expect(categoriesForOsmName({ building: 'yes', name: 'Safari House' })).toEqual([]);
   });
 });

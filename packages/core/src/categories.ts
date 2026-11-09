@@ -256,16 +256,25 @@ export const CATEGORIES: CategoryDef[] = [
     [['cinema', 'movie', 'movies', 'film'], ['σινεμ', 'κινηματογραφ', 'ταινι'], ['кино', 'кинотеатр', 'фильм']],
     { osm: [{ amenity: 'cinema' }], google: ['movie_theater'], visitMinutes: 140, dayParts: EVENING }),
   c('boat-trip', 'place', 'adventure', 'boat', ['Boat trips', 'Κρουαζιέρες & βάρκες', 'Морские прогулки'],
-    [['boat trip', 'boat tour', 'cruise', 'yacht', 'catamaran', 'boat rental', 'glass bottom'], ['κρουαζιερ', 'βαρκ', 'σκαφ', 'γιοτ'], ['морск прогулк', 'яхт', 'катер', 'катамаран', 'лодк']],
-    { osm: [{ amenity: 'boat_rental' }, { tourism: 'attraction', boat: 'yes' }], visitMinutes: 180, outdoor: true, dayParts: DAYTIME }),
+    [['boat trip', 'boat tour', 'boat ride', 'boat', 'cruise', 'yacht', 'catamaran', 'boat rental', 'glass bottom', 'sailing', 'pirate ship', 'fishing trip', 'fishing'],
+      ['κρουαζιερ', 'βαρκ', 'σκαφ', 'γιοτ', 'ιστιοπλο', 'ψαρεμ'],
+      ['морск прогулк', 'прогулк на лодк', 'прогулк на яхт', 'прогулк на катер', 'яхт', 'катер', 'катамаран', 'лодк', 'круиз', 'парусн', 'рыбалк']],
+    { osm: [{ amenity: 'boat_rental' }, { shop: 'boat_rental' }, { tourism: 'attraction', boat: 'yes' }], visitMinutes: 180, outdoor: true, dayParts: DAYTIME }),
   c('diving', 'place', 'adventure', 'diving', ['Diving & snorkelling', 'Καταδύσεις', 'Дайвинг'],
     [['diving', 'scuba', 'snorkel', 'dive'], ['καταδυσ', 'scuba'], ['дайвинг', 'снорк', 'погружен']],
     { osm: [{ shop: 'scuba_diving' }, { sport: 'scuba_diving' }], visitMinutes: 180, outdoor: true, dayParts: DAYTIME }),
-  c('surfing', 'place', 'adventure', 'surf', ['Surf, kite & windsurf', 'Surf, kite & windsurf', 'Серфинг и кайт'],
-    [['surf', 'kitesurf', 'windsurf', 'sup', 'paddle board', 'water sports'], ['σερφ', 'θαλασσια σπορ'], ['серф', 'кайт', 'виндсерф', 'сап', 'водн спорт']],
-    { osm: [{ sport: 'surfing' }, { sport: 'kitesurfing' }, { sport: 'windsurfing' }, { shop: 'surf' }], visitMinutes: 150, outdoor: true, dayParts: DAYTIME }),
+  c('surfing', 'place', 'adventure', 'surf', ['Water sports', 'Θαλάσσια σπορ', 'Водные развлечения'],
+    [['surf', 'kitesurf', 'windsurf', 'sup', 'paddle board', 'water sports', 'water sport', 'jet ski', 'jetski', 'parasailing', 'kayak', 'canoe', 'wakeboard', 'water ski', 'banana boat'],
+      ['σερφ', 'θαλασσια σπορ', 'καγιακ', 'τζετ σκι'],
+      ['серф', 'кайт', 'виндсерф', 'сап', 'водн спорт', 'водн развлечен', 'гидроцикл', 'парасейл', 'парашют над мор', 'каяк', 'байдарк', 'вейкборд', 'водн лыж', 'банан лодк']],
+    { osm: [{ sport: 'surfing' }, { sport: 'kitesurfing' }, { sport: 'windsurfing' }, { sport: 'water_ski' }, { sport: 'canoe' }, { shop: 'surf' }], visitMinutes: 150, outdoor: true, dayParts: DAYTIME }),
+  c('tours', 'place', 'adventure', 'compass', ['Tours & safaris', 'Εκδρομές & σαφάρι', 'Экскурсии и сафари'],
+    [['guided tour', 'day tour', 'tours', 'excursion', 'safari', 'jeep', 'quad', 'buggy', 'day trip', 'segway'],
+      ['εκδρομ', 'σαφαρι', 'ξεναγ', 'τζιπ'],
+      ['экскурс', 'сафари', 'джип', 'квадроцикл', 'багги', 'сигвей']],
+    { osm: [{ office: 'guide' }], visitMinutes: 240, outdoor: true, dayParts: DAYTIME }),
   c('hiking', 'place', 'nature', 'hiking', ['Hiking trails', 'Μονοπάτια πεζοπορίας', 'Пешие маршруты'],
-    [['hike', 'hiking', 'trail', 'trek', 'nature trail', 'walk'], ['πεζοπορ', 'μονοπατ', 'περιπατ'], ['пеш маршрут', 'поход', 'хайкинг', 'тропа', 'троп', 'треккинг', 'прогулк']],
+    [['hike', 'hiking', 'trail', 'trek', 'nature trail', 'walk'], ['πεζοπορ', 'μονοπατ', 'περιπατ'], ['пеш маршрут', 'поход', 'хайкинг', 'тропа', 'троп', 'треккинг', 'пеш прогулк']],
     { osm: [{ route: 'hiking' }, { highway: 'trailhead' }], osmRequireAny: ['name'], google: ['hiking_area'], visitMinutes: 150, outdoor: true, usuallyFree: true, dayParts: DAYTIME }),
   c('cycling', 'place', 'sports', 'bike', ['Cycling', 'Ποδηλασία', 'Велосипед'],
     [['cycling', 'bike', 'bicycle', 'mtb', 'bike rental'], ['ποδηλατ'], ['велосипед', 'вело', 'байк']],
@@ -386,6 +395,25 @@ export function categoriesForOsmTags(tags: Record<string, string>): CategoryDef[
     }
   }
   return out.sort((a, b) => b.specificity - a.specificity).map((x) => x.def);
+}
+
+/**
+ * Activities are often mapped only as a generic business (`tourism=attraction`, `shop=travel_agency`, `office=company`)
+ * with a telling name: "Blue Lagoon Cruise", "Jeep Safari Troodos". Recognised only on elements that are a business
+ * or attraction (never on streets or buildings).
+ */
+const NAME_RULES: Array<[slug: string, re: RegExp]> = [
+  ['boat-trip', /\b(cruises?|boat (trips?|tours?|rides?|hire|rentals?)|catamaran|yacht charters?|sailing|glass[- ]bottom|pirate ship)\b|κρουαζιερ|κρουαζιέρ|круиз/i],
+  ['diving', /\b(div(e|ing) (cent(er|re)|school|club)|scuba|snorkel)/i],
+  ['surfing', /\b(water ?sports?|jet ?skis?|parasail|kayak|canoe|wakeboard|kite ?surf|windsurf|paddle ?board)/i],
+  ['tours', /\b(safaris?|jeep|quad|buggy|excursions?|guided tours?|day tours?)\b|σαφάρι|σαφαρι|экскурс|сафари/i],
+];
+const BUSINESS_KEYS = ['tourism', 'leisure', 'shop', 'office', 'amenity', 'sport', 'club', 'craft'];
+
+export function categoriesForOsmName(tags: Record<string, string>): CategoryDef[] {
+  const name = [tags.name, tags['name:en'], tags.brand].filter(Boolean).join(' ');
+  if (!name || !BUSINESS_KEYS.some((k) => tags[k])) return [];
+  return NAME_RULES.filter(([, re]) => re.test(name)).map(([slug]) => getCategory(slug)!).filter(Boolean);
 }
 
 /** Return categories for Google Place types. */

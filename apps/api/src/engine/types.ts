@@ -112,7 +112,8 @@ export interface ConnectorContext {
    * Resumable connectors set complete=false when this run covered only part of the listing (time budget, failures);
    * "since" is when the current full cycle began, so absence is judged against the whole cycle.
    */
-  snapshot: { complete: boolean; since: Date | null };
+  /** complete: the run saw everything the source has; unchanged: the source reported no change, so nothing is marked missing. */
+  snapshot: { complete: boolean; since: Date | null; unchanged?: boolean };
   /** Soft time budget for this run (epoch ms); resumable connectors stop and continue next run. */
   deadline: number;
 }

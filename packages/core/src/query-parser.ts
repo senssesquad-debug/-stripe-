@@ -53,6 +53,8 @@ const DISHES: Array<{ stems: string[]; cuisine: string }> = [
   { stems: ['kebab', 'κεμπαπ', 'кебаб'], cuisine: 'kebab' },
 ];
 const DISH_CATS = ['restaurant', 'fast-food'];
+/** Keywords the parser added on purpose (a dish's cuisine), as opposed to words it simply did not understand. */
+export const isDishKeyword = (k: string) => DISHES.some((d) => d.cuisine === k);
 
 const TIME_PATTERNS: Array<[WindowRe: RegExp, kind: (typeof TIME_KINDS)[number]]> = [
   [/(right now|at the moment|open now|currently|прямо сейчас|сейчас|τωρα|αυτη τη στιγμη)/, 'now'],

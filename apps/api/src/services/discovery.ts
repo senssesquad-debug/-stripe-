@@ -3,7 +3,7 @@ import {
   CATEGORIES, CITIES, GROUP_LABELS, buildAffinity, expandCategories, canonicalKey, categoriesInGroup, cityBySlug, explain, getCategory, haversineKm,
   isValidLatLng, localDate, pickText, planDay, rank, scoreCandidate, surprise, timeWindow, type AgeRange, type Budget, type Candidate, type CityDef,
   type EntityDTO, type EventDTO, type FeedResponse, type FeedSectionDTO, type FeedSectionKey, type InteractionKind, type InterestGroup,
-  correctQuery, evaluatePlan, type EvalItem, type Locale, type PlaceDTO, type PlanCandidate, type PlanDayResponse, type PlanStopDTO, type PlanVariantDTO, type RecommendationDTO, type SearchFilters, type SearchResponse, type UserProfile,
+  correctQuery, evaluatePlan, isDishKeyword, type EvalItem, type Locale, type PlaceDTO, type PlanCandidate, type PlanDayResponse, type PlanStopDTO, type PlanVariantDTO, type RecommendationDTO, type SearchFilters, type SearchResponse, type UserProfile,
 } from '@passtra/core';
 import { DateTime } from 'luxon';
 import type pg from 'pg';
@@ -279,6 +279,13 @@ export async function search(db: pg.Pool, interpreter: QueryInterpreter, query: 
       const res = await searchWith(db, corrected, again.filters, again.engine, baseCtx, profile, limit);
       if (res.total > 0) { out = res; didYouMean = corrected; filters = again.filters; engine = again.engine; }
     }
+  }
+  // "катание на лодке", "best boat trip with kids": the category is clear, extra words the parser didn't know
+  // shouldn't hide every result. Retry with the category alone (a dish's cuisine stays — "pizza" means pizza).
+  if (out.total === 0 && (filters.categories.length || filters.groups.length) && filters.keywords.some((k) => !isDishKeyword(k))) {
+    const relaxed = { ...filters, keywords: filters.keywords.filter(isDishKeyword) };
+    const res = await searchWith(db, query, relaxed, engine, baseCtx, profile, limit);
+    if (res.total > 0) { out = res; filters = relaxed; }
   }
   const widen: Array<{ radiusKm: number; count: number }> = [];
   const explicitPlace = filters.radiusKm !== null || (filters.city !== null && filters.city !== baseCtx.city?.slug);

@@ -91,6 +91,20 @@ export class HttpClient {
     return { status: res.status, notModified: false, data: await res.text(), ...meta };
   }
 
+  /** Binary download (e.g. an OpenStreetMap extract). Same politeness and conditional-request rules as request(). */
+  async bytes(url: string, opts: FetchOptions = {}): Promise<FetchResult<Uint8Array>> {
+    const u = new URL(url);
+    await this.spacing(u, null);
+    const headers: Record<string, string> = { 'user-agent': this.userAgent, accept: '*/*', ...opts.headers };
+    if (opts.etag) headers['if-none-match'] = opts.etag;
+    if (opts.lastModified) headers['if-modified-since'] = opts.lastModified;
+    const res = await this.fetchImpl(url, { headers, signal: AbortSignal.timeout(opts.timeoutMs ?? 300_000) });
+    const meta = { etag: res.headers.get('etag'), lastModified: res.headers.get('last-modified'), expires: res.headers.get('expires') };
+    if (res.status === 304) return { status: 304, notModified: true, data: null, ...meta };
+    if (!res.ok) throw new HttpError(res.status, url, `HTTP ${res.status} for ${u.origin}${u.pathname}`);
+    return { status: res.status, notModified: false, data: new Uint8Array(await res.arrayBuffer()), ...meta };
+  }
+
   async json<T>(url: string, opts: FetchOptions = {}): Promise<FetchResult<T>> {
     const r = await this.request(url, opts);
     if (r.notModified || r.data === null) return { ...r, data: null };

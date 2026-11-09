@@ -53,9 +53,9 @@ export const DEFAULT_SOURCES: SourceDef[] = [
   // Places
   {
     key: 'osm_cy', name: 'OpenStreetMap', connector: 'osm', entity_type: 'place', country_code: 'CY',
-    homepage_url: 'https://www.openstreetmap.org', terms_url: 'https://www.openstreetmap.org/copyright', terms_notes: 'ODbL: attribution required; Overpass usage policy (<10k requests/day). Self-host Overpass for scale.',
+    homepage_url: 'https://www.openstreetmap.org', terms_url: 'https://www.openstreetmap.org/copyright', terms_notes: 'ODbL: attribution required. Daily Geofabrik extract (download.geofabrik.de), one download per day.',
     attribution: '© OpenStreetMap contributors (ODbL)', authority: SOURCE_AUTHORITY.open_data, is_official: false, requires_key: null,
-    config: { mode: 'overpass', countryIso: 'CY' }, enabled: true, min_interval_s: DAY, max_interval_s: 7 * DAY,
+    config: { mode: 'pbf', countryIso: 'CY' }, enabled: true, min_interval_s: DAY, max_interval_s: 7 * DAY,
   },
   {
     key: 'wikidata_cy', name: 'Wikidata + Wikimedia Commons', connector: 'wikidata', entity_type: 'place', country_code: 'CY',

@@ -129,7 +129,7 @@ export async function runSource(deps: EngineDeps, source: SourceRow, trigger: 's
     await logError('fetch', s.error);
   }
 
-  if (!fetchFailed && connector.fullSnapshot && ctx.snapshot.complete) s.missing = await markMissing(deps.pool, source, ctx.snapshot.since ?? startedAt, now);
+  if (!fetchFailed && connector.fullSnapshot && ctx.snapshot.complete && !ctx.snapshot.unchanged) s.missing = await markMissing(deps.pool, source, ctx.snapshot.since ?? startedAt, now);
 
   s.status = fetchFailed ? (s.fetched > 0 ? 'partial' : 'failed') : s.errors > 0 || !ctx.snapshot.complete ? 'partial' : 'success';
   if (!fetchFailed && !ctx.snapshot.complete) {

@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type pg from 'pg';
 import type { AppConfig } from '../src/config';
@@ -253,6 +254,70 @@ describe('places: OpenStreetMap + Wikidata', () => {
     expect(f2.calls.filter((u) => u.includes('backup.example/api')).length).toBeLessThan(firstRunUnits);
     expect(s2.status).toBe('success'); // cycle completed
     expect((await pool.query(`SELECT 1 FROM places WHERE name = 'Tile Test Café'`)).rowCount).toBe(1);
+  });
+
+  it('OSM from a Geofabrik extract: places, way and relation centres, activities by name, resume, no re-download when unchanged', async () => {
+    const pbf = readFileSync(new URL('./fixtures/cy-sample.osm.pbf', import.meta.url));
+    const src = await addSource(pool, 'osm_pbf_test', 'osm', 0.6, { mode: 'pbf', url: 'https://extracts.example/cyprus-latest.osm.pbf' }, 'place');
+    const stamp = 'Mon, 09 Nov 2026 03:00:00 GMT';
+    const f = fakeFetch([[/extracts\.example/, (_u, init) => {
+      const since = new Headers(init?.headers).get('if-modified-since');
+      return since === stamp ? new Response(null, { status: 304 }) : new Response(pbf, { headers: { 'last-modified': stamp } });
+    }]]);
+    const s = await runSource(engineDeps(pool, config, f, NOW), src, 'test');
+    expect(s.status).toBe('success');
+    const rows = (await pool.query<{ name: string; primary_category: string; lat: number; lng: number }>(
+      `SELECT p.name, p.primary_category, ST_Y(p.location::geometry) AS lat, ST_X(p.location::geometry) AS lng FROM places p
+       JOIN source_records r ON r.entity_id = p.id WHERE r.source_id = $1 ORDER BY p.name`, [src.id])).rows;
+    const by = Object.fromEntries(rows.map((r) => [r.name, r]));
+    expect(by['Limassol Boat Hire']?.primary_category).toBe('boat-trip');
+    expect(by['Blue Lagoon Cruise']?.primary_category).toBe('boat-trip'); // tourism=attraction, recognised by its name
+    expect(by['Jeep Safari Troodos']?.primary_category).toBe('tours');
+    expect(by['Φαρμακείο Ζήνωνος']?.primary_category).toBe('pharmacy');
+    expect(by['Limassol Marina']?.lat).toBeCloseTo(34.6804, 3); // way: centre of its nodes
+    expect(by['Kourion Beach']?.lng).toBeCloseTo(32.9013, 3); // multipolygon relation: centre of its outer way
+    expect(by['Untagged Somewhere']).toBeUndefined();
+    // Nothing changed upstream: a conditional request, no import, nothing marked missing.
+    const s2 = await runSource(engineDeps(pool, config, f, NOW), src, 'test');
+    expect(s2.fetched).toBe(0);
+    expect(s2.missing).toBe(0);
+    expect(f.calls.length).toBe(2);
+  });
+
+  it('OSM extract import resumes where the time budget stopped it, without downloading again', async () => {
+    const { osmConnector, placesFromPbf } = await import('../src/engine/connectors/osm');
+    const { HttpClient } = await import('../src/lib/http');
+    const pbf = readFileSync(new URL('./fixtures/cy-sample.osm.pbf', import.meta.url));
+    const all = await placesFromPbf(pbf);
+    // Most-searched categories first: the pharmacy comes before boat trips.
+    expect(all.findIndex((p) => p.tags?.amenity === 'pharmacy')).toBeLessThan(all.findIndex((p) => p.tags?.name === 'Blue Lagoon Cruise'));
+    const store = new Map<string, unknown>();
+    let downloads = 0;
+    const http = new HttpClient('test', 0, (async () => { downloads++; return new Response(pbf, { headers: { 'last-modified': 'Tue, 10 Nov 2026 03:00:00 GMT' } }); }) as typeof fetch);
+    const ctxFor = (budget: number) => {
+      let yielded = 0;
+      const ctx = {
+        source: { key: 'osm_resume_test', config: { mode: 'pbf', url: 'https://extracts.example/x.pbf' }, country_code: 'CY' },
+        http, now: NOW, log: { info: () => undefined, warn: () => undefined },
+        state: { get: async (k: string) => store.get(k) ?? null, set: async (k: string, v: unknown) => { store.set(k, v); } },
+        snapshot: { complete: true, since: null as Date | null },
+        get deadline() { return yielded >= budget ? 0 : Number.MAX_SAFE_INTEGER; },
+      };
+      return { ctx, count: () => yielded, tick: () => { yielded++; } };
+    };
+    const run = async (budget: number) => {
+      const c = ctxFor(budget);
+      const ids: string[] = [];
+      for await (const r of osmConnector.fetch(c.ctx as never)) { ids.push(r.externalId); c.tick(); }
+      return { ids, snapshot: c.ctx.snapshot };
+    };
+    const first = await run(3);
+    expect(first.ids).toHaveLength(3);
+    expect(first.snapshot.complete).toBe(false);
+    const second = await run(1000);
+    expect(second.snapshot.complete).toBe(true);
+    expect([...first.ids, ...second.ids]).toEqual(all.map((p) => `${p.type}/${p.id}`)); // nothing skipped, nothing twice
+    expect(downloads).toBe(1); // the resumed run used the saved extract
   });
 
   it('merges a Wikidata item into the OSM place with the same wikidata id: current photos first, historical separate, Wikipedia text', async () => {

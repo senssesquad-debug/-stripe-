@@ -191,6 +191,18 @@ describe('public API', () => {
       expect([...kinds(r)].every((k) => k === slug || r.interpretation.categories.includes(k) || k.includes(slug.split('-')[0]!))).toBe(true);
     });
 
+    it('unknown extra words do not hide a clear category; a dish still narrows', async () => {
+      const r = await search('кафе с котиками', { city: 'limassol', locale: 'ru' });
+      expect(r.interpretation.categories).toContain('cafe');
+      expect(r.total).toBeGreaterThan(0);
+      expect(kinds(r)).toContain('cafe');
+      const pizza = await search('pizza', { city: 'limassol' });
+      expect(pizza.interpretation.keywords).toEqual(['pizza']);
+      expect(pizza.total).toBeGreaterThan(0);
+      const docs = (await pool.query<{ search_doc: string }>('SELECT search_doc FROM places WHERE id = ANY($1::uuid[])', [pizza.results.map((p) => p.id)])).rows;
+      for (const d of docs) expect(d.search_doc).toContain('pizza'); // name or OSM cuisine tag
+    });
+
     it('typos still find the right category (fuzzy match or "did you mean")', async () => {
       const r = await search('nightclbs', { city: 'limassol' });
       expect(kinds(r)).toContain('nightclub');
