@@ -8,10 +8,11 @@ import { Linking, ScrollView, View } from 'react-native';
 import { Cover, EntityRow, SaveButton } from '@/components/cards';
 import { EntityActions } from '@/components/entity-actions';
 import { fromGoogle, PlaceGallery } from '@/components/gallery';
+import { PlaceHours } from '@/components/schedule';
 import { headerLeftForDirectOpen } from '@/components/home-button';
 import { Badge, Button, ErrorState, InfoLine, Skeleton, Tap, Txt } from '@/components/ui';
 import { VerificationBadge, VerificationBlock } from '@/components/verification';
-import { api } from '@/lib/api';
+import { api, type Summary } from '@/lib/api';
 import { distanceLabel, timeAgo } from '@/lib/format';
 import { useDiscoveryParams } from '@/lib/location';
 import { useTheme } from '@/theme';
@@ -35,10 +36,10 @@ function GoogleLive({ id }: { id: string }) {
 }
 
 /** Longer text about the place with its source and licence (e.g. Wikipedia, CC BY-SA), collapsed after a few lines. */
-function About({ p }: { p: PlaceDTO }) {
+function About({ p, summary }: { p: PlaceDTO; summary: Summary | null }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
-  const text = p.about?.text ?? p.description;
+  const text = p.about?.text ?? p.description ?? summary?.text;
   if (!text) return null;
   const long = text.length > 420;
   return (
@@ -46,6 +47,7 @@ function About({ p }: { p: PlaceDTO }) {
       <Txt v="headline">{t('detail.about')}</Txt>
       <Txt v="body" tone="secondary" numberOfLines={long && !open ? 7 : undefined}>{text}</Txt>
       {long ? <Button title={open ? t('place.readLess') : t('place.readMore')} kind="ghost" compact onPress={() => setOpen(!open)} style={{ alignSelf: 'flex-start' }} /> : null}
+      {!p.about && !p.description && summary ? <Txt v="caption" tone="tertiary">{summary.engine === 'ai' ? t('card2.summaryAi') : t('card2.summaryFacts')}</Txt> : null}
       {p.about ? (
         <Tap accessibilityRole={p.about.url ? 'link' : undefined} onPress={() => (p.about?.url ? void WebBrowser.openBrowserAsync(p.about.url) : undefined)}>
           <Txt v="caption" tone="tertiary">{t('place.source', { source: p.about.source })}{p.about.license ? ` · ${t('place.license', { license: p.about.license })}` : ''}{p.about.url ? ' ↗' : ''}</Txt>
@@ -95,15 +97,14 @@ export default function PlaceScreen() {
         </View>
         <Txt v="display" accessibilityRole="header">{p.name}</Txt>
         <EntityActions entity={p} />
-        <About p={p} />
+        <About p={p} summary={q.data.summary} />
         <PlaceGallery images={p.images} google={googlePhotos} skipFirst />
 
+        <PlaceHours place={p} week={q.data.schedule?.week ?? null} holidayRule={q.data.schedule?.holidayRule ?? null} />
         <View style={{ gap: 14 }}>
           <Txt v="headline">{t('place.practical')}</Txt>
           <InfoLine icon="map-marker-outline" label={t('detail.where')} value={where || p.category.label}
             sub={[p.location.precision === 'approximate' ? t('detail.approxLocation') : null, distanceLabel(p.distanceKm)].filter(Boolean).join(' · ') || null} />
-          {p.hours.label || p.hours.raw ? <InfoLine icon="clock-outline" label={t('detail.hours')} value={p.hours.label ?? p.hours.raw!} sub={p.hours.label && p.hours.raw ? p.hours.raw : null} /> : null}
-          {p.hours.weekText?.length ? <Txt v="caption" tone="secondary">{p.hours.weekText.join('\n')}</Txt> : null}
           {p.free.isFree !== null || p.priceLevel !== null ? <InfoLine icon="ticket-outline" label={t('detail.price')} value={p.free.isFree ? (p.free.basis === 'typical' ? t('common.usuallyFree') : t('common.free')) : p.priceLevel ? '€'.repeat(p.priceLevel) : t('common.priceUnknown')} /> : null}
           {p.phone ? <InfoLine icon="phone-outline" label={t('place.phone')} value={p.phone} /> : null}
           <View style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>

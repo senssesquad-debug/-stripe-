@@ -114,11 +114,81 @@ export function openIntervals(value: string | null | undefined, from: Date, to: 
   const oh = parse(value, lat, lng, countryCode);
   if (!oh) return undefined;
   try {
-    if (phUncertain(value, countryCode, toWall(from, tz)) || phUncertain(value, countryCode, toWall(to, tz))) return undefined;
+    if (phUncertain(value, countryCode, toWall(from, tz)) || phUncertain(value, countryCode, toWall(new Date(to.getTime() - 1), tz))) return undefined;
     const list = oh.getOpenIntervals(toWall(from, tz), toWall(to, tz));
     if (list.some(([, , unknown]) => unknown)) return undefined;
     return list.map(([s, e]) => ({ start: fromWall(s, tz), end: fromWall(e, tz) }));
   } catch {
     return undefined;
   }
+}
+
+export interface DaySchedule {
+  date: string; // YYYY-MM-DD (local)
+  weekday: string; // localized short name
+  /** Open intervals that day as HH:mm (several = breaks in between). Empty = closed. null = not known that day. */
+  intervals: Array<[string, string]> | null;
+  publicHoliday: boolean;
+}
+
+let PH_PROBE: OpeningHours | null = null;
+/** Cyprus public holiday? (Greek Orthodox calendar via the opening_hours library + Cyprus-specific dates.) */
+export function isCyprusPublicHoliday(date: DateTime): boolean {
+  const iso = date.toISODate()!;
+  if (cyprusPhDifferences(date.year).includes(iso)) return true;
+  try {
+    PH_PROBE ??= new OpeningHours('PH 00:00-24:00', { lat: 35, lon: 33, address: { country_code: 'gr', state: '' } }, { mode: 0, tag_key: 'opening_hours', map_value: true, warnings_severity: 0 } as never);
+    return PH_PROBE.getState(new Date(date.year, date.month - 1, date.day, 12, 0));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The next 7 days of opening hours (Cyprus time), day by day: intervals with breaks, closed days, public
+ * holidays flagged. Days whose hours can't be determined are null — never guessed.
+ */
+export function weeklySchedule(value: string | null | undefined, from: Date, tz: string, lat: number, lng: number, locale: Locale, countryCode = 'CY'): DaySchedule[] | null {
+  if (!value) return null;
+  const oh = parse(value, lat, lng, countryCode);
+  if (!oh) return null;
+  const zone = normalizeZone(tz);
+  const start = DateTime.fromJSDate(from, { zone }).startOf('day');
+  const out: DaySchedule[] = [];
+  for (let i = 0; i < 8; i++) { // one extra day so the 7th day's after-midnight hours are known
+    const day = start.plus({ days: i });
+    const next = day.plus({ days: 1 });
+    const ivs = openIntervals(value, day.toJSDate(), next.toJSDate(), tz, lat, lng, countryCode);
+    const fmt = (d: Date) => {
+      const t = DateTime.fromJSDate(d, { zone });
+      return t >= next ? '24:00' : t.toFormat('HH:mm');
+    };
+    out.push({
+      date: day.toISODate()!, weekday: day.setLocale(locale).toFormat('ccc'),
+      intervals: ivs ? ivs.map((iv) => [fmt(iv.start), fmt(iv.end)] as [string, string]) : null,
+      publicHoliday: isCyprusPublicHoliday(day),
+    });
+  }
+  // After-midnight hours belong to the evening before: "08:00–24:00" + next day "00:00–02:00" → "08:00–02:00".
+  for (let i = 0; i < out.length; i++) {
+    const cur = out[i]!.intervals;
+    const nxt = out[i + 1]?.intervals;
+    if (!cur?.length) continue;
+    const last = cur[cur.length - 1]!;
+    if (last[1] === '24:00' && nxt?.length && nxt[0]![0] === '00:00' && nxt[0]![1] !== '24:00') {
+      last[1] = nxt[0]![1];
+      nxt.shift();
+    }
+  }
+  // The first day may still start with the tail of the night before; it isn't an opening of that day.
+  const first = out[0]?.intervals;
+  if (first?.length && first[0]![0] === '00:00' && first[0]![1] !== '24:00' && first.length > 1) first.shift();
+  return out.slice(0, 7);
+}
+
+/** The public-holiday rule of an opening_hours value, if any (e.g. "PH off", "PH 10:00-14:00"). */
+export function holidayRule(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const seg = value.split(';').map((s) => s.trim()).find((s) => /\bPH\b/.test(s));
+  return seg ?? null;
 }

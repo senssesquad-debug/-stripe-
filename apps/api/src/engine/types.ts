@@ -45,6 +45,8 @@ export interface NormalizedEvent {
   timezone: string;
   startsAt: Date;
   endsAt: Date | null;
+  /** When the venue opens its doors, if a source states it separately from the start. */
+  doorsAt?: Date | null;
   timePrecision: 'exact' | 'date_only';
   localStartDate: string;
   localEndDate: string | null;

@@ -114,6 +114,9 @@ export interface PlanParams { lat?: number; lng?: number; city?: string; date?: 
 export type PlanItem = { kind: 'event' | 'place'; id: string; durationMin?: number } | { kind: 'custom'; title: string; lat?: number | null; lng?: number | null; durationMin: number };
 export interface SavedPlan { id?: string; title: string; date: string; params: PlanParams; items: PlanItem[]; shareToken?: string | null; plan: PlanDayResponse | null }
 
+export interface Summary { text: string; engine: 'ai' | 'facts' }
+export interface DaySchedule { date: string; weekday: string; intervals: Array<[string, string]> | null; publicHoliday: boolean }
+
 export interface RouteResult { mode: 'walk' | 'drive'; estimate: boolean; distanceKm: number; durationMin: number; geometry: Array<[number, number]>; attribution: string | null }
 export interface GeocodeItem { label: string; sublabel: string | null; lat: number; lng: number; source: string }
 export interface DeliveryResult { webPush: { sent: number; failed: number }; expo: { sent: number; failed: number } }
@@ -130,8 +133,8 @@ export const api = {
   feed: (p: LocationParams & { interests?: string[]; budget?: string | null }) => request<FeedResponse>('/v1/feed/today', { query: { ...p } }),
   events: (p: LocationParams & { category?: string; group?: string; when?: string; free?: boolean; q?: string; limit?: number }) => request<{ items: EventDTO[] }>('/v1/events', { query: { ...p } }),
   places: (p: LocationParams & { category?: string; group?: string; open_now?: boolean; free?: boolean; q?: string; limit?: number }) => request<{ items: PlaceDTO[] }>('/v1/places', { query: { ...p } }),
-  event: (id: string, p: LocationParams = {}) => request<{ event: EventDTO; navigation: { google: string; apple: string } | null }>(`/v1/events/${id}`, { query: { ...p } }),
-  place: (id: string, p: LocationParams = {}) => request<{ place: PlaceDTO; upcomingEvents: EventDTO[]; navigation: { google: string; apple: string } }>(`/v1/places/${id}`, { query: { ...p } }),
+  event: (id: string, p: LocationParams = {}) => request<{ event: EventDTO; summary: Summary | null; navigation: { google: string; apple: string } | null }>(`/v1/events/${id}`, { query: { ...p } }),
+  place: (id: string, p: LocationParams = {}) => request<{ place: PlaceDTO; schedule: { week: DaySchedule[] | null; holidayRule: string | null }; summary: Summary | null; upcomingEvents: EventDTO[]; navigation: { google: string; apple: string } }>(`/v1/places/${id}`, { query: { ...p } }),
   placePhotos: (id: string) => request<{ photos: Array<{ url: string; width: number; height: number; authors: Array<{ name: string; uri: string | null }> }>; source: 'google' | null; reason: string | null }>(`/v1/places/${id}/photos`),
   placeLive: (id: string) => request<{ google: { rating: number | null; ratingCount: number | null; openNow: boolean | null; weekdayText: string[] | null; mapsUrl: string | null; fetchedAt: string } | null; reason?: string }>(`/v1/places/${id}/live`),
   map: (bbox: [number, number, number, number], p: { layers?: string; category?: string; open_now?: boolean; free?: boolean }) => request<{ markers: MapMarker[]; truncated: boolean }>('/v1/map', { query: { bbox: bbox.join(','), ...p } }),

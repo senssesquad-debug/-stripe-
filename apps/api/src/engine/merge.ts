@@ -236,7 +236,7 @@ function resolveWithOverride(field: string, list: FieldObservation[]): FieldReso
 // ── Event recompute ─────────────────────────────────────────────────────────
 
 const EVENT_RESOLVED_FIELDS = ['title', 'description', 'venue_name', 'address', 'location', 'timezone', 'starts_at', 'ends_at', 'local_start_date', 'local_end_date',
-  'is_free', 'price_min', 'price_max', 'currency', 'price_text', 'ticket_url', 'website', 'organizer_name', 'organizer_url', 'age_min', 'place_id'] as const;
+  'is_free', 'price_min', 'price_max', 'currency', 'price_text', 'ticket_url', 'website', 'organizer_name', 'organizer_url', 'age_min', 'place_id', 'doors_at'] as const;
 
 export async function recomputeEvent(client: pg.PoolClient, id: string, now: Date): Promise<void> {
   const obs = await loadObservations(client, 'event', id);
@@ -326,7 +326,7 @@ export async function recomputeEvent(client: pg.PoolClient, id: string, now: Dat
        local_start_date=$18, local_end_date=$19, is_free=$20, price_min=$21, price_max=$22, currency=$23, price_text=$24,
        ticket_url=$25, website=$26, organizer_name=$27, organizer_url=$28, age_min=$29, images=$30, status=$31,
        verification_status=$32, confidence=$33, field_sources=$34, source_count=$35, external_ids=$36,
-       last_verified_at=$37, search_doc=$38, updated_at=now()
+       last_verified_at=$37, search_doc=$38, doors_at=$39, updated_at=now()
      WHERE id=$1`,
     [
       id, v('title'), v('description'), CATEGORY_BY_SLUG.has(primary) ? primary : 'community-event', categories.filter((s) => CATEGORY_BY_SLUG.has(s)),
@@ -337,6 +337,8 @@ export async function recomputeEvent(client: pg.PoolClient, id: string, now: Dat
       v('ticket_url'), v('website'), v('organizer_name'), v('organizer_url'), v('age_min') ?? getCategory(primary)?.ageMin ?? null,
       JSON.stringify(images), status, conf.status, conf.score, JSON.stringify(fieldSources), bySource.size, JSON.stringify(externalIds),
       lastVerified, searchDocument(v('title') as string, v('venue_name') as string, v('organizer_name') as string, city?.name.en, city?.name.el, city?.name.ru, ...catLabels, excerpt(v('description') as string | null)),
+      // Doors only when they open before a known start (never after it).
+      v('doors_at') && startsAt && new Date(v('doors_at') as string) <= new Date(startsAt as unknown as string) ? v('doors_at') : null,
     ],
   );
 }
@@ -635,6 +637,7 @@ export async function ingestEvent(d: MergeDeps, raw: { url?: string | null; payl
     timezone: n.timezone,
     starts_at: exact ? n.startsAt.toISOString() : null,
     ends_at: exact && n.endsAt ? n.endsAt.toISOString() : null,
+    doors_at: exact && n.doorsAt ? n.doorsAt.toISOString() : null,
     local_start_date: n.localStartDate,
     local_end_date: n.localEndDate,
     is_free: n.price?.isFree ?? null,

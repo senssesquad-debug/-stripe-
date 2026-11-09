@@ -63,6 +63,11 @@ export interface EventTimeDTO {
   localStartDate: string;
   localEndDate: string | null;
   label: string; // e.g. "Today · 20:30–22:00"
+  /** Venue doors, when a source states them separately (never confused with the start). */
+  doorsAt?: string | null;
+  durationMin?: number | null;
+  /** Every date of a multi-day event; null for one day. */
+  days?: string[] | null;
   happeningNow: boolean;
   /** Present when sources disagree on the time — the UI must say "time unconfirmed". */
   unconfirmed: boolean;

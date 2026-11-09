@@ -339,7 +339,7 @@ export function evaluatePlan(req: { start: Date; end: Date; tz: string; origin: 
   return {
     stops,
     totalKnownCost: Math.round(stops.reduce((s, x) => s + (x.price ?? 0), 0) * 100) / 100,
-    stopsWithUnknownPrice: stops.filter((x) => x.price === null).length,
+    stopsWithUnknownPrice: stops.filter((x, i) => x.price === null && req.items[i]!.category !== null).length, // own stops have no price to know
     totalTravelMin: travelTotal,
   };
 }

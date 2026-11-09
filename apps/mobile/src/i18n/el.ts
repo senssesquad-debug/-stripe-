@@ -162,6 +162,9 @@ const el: Strings = {
     photos: 'Φωτογραφίες', historical: 'Ιστορικές φωτογραφίες', historicalNote: 'Αρχειακές εικόνες — σήμερα το μέρος μπορεί να φαίνεται διαφορετικά.', photoYear: 'Φωτογραφία {{year}}',
     source: 'Πηγή: {{source}}', license: 'άδεια {{license}}', readMore: 'Περισσότερα', readLess: 'Λιγότερα', practical: 'Πρακτικές πληροφορίες', phone: 'Τηλέφωνο',
   },
+  hours: { openNow: 'Ανοιχτό τώρα', closedNow: 'Κλειστό τώρα', closed: 'Κλειστό', allDay: 'Ανοιχτό 24 ώρες', holiday: 'Αργία', unknownDay: 'Άγνωστο', notListed: 'Οι πηγές μας δεν αναφέρουν ωράριο.', cantRead: 'Αναφέρεται ως «{{raw}}».', phClosed: 'Κλειστό τις αργίες.', phHours: 'Αργίες: {{rule}}', tzNote: 'Οι ώρες είναι ώρα Κύπρου.' },
+  schedule: { title: 'Ημερομηνία & ώρα', date: 'Ημερομηνία', dates: 'Ημερομηνίες', days: 'Ημέρες', daysCount: '{{count}} ημέρες', doors: 'Άνοιγμα θυρών', start: 'Έναρξη', end: 'Λήξη', duration: 'Διάρκεια', time: 'Ώρα', timeNotListed: 'Δεν αναφέρεται ακριβής ώρα', notListed: 'Δεν αναφέρεται' },
+  card2: { about: 'Περιγραφή', summaryFacts: 'Σύντομη περίληψη από τα επιβεβαιωμένα στοιχεία.', summaryAi: 'Περίληψη από AI μόνο από τα επιβεβαιωμένα στοιχεία.', venue: 'Χώρος', organizer: 'Διοργανωτής', age: 'Ηλικία', ageAll: 'Για όλες τις ηλικίες', tickets: 'Εισιτήρια', unknown: 'Δεν αναφέρεται' },
   errors: {
     network: 'Δεν υπάρχει σύνδεση με το passtra.', server: 'Κάτι πήγε στραβά από την πλευρά μας.', notFound: 'Αυτό δεν είναι πλέον διαθέσιμο.',
     locationDenied: 'Η πρόσβαση στην τοποθεσία απορρίφθηκε.', locationOutside: 'Το passtra καλύπτει προς το παρόν την Κύπρο. Εμφανίζεται η Λεμεσός.',

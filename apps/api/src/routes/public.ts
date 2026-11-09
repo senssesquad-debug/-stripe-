@@ -7,7 +7,9 @@ import type { FastifyInstance, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import { integrationStatus } from '../config';
 import { googleLive, googlePhotos, resolveGooglePlaceId } from '../lib/google';
+import { holidayRule, weeklySchedule } from '../lib/hours';
 import { getWeather } from '../lib/weather';
+import { Summarizer, eventFacts, placeFacts } from '../services/summaries';
 import { ApiError, LocationQuery, csv, localeOf, parse, requireUser } from '../http';
 import {
   Sql, categoriesWhere, distanceExpr, eventToDTO, geoWhere, getEventRow, getPlaceRow, keywordsWhere, placeToDTO, provenance, queryEvents,
@@ -22,6 +24,7 @@ const Budget = z.enum(['free', 'low', 'medium', 'high']).optional();
 const TimeParam = z.enum(['now', 'today', 'tonight', 'tomorrow', 'weekend', 'this_week', 'next_7_days']).optional();
 
 export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
+  const summarizer = new Summarizer(deps.db, deps.config, app.log);
   const { db, config } = deps;
   const now = () => deps.now?.() ?? new Date();
 
@@ -107,7 +110,10 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
     const dto = placeToDTO(row, locale, now(), await provenance(db, 'place', id));
     const upcoming = await db.query<{ id: string }>(`SELECT id FROM events e WHERE e.place_id = $1 AND e.merged_into IS NULL AND e.status IN ('scheduled','rescheduled') AND e.starts_at > now() - interval '1 day' ORDER BY starts_at LIMIT 10`, [id]);
     const events = (await Promise.all(upcoming.rows.map((r) => getEventRow(db, r.id, null)))).filter((x) => !!x).map((r) => eventToDTO(r!, locale, now()));
-    return { place: dto, upcomingEvents: events, navigation: navigationLinks(dto.location, dto.name) };
+    // Opening hours for the next 7 days (Cyprus time), with breaks, closed days and public holidays.
+    const schedule = { week: weeklySchedule(row.opening_hours?.value, now(), row.city_tz ?? 'Europe/Nicosia', row.lat, row.lng, locale), holidayRule: holidayRule(row.opening_hours?.value) };
+    const summary = !dto.about && (!dto.description || dto.description.length < 120) ? await summarizer.get('place', id, placeFacts(dto, row.tags ?? []), locale) : null;
+    return { place: dto, schedule, summary, upcomingEvents: events, navigation: navigationLinks(dto.location, dto.name) };
   });
 
   // Google enrichment is fetched live and never stored (except the place id) — see lib/google.ts.
@@ -190,7 +196,13 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
     const row = await getEventRow(db, id, loc.lat !== undefined && loc.lng !== undefined ? { lat: loc.lat, lng: loc.lng } : null);
     if (!row) throw new ApiError(404, 'not_found', 'Event not found');
     const dto = eventToDTO(row, locale, now(), await provenance(db, 'event', id));
-    return { event: dto, navigation: dto.location ? navigationLinks(dto.location, dto.venue.name ?? dto.title) : null };
+    // No real description: a short one written only from verified facts (all sources' texts included).
+    let summary = null;
+    if (!dto.description || dto.description.length < 120) {
+      const others = await db.query<{ v: string }>(`SELECT DISTINCT value #>> '{}' AS v FROM field_observations WHERE entity_type = 'event' AND entity_id = $1 AND field = 'description' AND value IS NOT NULL AND value <> 'null'::jsonb`, [id]);
+      summary = await summarizer.get('event', id, eventFacts(dto, others.rows.map((r) => r.v).filter((v) => v && v !== dto.description)), locale);
+    }
+    return { event: dto, summary, navigation: dto.location ? navigationLinks(dto.location, dto.venue.name ?? dto.title) : null };
   });
 
   // ── Map ──

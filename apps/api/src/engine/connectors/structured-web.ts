@@ -87,6 +87,13 @@ function offersPrice(offers: unknown): ParsedPrice | null {
   return { isFree: max === 0, min, max, currency, confident: true, text: '' };
 }
 
+/** schema.org doorTime: a full date-time, or a time on the start day. Kept only if it is not after the start. */
+function doorsOf(v: string | null, start: { at: Date; localDate: string; precision: string }, tz: string): Date | null {
+  if (!v || start.precision !== 'exact') return null;
+  const full = /\d{4}-\d{2}-\d{2}/.test(v) ? parseSchemaDate(v, tz) : parseSchemaDate(`${start.localDate}T${v.replace(/^T/, '')}`, tz);
+  return full && full.precision === 'exact' && full.at <= start.at ? full.at : null;
+}
+
 export function normalizeJsonLdEvent(e: Json, pageUrl: string, tz: string, sourceKey: string): NormalizedEvent | null {
   const name = str(e.name);
   const start = str(e.startDate);
@@ -125,6 +132,7 @@ export function normalizeJsonLdEvent(e: Json, pageUrl: string, tz: string, sourc
     timezone: tz,
     startsAt: s.at,
     endsAt: en && en.at > s.at && !dateOnly ? en.at : null,
+    doorsAt: doorsOf(str(e.doorTime), s, tz),
     timePrecision: s.precision,
     localStartDate: s.localDate,
     localEndDate: en ? en.localDate : null,

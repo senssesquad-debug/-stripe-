@@ -160,6 +160,9 @@ const en = {
     photos: 'Photos', historical: 'Historical photos', historicalNote: 'Archive images — the place may look different today.', photoYear: 'Photo, {{year}}',
     source: 'Source: {{source}}', license: 'licence {{license}}', readMore: 'Read more', readLess: 'Show less', practical: 'Practical information', phone: 'Phone',
   },
+  hours: { openNow: 'Open now', closedNow: 'Closed now', closed: 'Closed', allDay: 'Open 24 hours', holiday: 'Public holiday', unknownDay: 'Not known', notListed: 'Opening hours are not listed by our sources.', cantRead: 'Listed as “{{raw}}”.', phClosed: 'Closed on public holidays.', phHours: 'Public holidays: {{rule}}', tzNote: 'Times are Cyprus time.' },
+  schedule: { title: 'Date & time', date: 'Date', dates: 'Dates', days: 'Days', daysCount: '{{count}} days', doors: 'Doors open', start: 'Starts', end: 'Ends', duration: 'Length', time: 'Time', timeNotListed: 'Exact time not listed', notListed: 'Not listed' },
+  card2: { about: 'About', summaryFacts: 'Short summary from the verified details above.', summaryAi: 'Summary written by AI only from the verified details above.', venue: 'Venue', organizer: 'Organiser', age: 'Age', ageAll: 'All ages', tickets: 'Tickets', unknown: 'Not listed' },
   errors: {
     network: 'Can’t reach passtra right now.', server: 'Something went wrong on our side.', notFound: 'This item is no longer available.',
     locationDenied: 'Location permission denied.', locationOutside: 'passtra currently covers Cyprus. Showing Limassol.',

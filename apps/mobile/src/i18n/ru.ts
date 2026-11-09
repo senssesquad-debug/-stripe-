@@ -162,6 +162,9 @@ const ru: Strings = {
     photos: 'Фото', historical: 'Исторические фото', historicalNote: 'Архивные снимки — сейчас место может выглядеть иначе.', photoYear: 'Фото {{year}} г.',
     source: 'Источник: {{source}}', license: 'лицензия {{license}}', readMore: 'Читать дальше', readLess: 'Свернуть', practical: 'Практическая информация', phone: 'Телефон',
   },
+  hours: { openNow: 'Открыто сейчас', closedNow: 'Сейчас закрыто', closed: 'Выходной', allDay: 'Круглосуточно', holiday: 'Праздник', unknownDay: 'Неизвестно', notListed: 'Часы работы не указаны в наших источниках.', cantRead: 'Указано как «{{raw}}».', phClosed: 'В праздники закрыто.', phHours: 'В праздники: {{rule}}', tzNote: 'Время — по Кипру.' },
+  schedule: { title: 'Дата и время', date: 'Дата', dates: 'Даты', days: 'Дней', daysCount: 'дней: {{count}}', doors: 'Открытие дверей', start: 'Начало', end: 'Окончание', duration: 'Длительность', time: 'Время', timeNotListed: 'Точное время не указано', notListed: 'Не указано' },
+  card2: { about: 'Описание', summaryFacts: 'Краткая сводка по подтверждённым данным выше.', summaryAi: 'Сводка написана AI только по подтверждённым данным выше.', venue: 'Место проведения', organizer: 'Организатор', age: 'Возраст', ageAll: 'Без ограничений', tickets: 'Билеты', unknown: 'Не указано' },
   errors: {
     network: 'Нет связи с passtra.', server: 'Что-то пошло не так на нашей стороне.', notFound: 'Этот объект больше недоступен.',
     locationDenied: 'Доступ к геолокации запрещён.', locationOutside: 'passtra пока работает на Кипре. Показываем Лимассол.',

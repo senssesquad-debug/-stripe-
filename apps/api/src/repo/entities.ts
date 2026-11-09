@@ -28,7 +28,7 @@ export const EVENT_COLUMNS = (dist: string) => `
   e.id, e.title, e.description, e.primary_category, e.categories, e.place_id, e.venue_name, e.address,
   c.slug AS city_slug, c.name AS city_name,
   ST_Y(e.location::geometry) AS lat, ST_X(e.location::geometry) AS lng, e.location_precision,
-  e.timezone, e.starts_at, e.ends_at, e.time_precision, e.time_unconfirmed, e.local_start_date, e.local_end_date,
+  e.timezone, e.starts_at, e.ends_at, e.doors_at, e.time_precision, e.time_unconfirmed, e.local_start_date, e.local_end_date,
   e.is_free, e.price_min, e.price_max, e.currency, e.price_text, e.ticket_url, e.website, e.organizer_name, e.age_min,
   e.images, e.status, e.verification_status, e.confidence, e.last_verified_at, e.is_demo, e.popularity, e.source_count,
   ${dist} AS distance_km`;
@@ -38,7 +38,7 @@ export const PLACE_COLUMNS = (dist: string) => `
   ST_Y(p.location::geometry) AS lat, ST_X(p.location::geometry) AS lng, p.location_precision, p.address,
   c.slug AS city_slug, c.name AS city_name, c.timezone AS city_tz, p.phone, p.website, p.opening_hours, p.price_level, p.is_free,
   p.user_rating_avg, p.user_rating_count, p.age_min, p.status, p.images, p.verification_status, p.confidence,
-  p.last_verified_at, p.external_ids, p.is_demo, p.popularity, p.source_count, p.description_i18n, p.about_source,
+  p.last_verified_at, p.external_ids, p.is_demo, p.popularity, p.source_count, p.description_i18n, p.about_source, p.tags,
   ${dist} AS distance_km`;
 
 export function distanceExpr(q: Sql, alias: 'e' | 'p', geo: { lat: number; lng: number } | null): string {
@@ -83,6 +83,7 @@ export function keywordsWhere(q: Sql, alias: 'e' | 'p', keywords: string[], cano
 // ── Row types ──────────────────────────────────────────────────────────────
 
 export interface EventRow extends pg.QueryResultRow {
+  doors_at: Date | null;
   id: string; title: string; description: string | null; primary_category: string; categories: string[]; place_id: string | null;
   venue_name: string | null; address: string | null; city_slug: string | null; city_name: LocalizedText | null;
   lat: number | null; lng: number | null; location_precision: LocationPrecision;
@@ -101,6 +102,7 @@ export interface PlaceRow extends pg.QueryResultRow {
   user_rating_avg: number | null; user_rating_count: number; age_min: number | null; status: PlaceDTO['status']; images: ImageDTO[];
   verification_status: PlaceDTO['verification']['status']; confidence: number; last_verified_at: Date | null;
   external_ids: Record<string, string>; is_demo: boolean; popularity: number; source_count: number; distance_km: number | null;
+  tags: string[];
   description_i18n: Record<string, string> | null; about_source: { name: string; url: string | null; license: string | null; urls?: Record<string, string> } | null;
 }
 
@@ -112,6 +114,14 @@ export function categoryRef(slug: string, locale: Locale): CategoryRefDTO {
 }
 
 const round = (n: number | null) => (n === null || n === undefined ? null : Math.round(n * 10) / 10);
+
+/** All dates of a multi-day event (capped at 31), or null for a single day. */
+function eventDays(start: string, end: string | null): string[] | null {
+  if (!end || end <= start) return null;
+  const out: string[] = [];
+  for (let d = DateTime.fromISO(start, { zone: 'utc' }); d.toISODate()! <= end && out.length < 31; d = d.plus({ days: 1 })) out.push(d.toISODate()!);
+  return out;
+}
 
 export function eventToDTO(r: EventRow, locale: Locale, now: Date, extra?: { sources?: SourceRefDTO[]; conflicts?: ConflictDTO[] }): EventDTO {
   const timing = { startsAt: r.starts_at, endsAt: r.ends_at, timePrecision: r.time_precision, timezone: r.timezone, localStartDate: r.local_start_date, localEndDate: r.local_end_date };
@@ -135,6 +145,9 @@ export function eventToDTO(r: EventRow, locale: Locale, now: Date, extra?: { sou
       localStartDate: r.local_start_date,
       localEndDate: r.local_end_date,
       label: formatEventTime(timing, locale, now),
+      doorsAt: r.doors_at && r.time_precision === 'exact' ? iso(r.doors_at) : null,
+      durationMin: r.time_precision === 'exact' && r.ends_at ? Math.round((r.ends_at.getTime() - r.starts_at.getTime()) / 60_000) : null,
+      days: eventDays(r.local_start_date, r.local_end_date),
       happeningNow: isHappeningNow(timing, now),
       unconfirmed: r.time_unconfirmed,
     },

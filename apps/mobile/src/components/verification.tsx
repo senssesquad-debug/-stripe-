@@ -17,37 +17,24 @@ export function VerificationBadge({ v }: { v: VerificationDTO }) {
 }
 
 /** "Where this comes from": status, sources with links, last check time and any disagreement between sources. */
+/**
+ * What the user needs from data checks: disagreements between sources (shown as the competing values, so nothing
+ * is silently picked) and a way to report a problem. Source names, links and check dates stay in the admin panel.
+ */
 export function VerificationBlock({ entity }: { entity: EntityDTO }) {
   const th = useTheme();
   const { t } = useTranslation();
   const v = entity.verification;
   return (
-    <View style={{ gap: 12, padding: 16, borderRadius: th.radius.lg, backgroundColor: th.c.surface }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Txt v="headline">{t('verification.sourcesTitle')}</Txt>
-        <VerificationBadge v={v} />
-      </View>
-      {v.lastVerifiedAt ? <Txt v="caption" tone="secondary">{t('verification.checked', { ago: timeAgo(v.lastVerifiedAt) })}</Txt> : null}
+    <View style={{ gap: 12 }}>
       {v.conflicts.map((c) => (
         <View key={c.field} style={{ gap: 6, padding: 12, borderRadius: th.radius.md, backgroundColor: th.dark ? '#3A2E10' : '#FFF4DB' }}>
           <Txt v="bodyStrong">{t('verification.conflictTitle', { field: t(`verification.field_${c.field}`, { defaultValue: c.field }) })}</Txt>
-          {c.candidates.map((cand, i) => (
-            <Txt key={i} v="callout">• {formatCandidate(cand.display, c.field, entity)} — {cand.sources.join(', ')}</Txt>
-          ))}
+          {c.candidates.map((cand, i) => <Txt key={i} v="callout">• {formatCandidate(cand.display, c.field, entity)}</Txt>)}
           <Txt v="caption" tone="secondary">{t('verification.conflictHelp')}</Txt>
         </View>
       ))}
-      {v.sources.map((s) => (
-        <Tap key={s.key} disabled={!s.url} onPress={() => s.url && WebBrowser.openBrowserAsync(s.url)} accessibilityRole="link" style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <Icon name={s.isOfficial ? 'shield-check-outline' : 'link-variant'} size={18} color={th.c.textSecondary} />
-          <View style={{ flex: 1 }}>
-            <Txt v="callout">{s.name}{s.isOfficial ? ` · ${t('verification.official')}` : ''}</Txt>
-            <Txt v="caption" tone="tertiary">{[s.attribution, timeAgo(s.lastSeenAt)].filter(Boolean).join(' · ')}</Txt>
-          </View>
-          {s.url ? <Icon name="open-in-new" size={16} color={th.c.textTertiary} /> : null}
-        </Tap>
-      ))}
-      <Tap onPress={() => router.push({ pathname: '/report', params: { type: entity.type, id: entity.id } })} accessibilityRole="button" style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingTop: 4 }}>
+      <Tap onPress={() => router.push({ pathname: '/report', params: { type: entity.type, id: entity.id } })} accessibilityRole="button" style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
         <Icon name="flag-outline" size={16} color={th.c.primaryText} />
         <Txt v="callout" tone="primary">{t('verification.report')}</Txt>
       </Tap>
@@ -55,7 +42,6 @@ export function VerificationBlock({ entity }: { entity: EntityDTO }) {
   );
 }
 
-/** ISO instants in conflicts are shown as local wall time in the entity's zone. */
 function formatCandidate(display: string, field: string, entity: EntityDTO): string {
   if ((field === 'starts_at' || field === 'ends_at') && /^\d{4}-\d{2}-\d{2}T/.test(display) && entity.type === 'event') {
     try {
