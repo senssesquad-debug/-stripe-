@@ -6,6 +6,7 @@ import { runNotifications } from '../services/notifications';
 import { deliverDueReminders } from '../services/reminders';
 import { runMaintenance } from './maintenance';
 import { tick } from './scheduler';
+import { refreshGtfs } from '../transit/gtfs';
 import type { Logger } from './types';
 
 /**
@@ -42,6 +43,7 @@ export function startBackground(pool: pg.Pool, config: AppConfig, log: Logger): 
     while (!stopping) {
       try {
         await tick(deps);
+        await refreshGtfs(pool, log); // public transport timetables: one stale feed per pass
         if (Date.now() - lastMaintenance > 30 * 60_000) {
           lastMaintenance = Date.now();
           await runMaintenance(pool, log);

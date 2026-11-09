@@ -1,10 +1,12 @@
 import { readFileSync, existsSync } from 'node:fs';
-import { canonicalKey, haversineKm, isValidLatLng } from '@passtra/core';
+import { canonicalKey, haversineKm, isValidLatLng, type Locale } from '@passtra/core';
 import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 import type { AppDeps } from '../app';
 import { ApiError, parse } from '../http';
 import { Geocoder } from '../lib/geocode';
+import { instruction } from '../transit/instructions';
+import { planTransit } from '../transit/plan';
 
 /**
  * Web-facing helpers:
@@ -22,8 +24,66 @@ const LatLng = z.string().regex(/^-?\d+(\.\d+)?,-?\d+(\.\d+)?$/).transform((s) =
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
+export type RouteMode = 'walk' | 'bike' | 'drive';
+const PROFILE: Record<RouteMode, string> = { walk: 'routed-foot/route/v1/foot', bike: 'routed-bike/route/v1/bike', drive: 'routed-car/route/v1/driving' };
+
+export interface StreetRoute {
+  mode: RouteMode; estimate: boolean; distanceKm: number; durationMin: number; geometry: Array<[number, number]>; attribution: string | null;
+  steps: Array<{ text: string; distanceM: number; durationMin: number; location: [number, number] }>;
+}
+
+/**
+ * Street routing for one mode via an OSRM service (FOSSGIS by default: separate foot, bicycle and car profiles —
+ * a bicycle route is never a car route). Cached 7 days per rounded endpoints. Fallback: straight-line estimate, flagged.
+ */
+export async function streetRoute(deps: AppDeps, mode: RouteMode, from: { lat: number; lng: number }, to: { lat: number; lng: number }, locale: Locale): Promise<StreetRoute> {
+  const { db, config } = deps;
+  const km = haversineKm(from, to);
+  const key = `route2:${mode}:${locale}:${from.lat.toFixed(5)},${from.lng.toFixed(5)}:${to.lat.toFixed(5)},${to.lng.toFixed(5)}`;
+  const cached = await db.query<{ payload: StreetRoute }>('SELECT payload FROM http_cache WHERE key = $1 AND expires_at > now()', [key]);
+  if (cached.rows[0]) return cached.rows[0].payload;
+  try {
+    const url = `${config.ROUTING_URL.replace(/\/$/, '')}/${PROFILE[mode]}/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=geojson&steps=true`;
+    type Step = { distance: number; duration: number; name: string; maneuver: { type: string; modifier?: string; exit?: number; location: [number, number] } };
+    const res = await deps.http.json<{ code: string; routes?: Array<{ distance: number; duration: number; geometry: { coordinates: Array<[number, number]> }; legs: Array<{ steps: Step[] }> }> }>(url, { timeoutMs: 12_000 });
+    const route = res.data?.routes?.[0];
+    if (res.data?.code !== 'Ok' || !route) throw new Error('no route');
+    const steps = (route.legs[0]?.steps ?? []).map((st) => ({ text: instruction(st.maneuver, st.name, locale), distanceM: Math.round(st.distance), durationMin: Math.round(st.duration / 6) / 10, location: st.maneuver.location }))
+      .filter((x): x is StreetRoute['steps'][number] & { text: string } => !!x.text);
+    const payload: StreetRoute = {
+      mode, estimate: false, distanceKm: Math.round(route.distance / 100) / 10, durationMin: Math.max(1, Math.round(route.duration / 60)),
+      geometry: route.geometry.coordinates, attribution: 'Routing © OpenStreetMap contributors, OSRM (FOSSGIS)', steps,
+    };
+    await db.query(`INSERT INTO http_cache (key, payload, expires_at) VALUES ($1,$2, now() + interval '7 days') ON CONFLICT (key) DO UPDATE SET payload = EXCLUDED.payload, expires_at = EXCLUDED.expires_at`, [key, JSON.stringify(payload)]);
+    return payload;
+  } catch {
+    const speed = mode === 'walk' ? 4.5 : mode === 'bike' ? 15 : 35;
+    return { mode, estimate: true, distanceKm: Math.round(km * 13) / 10, durationMin: Math.max(1, Math.round(((km * 1.3) / speed) * 60)), geometry: [[from.lng, from.lat], [to.lng, to.lat]], attribution: null, steps: [] };
+  }
+}
+
 export async function webRoutes(app: FastifyInstance, deps: AppDeps) {
   const { db, config } = deps;
+
+  // All four ways to get somewhere, each with distance, time and arrival; public transport from official timetables.
+  app.get('/v1/directions', { config: { rateLimit: { max: 30, timeWindow: '1 minute' } } }, async (req) => {
+    const q = parse(z.object({ from: LatLng, to: LatLng, at: z.string().datetime({ offset: true }).optional(), locale: z.string().optional() }), req.query);
+    const locale = (['en', 'el', 'ru'].includes(q.locale ?? '') ? q.locale : 'en') as Locale;
+    if (haversineKm(q.from, q.to) > 250) throw new ApiError(400, 'too_far', 'Route is too long');
+    const at = q.at ? new Date(q.at) : deps.now?.() ?? new Date();
+    const eta = (min: number) => new Date(at.getTime() + min * 60_000).toISOString();
+    const [walk, bike, drive, transit] = await Promise.all([
+      streetRoute(deps, 'walk', q.from, q.to, locale), streetRoute(deps, 'bike', q.from, q.to, locale), streetRoute(deps, 'drive', q.from, q.to, locale),
+      planTransit(db, q.from, q.to, at).catch((e) => { req.log.warn({ err: (e as Error).message }, 'transit planning failed'); return null; }),
+    ]);
+    return {
+      departAt: at.toISOString(),
+      walk: { ...walk, arriveAt: eta(walk.durationMin) },
+      bike: { ...bike, arriveAt: eta(bike.durationMin), note: 'cycling_network' },
+      drive: { ...drive, arriveAt: eta(drive.durationMin), note: 'no_live_traffic' },
+      transit: transit ?? { status: 'unavailable', options: [], scheduledOnly: true, validUntil: null, attribution: null },
+    };
+  });
 
   app.get('/v1/route', { config: { rateLimit: { max: 40, timeWindow: '1 minute' } } }, async (req) => {
     const q = parse(z.object({ from: LatLng, to: LatLng, mode: z.enum(['walk', 'drive']).default('walk') }), req.query);
