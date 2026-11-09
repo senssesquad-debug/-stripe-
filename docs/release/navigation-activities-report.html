@@ -1,0 +1,366 @@
+<title>passtra: навигация и активности</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column; a status strip up top, then sections that read like an engineering report. */
+:root {
+  --bg: #F6F7FB;
+  --surface: #FFFFFF;
+  --fg: #0E1230;
+  --muted: #565D7A;
+  --line: #DFE2EE;
+  --brand: #0009A9;
+  --brand-soft: #E7E8FA;
+  --ok: #0B7A55;
+  --ok-soft: #E3F4EC;
+  --warn: #9A5B00;
+  --warn-soft: #FDF1DC;
+  --bad: #B3261E;
+  --bad-soft: #FBE6E4;
+  --font-body: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0B0D1C; --surface: #141832; --fg: #E9EBF7; --muted: #A2A8C6; --line: #2A2F52;
+  --brand: #9BA2FF; --brand-soft: #1E2350; --ok: #5FD3A2; --ok-soft: #12302A; --warn: #F2B65A; --warn-soft: #33270F;
+  --bad: #FF8A80; --bad-soft: #3A1A1A; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0B0D1C; --surface: #141832; --fg: #E9EBF7; --muted: #A2A8C6; --line: #2A2F52;
+  --brand: #9BA2FF; --brand-soft: #1E2350; --ok: #5FD3A2; --ok-soft: #12302A; --warn: #F2B65A; --warn-soft: #33270F;
+  --bad: #FF8A80; --bad-soft: #3A1A1A; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 860px; margin: 0 auto; padding-block: 40px 72px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 44px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.2; margin: 0; }
+h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 16px; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--brand); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 3px; }
+code, .mono { font-family: var(--font-mono); font-size: 0.86em; }
+code { background: var(--brand-soft); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brand); }
+section { display: grid; gap: 16px; min-width: 0; }
+.lede { color: var(--muted); font-size: 16px; }
+header { display: grid; gap: 14px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--muted); font-size: 13px; }
+
+.strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 14px; background: var(--surface); overflow: hidden; }
+.strip > div { padding: 16px 18px; display: grid; gap: 2px; border-left: 1px solid var(--line); min-width: 0; }
+.strip > div:first-child { border-left: 0; }
+.strip b { font-family: var(--font-mono); font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.strip span { font-size: 13px; color: var(--muted); }
+@media (max-width: 640px) { .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); } .strip > div:nth-child(3) { border-left: 0; } .strip > div:nth-child(n+3) { border-top: 1px solid var(--line); } }
+
+.list { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.row { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 4px 20px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.row > :first-child { font-weight: 700; }
+.row p { color: var(--fg); }
+.row p + p { margin-top: 4px; }
+@media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 700; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td.n { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+
+.callout { border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 16px 18px; display: grid; gap: 8px; }
+.callout.warn { border-color: color-mix(in srgb, var(--warn) 40%, var(--line)); background: var(--warn-soft); }
+ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+li { max-width: 70ch; }
+.small { font-size: 13px; color: var(--muted); }
+.keys { display: grid; gap: 12px; }
+.key { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 6px; min-width: 0; }
+.key-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: baseline; justify-content: space-between; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+.tbl tr.bucket th { background: var(--brand-soft); color: var(--fg); text-transform: none; letter-spacing: 0; font-size: 14px; }
+.tbl tr.zero td { color: var(--bad); }
+.tbl tr.low td { color: var(--warn); }
+.muted { color: var(--muted); font-weight: 500; }
+.files { columns: 2 260px; column-gap: 24px; margin: 0; padding-left: 18px; font-family: var(--font-mono); font-size: 12.5px; }
+.files li { break-inside: avoid; }
+</style>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">passtra · Map Navigation &amp; Active Lifestyle Discovery</div>
+    <h1>Навигация и чем заняться</h1>
+    <p class="lede">Отчёт по обновлению: полноценная навигация по карте, симуляция движения для тестов, активный отдых вместо перекоса в еду, блок «Чем заняться сегодня?».</p>
+    <div class="meta">
+      <span>9 ноября 2026</span>
+      <span>Ветка <code>claude/fervent-maxwell-r7hhj0</code></span>
+      <span><a href="https://passtra.onrender.com" target="_blank" rel="noopener">passtra.onrender.com</a> · <a href="https://passtra.onrender.com/v1/coverage" target="_blank" rel="noopener">/v1/coverage</a></span>
+    </div>
+  </header>
+
+  <div class="strip" role="list" aria-label="Итоги проверок">
+    <div role="listitem"><b>472</b><span>автотеста прошли (ядро 314 + API 158)</span></div>
+    <div role="listitem"><b>48</b><span>браузерных сценариев прошли, из них 14 навигационных</span></div>
+    <div role="listitem"><b>0</b><span>упавших тестов</span></div>
+    <div role="listitem"><b>0</b><span>проверок на реальных iOS / Android</span></div>
+  </div>
+
+  <section>
+    <h2>Главное</h2>
+    <div class="callout warn">
+      <h3>Реальная навигация на телефоне не проверялась</h3>
+      <p>Устройств iOS и Android в моей среде нет. Навигация проверена в браузере: на симулированном движении (14 сценариев) и один раз с реальным GPS браузера, но без перемещения. Заявлять, что реальная навигация протестирована, я не могу.</p>
+    </div>
+    <div class="callout">
+      <h3>Перекос в еду был в первую очередь в данных</h3>
+      <p>До нового импорта: 4679 мест, из них еда 3639, активный отдых 0, спорт 0, природа 19. Причина в том, что старый импорт по категориям застревал на Render. Теперь места берутся из ежедневного файла Geofabrik целиком, плюс добавлено 33 категории активного отдыха. Цифры ниже сняты с живого сервера (2026-11-09 19:24 UTC).</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>1. Какие проблемы обнаружены</h2>
+    <div class="list">
+      <div class="row"><div>Карта отдалялась</div><div><p>При каждом обновлении маршрута карта заново вписывала его целиком. Режима навигации не было: нет кнопки старта, камера не следовала за пользователем, масштаб не фиксировался, карта не поворачивалась.</p></div></div>
+      <div class="row"><div>Найдено симуляцией</div><div><p>Масштаб «наползал»: анимации камеры перебивали друг друга, и карта доходила до нужного зума десятками мелких шагов. Обзор маршрута пересчитывался на каждой точке GPS. Перетаскивание карты терялось во время анимации. На вебе падала ошибка блокировки сна экрана. Всё исправлено и проверено повторно.</p></div></div>
+      <div class="row"><div>Транспорт</div><div><p>У автобусного участка не было списка остановок: линия рисовалась прямой от посадки до высадки.</p></div></div>
+      <div class="row"><div>Перекос в еду: данные</div><div><p>В живой базе 3 639 из 4 679 мест были заведениями питания, ноль мест активного отдыха и спорта. Импорт OpenStreetMap не доходил до этих категорий. Десятков видов активного отдыха (пейнтбол, скалолазание, конные прогулки, водопады, падел и т.д.) не было вовсе.</p></div></div>
+      <div class="row"><div>Перекос в еду: алгоритм</div><div><p>Лента брала 600 ближайших мест, а в центре города почти все ближайшие — кафе. Разнообразие обеспечивал слабый штраф, который не мешал трём ресторанам подряд. Раздел «Вечером» не балансировался. Удаление повторов между разделами шло после перемешивания и снова склеивало рестораны.</p></div></div>
+      <div class="row"><div>Поиск</div><div><p>Общее слово доставалось одной категории: «теннис» искал только матчи, не корты; «пикник» — только кемпинги; «заповедник» — просто парки.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Какие файлы изменены</h2>
+    <ul class="files">
+      <li>packages/core/src/navigation.ts <span class="muted">(новый)</span></li>
+      <li>packages/core/src/activities.ts <span class="muted">(новый)</span></li>
+      <li>packages/core/src/categories.ts</li>
+      <li>packages/core/src/query-parser.ts</li>
+      <li>packages/core/src/index.ts</li>
+      <li>packages/core/test/navigation.test.ts <span class="muted">(новый)</span></li>
+      <li>packages/core/test/balance.test.ts <span class="muted">(новый)</span></li>
+      <li>packages/core/test/categories-activities.test.ts <span class="muted">(новый)</span></li>
+      <li>packages/core/test/search-typos.test.ts</li>
+      <li>apps/api/src/services/discovery.ts</li>
+      <li>apps/api/src/routes/public.ts</li>
+      <li>apps/api/src/routes/web.ts</li>
+      <li>apps/api/src/transit/plan.ts</li>
+      <li>apps/api/src/engine/maintenance.ts</li>
+      <li>apps/api/test/activities.test.ts <span class="muted">(новый)</span></li>
+      <li>apps/api/test/transit.test.ts</li>
+      <li>apps/mobile/src/app/navigate.tsx <span class="muted">(новый)</span></li>
+      <li>apps/mobile/src/app/activity/[key].tsx <span class="muted">(новый)</span></li>
+      <li>apps/mobile/src/lib/navigation-session.ts <span class="muted">(новый)</span></li>
+      <li>apps/mobile/src/components/nav-map.web.tsx <span class="muted">(новый)</span></li>
+      <li>apps/mobile/src/components/nav-map.tsx <span class="muted">(новый)</span></li>
+      <li>apps/mobile/src/components/nav-map-shared.ts <span class="muted">(новый)</span></li>
+      <li>apps/mobile/src/components/what-to-do.tsx <span class="muted">(новый)</span></li>
+      <li>apps/mobile/src/components/directions-panel.tsx</li>
+      <li>apps/mobile/src/components/ui.tsx</li>
+      <li>apps/mobile/src/app/(tabs)/index.tsx</li>
+      <li>apps/mobile/src/app/_layout.tsx</li>
+      <li>apps/mobile/src/lib/api.ts</li>
+      <li>apps/mobile/src/lib/icons.ts</li>
+      <li>apps/mobile/src/i18n/en.ts, el.ts, ru.ts</li>
+      <li>apps/mobile/e2e/navigation.cjs <span class="muted">(новый)</span></li>
+      <li>apps/mobile/e2e/what-to-do.cjs <span class="muted">(новый)</span></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>3. Какие функции реализованы</h2>
+    <div class="list">
+      <div class="row"><div>START NAVIGATION</div><div><p>Большая кнопка в панели маршрута для пешком, велосипеда, электросамоката, авто и общественного транспорта. Экран показывает:</p><ul><li>следующий поворот со стрелкой и расстоянием до него;</li><li>оставшиеся время и расстояние, время прибытия, полосу прогресса;</li><li>скорость, только если точность GPS не хуже 25 м;</li><li>кнопки «Стоп» и «Завершить» по прибытии.</li></ul><p>Экран не гаснет, пока идёт навигация.</p></div></div>
+      <div class="row"><div>Камера</div><div><ul><li><b>Следование:</b> масштаб фиксирован для режима (пешком 17,5, велосипед и самокат 16,8, авто 16 или 15 по скорости с гистерезисом). Пользователь ниже центра, карта поворачивается по движению, но не больше 30° за обновление. Дрожание GPS до 2 м и поворот до 5° камеру не двигают.</li><li><b>Обзор:</b> весь оставшийся маршрут.</li><li><b>Ручной режим:</b> после любого жеста карта не возвращается сама; есть кнопка «Вернуть ко мне».</li><li>Режим «север сверху».</li></ul></div></div>
+      <div class="row"><div>Ведение по маршруту</div><div><p>Позиция привязывается к маршруту. Уход с маршрута фиксируется с учётом точности и после 5 секунд подтверждения, тогда маршрут перестраивается от текущей точки. Также распознаются остановка, разворот, потеря и возврат GPS, прибытие. Время прибытия смешивает плановую и фактическую скорость.</p></div></div>
+      <div class="row"><div>Общественный транспорт</div><div><p>Шаги «идите к остановке», «садитесь на 4 → … в 10:20», «выходите на …». Список остановок участка с временем по расписанию, линия автобуса через все остановки.</p></div></div>
+      <div class="row"><div>Симуляция</div><div><p>Только для разработчиков: dev-сборки, <code>EXPO_PUBLIC_DEV_TOOLS</code> или <code>?devtools=1</code>. Сценарии: пешком, велосипед, самокат, авто, уход с маршрута, остановка, разворот, потеря GPS.</p><p>Всё время висит красная плашка «СИМУЛЯЦИЯ — это не ваше реальное местоположение». Симулированные точки никуда не сохраняются и не используются как местоположение.</p></div></div>
+      <div class="row"><div>Категории</div><div><p>33 новые категории с тегами OpenStreetMap и словами на трёх языках:</p><ul><li><b>Приключения:</b> пейнтбол и страйкбол, лазертаг, скалолазание и боулдеринг, зиплайны и верёвочные парки, конные прогулки, параглайдинг и парашют.</li><li><b>Вода:</b> рыбалка, бассейны, парусный спорт.</li><li><b>Спорт:</b> единоборства и бокс, кроссфит, теннис и падел, спортплощадки, скейт-парки, йога, танцы, спортклубы.</li><li><b>Природа:</b> заповедники и нацпарки, водопады, пещеры, ботанические сады, наблюдение за птицами, пикник.</li><li><b>Развлечения:</b> игровые залы, батуты, театры и концертные залы, антикафе.</li><li><b>Общение и творчество:</b> культурные центры, творческие мастерские.</li><li><b>Шопинг:</b> винтаж и секонд-хенд, местные бутики и ремёсла.</li><li><b>Для детей:</b> детские центры, научные центры.</li></ul><p>У каждой категории есть характер (в помещении, на улице, экстрим, спокойно, спорт, приключения, с компанией, с детьми), раздел ленты и обычный сезон. Компании распознаются и по названию («Jeep Safari», «Adventure Park»).</p></div></div>
+      <div class="row"><div>Сбалансированная лента</div><div><p>Еда берётся отдельной меньшей квотой. Разделы и рекомендации смешиваются по долям: 15% еда, 20% активный отдых, 15% развлечения, 15% события, 15% природа, 10% спорт, 5% шопинг, 5% культура. Интересы пользователя увеличивают долю.</p><p>Три одинаковых подряд не бывает никогда, двух ресторанов подряд — пока есть альтернативы. Если вокруг только еда, показывается она.</p></div></div>
+      <div class="row"><div>Чем заняться сегодня?</div><div><p>40 конкретных занятий: картинг, дайвинг, квест, поход, падел, гидроцикл, зиплайн, боулинг, водопады, концерт, морская прогулка и другие. Каждое показывается, только если рядом есть реальные варианты.</p><ul><li><b>Время:</b> сейчас, сегодня, вечером, завтра, выходные.</li><li><b>Характер:</b> в помещении, на улице, экстрим, спокойно, спорт, приключения, с компанией, с детьми; бесплатно или платно.</li><li><b>Доступность:</b> закрытые в выбранное время не показываются. Места без надёжных часов помечаются «часы не подтверждены». Сезонные (аквапарки, водные развлечения, морские прогулки) в несезон помечаются «обычно сезонное» и не называются доступными.</li></ul><p>На экране занятия все варианты с маршрутом.</p></div></div>
+      <div class="row"><div>Аудит базы</div><div><p><code>GET /v1/coverage</code>: реальные объекты по каждой категории, сколько с фото, с подтверждённым адресом, с часами работы, плюс будущие события.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>4. Сколько реальных объектов в каждой категории</h2>
+    <p>Живая база, без демо-данных: 9 449 мест, 17 будущих событий. С фото 112 (1%), с подтверждённым адресом 41 (0%), с часами работы 1472 (16%). Доля мест еды по основной категории: 45%. Красным отмечены категории без объектов, жёлтым — с 1–4 объектами.</p>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Категория</th><th>Мест</th><th>Событий</th><th>С фото</th><th>Адрес подтв.</th><th>С часами</th></tr></thead>
+        <tbody>
+<tr class="bucket"><th colspan="6">Активный отдых и приключения <span class="muted">· 36 мест (по основной категории)</span></th></tr>
+<tr class=""><td>Diving &amp; snorkelling</td><td class="n">17</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">3</td></tr>
+<tr class=""><td>Water sports</td><td class="n">8</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">2</td></tr>
+<tr class=""><td>Tours, safaris &amp; off-road</td><td class="n">6</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class=""><td>Boat trips</td><td class="n">5</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">3</td></tr>
+<tr class="low"><td>Horse riding</td><td class="n">3</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Escape rooms</td><td class="n">2</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class="low"><td>Paintball &amp; airsoft</td><td class="n">2</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Ziplines &amp; rope parks</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class="zero"><td>Karting</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Water parks</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Laser tag</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Climbing &amp; bouldering</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Paragliding &amp; skydiving</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Sailing</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="bucket"><th colspan="6">Природа и отдых на улице <span class="muted">· 813 мест (по основной категории)</span></th></tr>
+<tr class=""><td>Parks &amp; nature</td><td class="n">280</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">10</td></tr>
+<tr class=""><td>Hiking trails</td><td class="n">262</td><td class="n">0</td><td class="n">2</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class=""><td>Beaches</td><td class="n">137</td><td class="n">1</td><td class="n">16</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class=""><td>Viewpoints</td><td class="n">91</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class=""><td>Camping</td><td class="n">25</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class=""><td>Picnic sites</td><td class="n">19</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class=""><td>Waterfalls</td><td class="n">8</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class=""><td>Caves</td><td class="n">8</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class=""><td>Nature reserves &amp; national parks</td><td class="n">6</td><td class="n">0</td><td class="n">2</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class=""><td>Marinas</td><td class="n">5</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Bird watching</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Fishing</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Botanical gardens</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="bucket"><th colspan="6">Спорт и фитнес <span class="muted">· 70 мест (по основной категории)</span></th></tr>
+<tr class=""><td>Gyms &amp; fitness</td><td class="n">32</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">8</td></tr>
+<tr class=""><td>Cycling</td><td class="n">31</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class=""><td>Sports events</td><td class="n">0</td><td class="n">12</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class=""><td>Sports clubs</td><td class="n">6</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Sports courts &amp; pitches</td><td class="n">2</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Swimming pools</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Yoga &amp; pilates studios</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class="zero"><td>Car &amp; motor events</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Yoga &amp; wellness</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Martial arts &amp; boxing</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>CrossFit</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Tennis &amp; padel</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Skateparks</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="bucket"><th colspan="6">Развлечения <span class="muted">· 111 мест (по основной категории)</span></th></tr>
+<tr class=""><td>Electronics</td><td class="n">67</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">17</td></tr>
+<tr class=""><td>Playgrounds</td><td class="n">15</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class=""><td>Theatres &amp; concert halls</td><td class="n">15</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class=""><td>Casinos</td><td class="n">13</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class=""><td>Cinemas</td><td class="n">9</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class="low"><td>Bowling</td><td class="n">4</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class="low"><td>Amusement parks</td><td class="n">3</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Billiards &amp; snooker</td><td class="n">2</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class="low"><td>Workshops &amp; classes</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Zoos &amp; aquariums</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Science &amp; discovery centres</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>For kids</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Tech &amp; startups</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Coworking</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>VR &amp; arcades</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Arcades &amp; gaming</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Trampoline parks</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Board game cafés</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Kids activity centres</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="bucket"><th colspan="6">События и ночная жизнь <span class="muted">· 609 мест (по основной категории)</span></th></tr>
+<tr class=""><td>Bars</td><td class="n">418</td><td class="n">0</td><td class="n">0</td><td class="n">2</td><td class="n">76</td></tr>
+<tr class=""><td>Pubs</td><td class="n">107</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">12</td></tr>
+<tr class=""><td>Nightclubs</td><td class="n">84</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">28</td></tr>
+<tr class="low"><td>Classical &amp; opera</td><td class="n">0</td><td class="n">3</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Concerts</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Live music venues</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Music festivals</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Parties &amp; club nights</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Rock, metal &amp; hardcore</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Electronic music</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Jazz &amp; blues</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="bucket"><th colspan="6">Культура и другое <span class="muted">· 772 мест (по основной категории)</span></th></tr>
+<tr class=""><td>Historic sites</td><td class="n">530</td><td class="n">0</td><td class="n">64</td><td class="n">0</td><td class="n">23</td></tr>
+<tr class=""><td>Museums</td><td class="n">187</td><td class="n">0</td><td class="n">21</td><td class="n">0</td><td class="n">65</td></tr>
+<tr class=""><td>Churches &amp; monasteries</td><td class="n">50</td><td class="n">0</td><td class="n">32</td><td class="n">0</td><td class="n">5</td></tr>
+<tr class=""><td>Art galleries</td><td class="n">21</td><td class="n">0</td><td class="n">5</td><td class="n">0</td><td class="n">5</td></tr>
+<tr class=""><td>Theatre</td><td class="n">9</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class=""><td>Community &amp; social centres</td><td class="n">10</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class=""><td>Spa &amp; massage</td><td class="n">7</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class="low"><td>Festivals &amp; celebrations</td><td class="n">0</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Dance studios</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="low"><td>Creative workshops</td><td class="n">1</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+<tr class="zero"><td>Exhibitions</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Dance &amp; ballet</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Comedy &amp; stand-up</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Film screenings</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Other events</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="bucket"><th colspan="6">Шопинг <span class="muted">· 1595 мест (по основной категории)</span></th></tr>
+<tr class=""><td>Supermarkets</td><td class="n">1230</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">226</td></tr>
+<tr class=""><td>Clothing &amp; fashion</td><td class="n">170</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">19</td></tr>
+<tr class=""><td>Barbers &amp; hairdressers</td><td class="n">53</td><td class="n">2</td><td class="n">0</td><td class="n">0</td><td class="n">9</td></tr>
+<tr class=""><td>Beauty salons</td><td class="n">47</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">11</td></tr>
+<tr class=""><td>Local boutiques &amp; crafts</td><td class="n">43</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">4</td></tr>
+<tr class=""><td>Bookshops</td><td class="n">23</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">3</td></tr>
+<tr class=""><td>Sports shops</td><td class="n">13</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">2</td></tr>
+<tr class=""><td>Shopping malls</td><td class="n">11</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">5</td></tr>
+<tr class=""><td>Farmers markets</td><td class="n">8</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">6</td></tr>
+<tr class="low"><td>Vintage &amp; second-hand</td><td class="n">4</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="zero"><td>Fairs &amp; markets</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+<tr class="bucket"><th colspan="6">Еда и напитки <span class="muted">· 4258 мест (по основной категории)</span></th></tr>
+<tr class=""><td>Restaurants</td><td class="n">2227</td><td class="n">0</td><td class="n">0</td><td class="n">19</td><td class="n">423</td></tr>
+<tr class=""><td>Cafés</td><td class="n">1245</td><td class="n">0</td><td class="n">0</td><td class="n">16</td><td class="n">199</td></tr>
+<tr class=""><td>Street food &amp; fast food</td><td class="n">476</td><td class="n">0</td><td class="n">0</td><td class="n">1</td><td class="n">86</td></tr>
+<tr class=""><td>Bakeries</td><td class="n">263</td><td class="n">0</td><td class="n">0</td><td class="n">2</td><td class="n">48</td></tr>
+<tr class=""><td>Ice cream</td><td class="n">39</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">7</td></tr>
+<tr class=""><td>Wineries</td><td class="n">12</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">4</td></tr>
+<tr class="zero"><td>Food &amp; wine festivals</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="small">Одно место может входить в несколько категорий. Снято с <code>/v1/coverage</code> 2026-11-09 19:24 UTC.</p>
+  </section>
+
+  <section>
+    <h2>5. Недостаточное покрытие</h2>
+    <div class="list">
+      <div class="row"><div>Нет объектов (34 из 103)</div><div><p>Music festivals, Parties & club nights, Rock, metal & hardcore, Electronic music, Jazz & blues, Exhibitions, Dance & ballet, Comedy & stand-up, Film screenings, Car & motor events, Food & wine festivals, Fairs & markets, For kids, Tech & startups, Other events, Yoga & wellness, Coworking, Karting, Water parks, VR & arcades, Laser tag, Climbing & bouldering, Paragliding & skydiving, Fishing, Sailing, Martial arts & boxing, CrossFit, Tennis & padel, Skateparks, Botanical gardens, Arcades & gaming, Trampoline parks, Board game cafés, Kids activity centres</p></div></div>
+      <div class="row"><div>Меньше 5</div><div><p>Concerts (1), Classical & opera (3), Festivals & celebrations (1), Workshops & classes (1), Billiards & snooker (2), Live music venues (1), Bowling (4), Amusement parks (3), Escape rooms (2), Zoos & aquariums (1), Paintball & airsoft (2), Ziplines & rope parks (1), Horse riding (3), Swimming pools (1), Sports courts & pitches (2), Yoga & pilates studios (1), Dance studios (1), Bird watching (1), Creative workshops (1), Vintage & second-hand (4), Science & discovery centres (1)</p></div></div>
+      <div class="row"><div>Почему</div><div><p>OpenStreetMap — открытая карта: активные развлечения на Кипре отмечены в ней частично, а у большинства мест нет фото и часов работы. Полные данные по прокату, экскурсиям, водным развлечениям и спортклубам есть у Google Places и площадок вроде Viator. Без ключей они не подключены. Выдумывать заведения я не стал.</p></div></div>
+      <div class="row"><div>Адреса</div><div><p>Фоновая проверка адресов идёт медленно: 15 мест за 10 минут, бесплатный Nominatim, и только пока сервер не спит. С ключом Google Geocoding пойдёт быстрее и точнее.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>6. Какие тесты пройдены</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>Набор</th><th>Что проверяет</th><th>Итог</th></tr></thead>
+        <tbody>
+          <tr><td>Навигация (ядро)</td><td>Сценарии пешком, велосипед, самокат, авто: прибытие, убывание остатка, следующий поворот, неизменный масштаб, без скачков камеры (≤ 30° и ≤ 40 м за шаг), поворот карты по маршруту, точность ETA. Уход с маршрута с подтверждением, одиночный сбой GPS не перестраивает маршрут, остановка, разворот, потеря и возврат GPS, продолжение по новому маршруту. Ручной режим и Recenter, неподвижность при дрожании, зум авто по двум классам скорости, «север сверху»</td><td class="n"><span class="pill ok">43 / 43</span></td></tr>
+          <tr><td>Ядро: остальное</td><td>Балансировка ленты (еда в меньшинстве, нет трёх подряд, интересы, только еда → не пусто), 40 занятий, категории из тегов и названий, сезоны, поиск «картинг», «страйкбол», «водопад», «падел», «антикафе» и ещё 40 запросов на 3 языках</td><td class="n"><span class="pill ok">271 / 271</span></td></tr>
+          <tr><td>API</td><td>«Чем заняться»: сейчас и вечер по часам, без часов → не подтверждено, сезонность в ноябре, фильтры, круиз по названию. Лента без трёх ресторанов подряд, рекомендации, покрытие, остановки автобуса со временем, плюс все прежние тесты</td><td class="n"><span class="pill ok">158 / 158</span></td></tr>
+          <tr><td>Браузер: навигация</td><td>Симуляция с плашкой и прибытием для 4 видов передвижения, стабильный масштаб и плавный поворот, ручной режим и Recenter, обзор, «север сверху», уход с маршрута и перестроение через реальный сервис маршрутов, потеря GPS, остановка, разворот, Стоп, автобус с остановками, кнопка START NAVIGATION с реальным GPS браузера</td><td class="n"><span class="pill ok">14 / 14</span></td></tr>
+          <tr><td>Браузер: «Чем заняться»</td><td>Блок на главной с реальными вариантами, фильтр «Прямо сейчас», фильтр «В помещении», экран занятия с маршрутами</td><td class="n"><span class="pill ok">4 / 4</span></td></tr>
+          <tr><td>Браузер: регрессия</td><td>Все прежние сценарии: ссылки, карта, маршруты, «Мои события», аккаунт, уведомления, план дня, отзывы, аватары</td><td class="n"><span class="pill ok">30 / 30</span></td></tr>
+          <tr><td>Типы и линтер</td><td>TypeScript во всех пакетах; новые файлы проходят строгий линтер</td><td class="n"><span class="pill ok">чисто</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>7. Какие тесты провалены</h2>
+    <p>Среди автоматических проверок упавших нет. Симуляция по ходу работы нашла 5 настоящих ошибок (см. раздел 1), все исправлены и перепроверены. В старом коде остаются 23 ошибки строгого линтера React, они на работу не влияют; новых не добавилось.</p>
+  </section>
+
+  <section>
+    <h2>8. Что требует реальных устройств или API</h2>
+    <div class="list">
+      <div class="row"><div>iOS и Android</div><div><p>Реальная навигация на ходу, поворот карты по компасу, точность в городе, работа в фоне и с выключенным экраном, Apple Maps (масштаб через высоту камеры) и Google Maps. Нужны сборки EAS и аккаунты Apple Developer и Google Play.</p></div></div>
+      <div class="row"><div>Google Places</div><div><p>Ключ <code>GOOGLE_MAPS_API_KEY</code> (Places API New + Geocoding) даст фото, часы работы, рейтинг и точные адреса для мест активного отдыха, которых нет в OpenStreetMap.</p></div></div>
+      <div class="row"><div>Viator</div><div><p>Партнёрский аккаунт с бесплатным базовым API даст экскурсии, морские прогулки, сафари и водные развлечения с ценами.</p></div></div>
+      <div class="row"><div>Пробки и автобусы онлайн</div><div><p>Время на авто без учёта пробок, автобусы по расписанию без онлайн-позиций. Для живых данных нужен платный сервис маршрутов и стабильный фид GTFS-Realtime.</p></div></div>
+      <div class="row"><div>Render</div><div><p>На бесплатном плане сервер засыпает, и импорт и проверки идут только пока он не спит. Каждый деплой прерывает начатый импорт, и источник блокируется на 30 минут.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>9. Какие проблемы ещё остались</h2>
+    <ul>
+      <li>Мало фото (только Wikimedia) и мало подтверждённых часов работы. Поэтому многие варианты в «Чем заняться» помечены «часы не подтверждены».</li>
+      <li>Сезонность задана по типу занятия (например, аквапарки май–октябрь), а не по реальному расписанию конкретного места. В приложении так и написано: «обычно сезонное».</li>
+      <li>Нет голосовых подсказок и предупреждений о полосах.</li>
+      <li>Перестроение маршрута общественного транспорта берёт первый подходящий рейс.</li>
+      <li>Импорт мест на живом сервере ещё догружается. Таблицу выше можно обновить в любой момент: <a href="https://passtra.onrender.com/v1/coverage" target="_blank" rel="noopener">/v1/coverage</a>.</li>
+    </ul>
+  </section>
+</div>
