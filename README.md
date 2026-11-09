@@ -14,7 +14,7 @@ sources, with the time each fact was last checked. Starting in Cyprus; built for
 
 | Path | What |
 |---|---|
-| `packages/core` | Domain logic: taxonomy, regions, Europe/Nicosia time & DST, transliteration, price parsing, robots.txt, confidence & conflict resolution, dedup, recommendations, Plan My Day, multilingual query parser |
+| `packages/core` | Domain logic: taxonomy, regions, Europe/Nicosia time & DST, transliteration, price parsing, robots.txt, confidence & conflict resolution, dedup, balanced recommendations, "What can I do", Plan My Day, turn-by-turn navigation & simulation, multilingual query parser |
 | `packages/brand` | passtra design tokens (colours, type, radius, motion) |
 | `apps/api` | Fastify API + worker: PostGIS schema, Data Aggregation Engine (connectors, provenance, dedup, conflicts, adaptive scheduler), search/recs/plan, GDPR, admin endpoints |
 | `apps/admin` | Moderation panel (served by the API at `/admin/`) |
@@ -28,17 +28,19 @@ Requirements: Node 22, pnpm 10, PostgreSQL 15+ with PostGIS (or `docker compose 
 
 ```bash
 pnpm install
-cp apps/api/.env.example apps/api/.env      # set DATABASE_URL, AUTH_JWT_SECRET for dev
+cp apps/api/.env.example apps/api/.env      # set AUTH_JWT_SECRET, DEV_SHOW_CODES=true, NODE_ENV=development
 pnpm db:migrate                              # schema + countries/cities/categories + sources
 pnpm --filter @passtra/api ingest visitcyprus_events   # live events (no key needed)
 pnpm --filter @passtra/api ingest wikidata_cy           # museums & heritage (no key)
-pnpm --filter @passtra/api ingest osm_cy                # places via Overpass (no key)
+pnpm --filter @passtra/api ingest osm_cy                # places: daily Geofabrik extract of Cyprus (no key)
 pnpm dev:api                                 # http://localhost:8080  (worker: pnpm dev:worker)
 cd apps/mobile && cp .env.example .env && npx expo start
 ```
 
 Tests: `pnpm test` (core unit tests + API integration tests on real Postgres/PostGIS), `pnpm typecheck`.
-UI smoke test: `node scripts/e2e-web-smoke.mjs` against a served web build.
+UI tests: `node scripts/e2e-web-smoke.mjs`, `node apps/mobile/e2e/navigation.cjs`, `node apps/mobile/e2e/what-to-do.cjs` against a served web build.
+
+**New to the project? Start with [docs/HANDOVER.md](docs/HANDOVER.md)** (Russian): access, setup, deploy, current state, next steps.
 
 ## Principles
 - **Never invent facts.** Unknown times/prices are shown as unknown. AI only interprets queries; results always come from the database.
