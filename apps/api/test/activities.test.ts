@@ -125,3 +125,24 @@ describe('balanced home feed and coverage', () => {
     expect(r.buckets.active!.places).toBeGreaterThan(0);
   });
 });
+
+describe('plan of the day', () => {
+  it('a day plan in a café-dense centre is mostly things to do, with no bar before 17:00', async () => {
+    const r = (await app.inject({ method: 'POST', url: '/v1/plan-day', payload: { lat: 34.675, lng: 33.044, date: '2026-11-09', start: '10:00', end: '21:00', tripType: 'active', variants: 1 } }))
+      .json<{ stops: Array<{ arrive: string; notes: string[]; entity: { category: { slug: string } } | null }> }>();
+    const kinds = r.stops.map((s) => bucketOf(s.entity?.category.slug));
+    expect(kinds.filter((k) => k !== 'food' && k !== 'events_nightlife').length).toBeGreaterThanOrEqual(2);
+    for (const s of r.stops) {
+      if (s.entity?.category.slug === 'bar') expect(new Date(s.arrive).getUTCHours() + 2).toBeGreaterThanOrEqual(17);
+    }
+    expect(r.stops.filter((s) => s.entity?.category.slug === 'cafe' && !s.notes.includes('meal')).length).toBeLessThanOrEqual(1);
+  });
+
+  it('“Replace” offers different kinds of things, not only the nearest cafés', async () => {
+    const r = (await app.inject({ method: 'POST', url: '/v1/plan-day/alternatives', payload: { arrive: '2026-11-09T13:00:00+02:00', durationMin: 60, near: { lat: 34.675, lng: 33.044 } } }))
+      .json<{ items: Array<{ category: { slug: string } }> }>();
+    const kinds = r.items.map((e) => bucketOf(e.category.slug));
+    expect(new Set(kinds).size).toBeGreaterThanOrEqual(3);
+    expect(kinds.filter((k) => k === 'food').length).toBeLessThanOrEqual(2);
+  });
+});

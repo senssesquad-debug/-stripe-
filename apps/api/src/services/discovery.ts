@@ -663,21 +663,44 @@ export async function evaluatePlanItems(db: pg.Pool, ctx: DiscoveryContext, inpu
 export async function planAlternatives(db: pg.Pool, ctx: DiscoveryContext, input: { arrive: string; durationMin: number; near: { lat: number; lng: number }; categories?: string[]; exclude?: string[]; maxPrice?: number | null }): Promise<EntityDTO[]> {
   const arrive = new Date(input.arrive);
   const depart = new Date(arrive.getTime() + input.durationMin * 60_000);
-  const local = { ...ctx, geo: input.near, radiusKm: 3 };
+  const local = { ...ctx, geo: input.near, radiusKm: 5 };
   const cats = (input.categories?.length ? input.categories : LEISURE_PLACE_CATS).filter((s) => !PRACTICAL.includes(s) && !ERRANDS.has(s));
-  const places = await nearbyPlaces(db, local, { categories: cats, limit: 150, requireHours: false });
+  // Food and bars get their own small share, so alternatives aren't only the nearest cafés.
+  const eatDrink = cats.filter((c) => ['food', 'events_nightlife'].includes(getCategory(c)?.bucket ?? ''));
+  const other = cats.filter((c) => !eatDrink.includes(c));
+  const [pa, pb] = await Promise.all([
+    eatDrink.length ? nearbyPlaces(db, local, { categories: eatDrink, limit: 40 }) : Promise.resolve([] as PlaceRow[]),
+    other.length ? nearbyPlaces(db, local, { categories: other, limit: 200 }) : Promise.resolve([] as PlaceRow[]),
+  ]);
   const zone = ctx.tz;
   const dayStart = DateTime.fromJSDate(arrive, { zone }).startOf('day');
-  const out: Array<{ dto: EntityDTO; d: number }> = [];
-  for (const r of places) {
+  const hourOf = (d: Date) => DateTime.fromJSDate(d, { zone }).hour + DateTime.fromJSDate(d, { zone }).minute / 60;
+  const daytime = hourOf(arrive) >= 8 && hourOf(depart) <= 18.5 && depart.getTime() - dayStart.toJSDate().getTime() < 86_400_000;
+  const out: Array<{ dto: EntityDTO; d: number; kind: string }> = [];
+  for (const r of [...pb, ...pa]) {
     if (input.exclude?.includes(r.id)) continue;
     const ivs = openIntervals(r.opening_hours?.value, dayStart.toJSDate(), dayStart.endOf('day').plus({ hours: 6 }).toJSDate(), zone, r.lat, r.lng);
-    if (!ivs || !ivs.some((i) => i.start <= arrive && i.end >= depart)) continue; // only places confirmed open for the visit
-    out.push({ dto: placeToDTO(r, ctx.locale, ctx.now), d: r.distance_km ?? 0 });
+    const confirmedOpen = !!ivs?.some((i) => i.start <= arrive && i.end >= depart);
+    // Outdoor places without opening hours (beaches, parks, trails, viewpoints) are fine in daylight; the card says the hours are unknown.
+    const outdoorNoHours = !r.opening_hours?.value && daytime && r.categories.some((c) => getCategory(c)?.outdoor || getCategory(c)?.usuallyFree);
+    if (!confirmedOpen && !outdoorNoHours) continue;
+    out.push({ dto: placeToDTO(r, ctx.locale, ctx.now), d: r.distance_km ?? 0, kind: getCategory(r.primary_category)?.bucket ?? 'culture' });
   }
   const evs = await upcomingEvents(db, local, { window: { kind: 'custom', start: new Date(arrive.getTime() - 30 * 60_000), end: depart, startDate: dayStart.toISODate()!, endDate: dayStart.toISODate()! }, excludeMultiDay: true, limit: 20 });
-  for (const r of evs) if (!input.exclude?.includes(r.id) && r.time_precision === 'exact' && r.starts_at >= new Date(arrive.getTime() - 15 * 60_000) && r.starts_at <= depart) out.push({ dto: eventToDTO(r, ctx.locale, ctx.now), d: r.distance_km ?? 0 });
-  return out.sort((a, b) => a.d - b.d).slice(0, 8).map((x) => x.dto);
+  for (const r of evs) if (!input.exclude?.includes(r.id) && r.time_precision === 'exact' && r.starts_at >= new Date(arrive.getTime() - 15 * 60_000) && r.starts_at <= depart) out.push({ dto: eventToDTO(r, ctx.locale, ctx.now), d: r.distance_km ?? 0, kind: 'events_nightlife' });
+  // Nearest first, but taking turns between kinds of stop (at most 2 of a kind among the 8 shown while others exist).
+  out.sort((a, b) => a.d - b.d);
+  const picked: typeof out = [];
+  const perKind = new Map<string, number>();
+  for (const cap of [2, 8]) {
+    for (const x of out) {
+      if (picked.length >= 8) break;
+      if (picked.includes(x) || (perKind.get(x.kind) ?? 0) >= cap) continue;
+      picked.push(x);
+      perKind.set(x.kind, (perKind.get(x.kind) ?? 0) + 1);
+    }
+  }
+  return picked.sort((a, b) => a.d - b.d).map((x) => x.dto);
 }
 
 export type { EventDTO };
