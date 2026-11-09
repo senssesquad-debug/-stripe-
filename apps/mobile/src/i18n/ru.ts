@@ -6,7 +6,7 @@ const ru: Strings = {
     seeAll: 'Все', share: 'Поделиться', km: 'км', min: 'мин', loading: 'Загрузка…', offlineCached: 'Нет сети — данные от {{time}}',
     demo: 'DEMO', free: 'Бесплатно', usuallyFree: 'Обычно бесплатно', priceUnknown: 'Цена не указана', close: 'Закрыть', apply: 'Применить', clear: 'Сбросить',
   },
-  tabs: { today: 'Сегодня', explore: 'Обзор', map: 'Карта', saved: 'Избранное', profile: 'Профиль' },
+  tabs: { events: 'События', today: 'Сегодня', explore: 'Обзор', map: 'Карта', saved: 'Избранное', profile: 'Профиль' },
   onboarding: {
     welcomeTitle: 'Всё интересное вокруг вас — прямо сейчас.',
     welcomeBody: 'Концерты, места, рынки, пляжи и полезные сервисы — из проверенных источников и с временем последней проверки.',
@@ -165,6 +165,7 @@ const ru: Strings = {
   hours: { openNow: 'Открыто сейчас', closedNow: 'Сейчас закрыто', closed: 'Выходной', allDay: 'Круглосуточно', holiday: 'Праздник', unknownDay: 'Неизвестно', notListed: 'Часы работы не указаны в наших источниках.', cantRead: 'Указано как «{{raw}}».', phClosed: 'В праздники закрыто.', phHours: 'В праздники: {{rule}}', tzNote: 'Время — по Кипру.' },
   schedule: { title: 'Дата и время', date: 'Дата', dates: 'Даты', days: 'Дней', daysCount: 'дней: {{count}}', doors: 'Открытие дверей', start: 'Начало', end: 'Окончание', duration: 'Длительность', time: 'Время', timeNotListed: 'Точное время не указано', notListed: 'Не указано' },
   card2: { about: 'Описание', summaryFacts: 'Краткая сводка по подтверждённым данным выше.', summaryAi: 'Сводка написана AI только по подтверждённым данным выше.', venue: 'Место проведения', organizer: 'Организатор', age: 'Возраст', ageAll: 'Без ограничений', tickets: 'Билеты', unknown: 'Не указано' },
+  events: { title: 'События', list: 'Список', calendar: 'Календарь', s_all: 'Ближайшие события', s_concerts: 'Концерты', s_festivals: 'Фестивали', s_markets: 'Ярмарки и рынки', s_nightlife: 'Вечеринки и ночная жизнь', s_sports: 'Спорт', s_family: 'Для семьи и детей', s_culture: 'Культура', within: '{{km}} км', useLocation: 'Рядом со мной', changeCity: 'Сменить город', anyPrice: 'Любая цена', ageFamily: 'Без ограничений', nearYou: 'Скоро рядом с вами', onDay: 'В этот день', pickDay: 'Выберите день, чтобы увидеть все события.', empty: 'Нет событий по этим фильтрам.', prevMonth: 'Предыдущий месяц', nextMonth: 'Следующий месяц', countOnDay: 'событий: {{count}}' },
   errors: {
     network: 'Нет связи с passtra.', server: 'Что-то пошло не так на нашей стороне.', notFound: 'Этот объект больше недоступен.',
     locationDenied: 'Доступ к геолокации запрещён.', locationOutside: 'passtra пока работает на Кипре. Показываем Лимассол.',

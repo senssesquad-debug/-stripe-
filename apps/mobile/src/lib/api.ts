@@ -117,6 +117,8 @@ export interface SavedPlan { id?: string; title: string; date: string; params: P
 export interface Summary { text: string; engine: 'ai' | 'facts' }
 export interface DaySchedule { date: string; weekday: string; intervals: Array<[string, string]> | null; publicHoliday: boolean }
 
+export interface EventFilters { category?: string; group?: string; when?: string; from?: string; to?: string; free?: boolean; maxPrice?: number; age?: 'family' | 'adults' }
+
 export interface RouteResult { mode: 'walk' | 'drive'; estimate: boolean; distanceKm: number; durationMin: number; geometry: Array<[number, number]>; attribution: string | null }
 export interface GeocodeItem { label: string; sublabel: string | null; lat: number; lng: number; source: string }
 export interface DeliveryResult { webPush: { sent: number; failed: number }; expo: { sent: number; failed: number } }
@@ -131,7 +133,8 @@ export interface MapMarker { id: string; type: 'event' | 'place'; lat: number; l
 export const api = {
   meta: () => request<MetaResponse>('/v1/meta'),
   feed: (p: LocationParams & { interests?: string[]; budget?: string | null }) => request<FeedResponse>('/v1/feed/today', { query: { ...p } }),
-  events: (p: LocationParams & { category?: string; group?: string; when?: string; free?: boolean; q?: string; limit?: number }) => request<{ items: EventDTO[] }>('/v1/events', { query: { ...p } }),
+  events: (p: LocationParams & EventFilters & { q?: string; limit?: number; offset?: number; sort?: 'time' | 'distance' }) => request<{ items: EventDTO[] }>('/v1/events', { query: { ...p } }),
+  eventCalendar: (month: string, p: LocationParams & EventFilters) => request<{ month: string; days: Record<string, number> }>('/v1/events/calendar', { query: { month, ...p } }),
   places: (p: LocationParams & { category?: string; group?: string; open_now?: boolean; free?: boolean; q?: string; limit?: number }) => request<{ items: PlaceDTO[] }>('/v1/places', { query: { ...p } }),
   event: (id: string, p: LocationParams = {}) => request<{ event: EventDTO; summary: Summary | null; navigation: { google: string; apple: string } | null }>(`/v1/events/${id}`, { query: { ...p } }),
   place: (id: string, p: LocationParams = {}) => request<{ place: PlaceDTO; schedule: { week: DaySchedule[] | null; holidayRule: string | null }; summary: Summary | null; upcomingEvents: EventDTO[]; navigation: { google: string; apple: string } }>(`/v1/places/${id}`, { query: { ...p } }),

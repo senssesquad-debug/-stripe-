@@ -326,6 +326,23 @@ describe('public API', () => {
     });
   });
 
+  it('events: calendar counts each day of multi-day events; price, age and category filters', async () => {
+    const all = (await app.inject('/v1/events?limit=100')).json<{ items: EventDTO[] }>().items;
+    const month = all[0]!.time.localStartDate.slice(0, 7);
+    const cal = (await app.inject(`/v1/events/calendar?month=${month}`)).json<{ days: Record<string, number> }>();
+    const multi = all.find((e) => e.time.days && e.time.days.length > 1 && e.time.days.every((d) => d.startsWith(month)));
+    if (multi) for (const d of multi.time.days!) expect(cal.days[d]).toBeGreaterThanOrEqual(1);
+    const day = Object.keys(cal.days)[0]!;
+    const that = (await app.inject(`/v1/events?from=${day}&to=${day}&limit=100`)).json<{ items: EventDTO[] }>().items;
+    expect(that.length).toBe(cal.days[day]);
+    const cheap = (await app.inject('/v1/events?maxPrice=10&limit=100')).json<{ items: EventDTO[] }>().items;
+    for (const e of cheap) expect(e.price.isFree === true || (e.price.min !== null && e.price.min <= 10)).toBe(true);
+    const family = (await app.inject('/v1/events?age=family&limit=100')).json<{ items: EventDTO[] }>().items;
+    for (const e of family) expect((e.ageMin ?? 0) < 18).toBe(true);
+    const concerts = (await app.inject('/v1/events?category=concert,classical,jazz-blues&limit=100')).json<{ items: EventDTO[] }>().items;
+    for (const e of concerts) expect(['concert', 'classical', 'jazz-blues', 'rock-metal', 'electronic']).toContain(e.category.slug);
+  });
+
   it('anonymous report is accepted', async () => {
     const id = (await pool.query(`SELECT id FROM events LIMIT 1`)).rows[0].id;
     const r = await app.inject({ method: 'POST', url: '/v1/reports', payload: { entityType: 'event', entityId: id, kind: 'cancelled', message: 'Organiser posted that it is cancelled' } });

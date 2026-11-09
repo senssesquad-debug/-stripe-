@@ -164,16 +164,15 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
     from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     free: z.coerce.boolean().optional(),
+    /** Only events whose known lowest price is at most this (unknown prices are excluded when set). */
+    maxPrice: z.coerce.number().min(0).max(10000).optional(),
+    /** 'family': no age limit; 'adults': 18+ only. */
+    age: z.enum(['family', 'adults']).optional(),
     sort: z.enum(['time', 'distance']).default('time'),
     limit: z.coerce.number().int().min(1).max(100).default(40),
     offset: z.coerce.number().int().min(0).max(2000).default(0),
   });
-  app.get('/v1/events', async (req) => {
-    const p = parse(EventsQuery, req.query);
-    const locale = localeOf(req, p.locale);
-    const ctx = resolveContext({ lat: p.lat, lng: p.lng, city: p.city, radiusKm: p.radius, locale }, now());
-    const q = new Sql();
-    const dist = distanceExpr(q, 'e', ctx.geo);
+  const eventFilters = (p: z.infer<typeof EventsQuery>, ctx: ReturnType<typeof resolveContext>, q: Sql) => {
     upcomingWhere(q, ctx.now);
     if (p.when) windowWhere(q, timeWindow(p.when, ctx.now, ctx.tz));
     if (p.from) q.where.push(`COALESCE(e.local_end_date, e.local_start_date) >= ${q.add(p.from)}::date`);
@@ -181,7 +180,34 @@ export async function publicRoutes(app: FastifyInstance, deps: AppDeps) {
     geoWhere(q, 'e', ctx.geo ? { ...ctx.geo, radiusKm: ctx.radiusKm } : null);
     categoriesWhere(q, 'e', expandCategories([...(p.category?.split(',').filter((s) => getCategory(s)) ?? []), ...(p.group ? categoriesInGroup(p.group).map((c) => c.slug) : [])]));
     if (p.free) q.where.push('e.is_free = true');
+    if (p.maxPrice !== undefined) q.where.push(`(e.is_free = true OR (e.price_min IS NOT NULL AND e.price_min <= ${q.add(p.maxPrice)}))`);
+    if (p.age === 'family') q.where.push('COALESCE(e.age_min, 0) < 18');
+    if (p.age === 'adults') q.where.push('e.age_min >= 18');
     if (p.q) keywordsWhere(q, 'e', [p.q], canonicalKey);
+  };
+  // Calendar: how many events fall on each day of a month (multi-day events count on every one of their days).
+  app.get('/v1/events/calendar', async (req) => {
+    const p = parse(EventsQuery.extend({ month: z.string().regex(/^\d{4}-\d{2}$/) }), req.query);
+    const ctx = resolveContext({ lat: p.lat, lng: p.lng, city: p.city, radiusKm: p.radius, locale: localeOf(req, p.locale) }, now());
+    const first = `${p.month}-01`;
+    const q = new Sql();
+    eventFilters({ ...p, from: first, to: undefined, when: undefined }, ctx, q);
+    const f = q.add(first);
+    const r = await db.query<{ day: string; n: number }>(
+      `SELECT to_char(d, 'YYYY-MM-DD') AS day, count(*)::int AS n
+         FROM events e LEFT JOIN cities c ON c.id = e.city_id,
+              generate_series(GREATEST(e.local_start_date, ${f}::date), LEAST(COALESCE(e.local_end_date, e.local_start_date), (${f}::date + interval '1 month' - interval '1 day')::date), interval '1 day') d
+        WHERE ${q.where.join(' AND ')} AND e.local_start_date < ${f}::date + interval '1 month'
+        GROUP BY 1 ORDER BY 1`, q.params);
+    return { month: p.month, days: Object.fromEntries(r.rows.map((x) => [x.day, x.n])) };
+  });
+  app.get('/v1/events', async (req) => {
+    const p = parse(EventsQuery, req.query);
+    const locale = localeOf(req, p.locale);
+    const ctx = resolveContext({ lat: p.lat, lng: p.lng, city: p.city, radiusKm: p.radius, locale }, now());
+    const q = new Sql();
+    const dist = distanceExpr(q, 'e', ctx.geo);
+    eventFilters(p, ctx, q);
     const order = p.sort === 'distance' && ctx.geo ? `${dist}, e.starts_at` : 'e.starts_at, e.id';
     const rows = await queryEvents(db, q, dist, `${order} OFFSET ${p.offset}`, p.limit);
     return { items: rows.map((r) => eventToDTO(r, locale, ctx.now)) };

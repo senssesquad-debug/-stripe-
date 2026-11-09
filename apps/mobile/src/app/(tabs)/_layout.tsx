@@ -7,6 +7,7 @@ import { useTheme } from '@/theme';
 
 const ICONS = {
   index: ['calendar-today', 'calendar-today-outline'],
+  events: ['ticket', 'ticket-outline'],
   explore: ['compass', 'compass-outline'],
   map: ['map', 'map-outline'],
   saved: ['bookmark', 'bookmark-outline'],
@@ -32,6 +33,7 @@ export default function TabsLayout() {
         },
       })}>
       <Tabs.Screen name="index" options={{ title: t('tabs.today') }} />
+      <Tabs.Screen name="events" options={{ title: t('tabs.events') }} />
       <Tabs.Screen name="explore" options={{ title: t('tabs.explore') }} />
       <Tabs.Screen name="map" options={{ title: t('tabs.map') }} />
       <Tabs.Screen name="saved" options={{ title: t('tabs.saved') }} />

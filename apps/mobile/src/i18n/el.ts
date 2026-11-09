@@ -6,7 +6,7 @@ const el: Strings = {
     seeAll: 'Όλα', share: 'Κοινοποίηση', km: 'χλμ', min: 'λεπ.', loading: 'Φόρτωση…', offlineCached: 'Εκτός σύνδεσης — δεδομένα από {{time}}',
     demo: 'DEMO', free: 'Δωρεάν', usuallyFree: 'Συνήθως δωρεάν', priceUnknown: 'Δεν αναφέρεται τιμή', close: 'Κλείσιμο', apply: 'Εφαρμογή', clear: 'Καθαρισμός',
   },
-  tabs: { today: 'Σήμερα', explore: 'Εξερεύνηση', map: 'Χάρτης', saved: 'Αποθηκευμένα', profile: 'Προφίλ' },
+  tabs: { events: 'Εκδηλώσεις', today: 'Σήμερα', explore: 'Εξερεύνηση', map: 'Χάρτης', saved: 'Αποθηκευμένα', profile: 'Προφίλ' },
   onboarding: {
     welcomeTitle: 'Τι συμβαίνει γύρω σας, τώρα.',
     welcomeBody: 'Συναυλίες, μέρη, αγορές, παραλίες και καθημερινές υπηρεσίες — από επαληθευμένες πηγές, με την ώρα του τελευταίου ελέγχου.',
@@ -165,6 +165,7 @@ const el: Strings = {
   hours: { openNow: 'Ανοιχτό τώρα', closedNow: 'Κλειστό τώρα', closed: 'Κλειστό', allDay: 'Ανοιχτό 24 ώρες', holiday: 'Αργία', unknownDay: 'Άγνωστο', notListed: 'Οι πηγές μας δεν αναφέρουν ωράριο.', cantRead: 'Αναφέρεται ως «{{raw}}».', phClosed: 'Κλειστό τις αργίες.', phHours: 'Αργίες: {{rule}}', tzNote: 'Οι ώρες είναι ώρα Κύπρου.' },
   schedule: { title: 'Ημερομηνία & ώρα', date: 'Ημερομηνία', dates: 'Ημερομηνίες', days: 'Ημέρες', daysCount: '{{count}} ημέρες', doors: 'Άνοιγμα θυρών', start: 'Έναρξη', end: 'Λήξη', duration: 'Διάρκεια', time: 'Ώρα', timeNotListed: 'Δεν αναφέρεται ακριβής ώρα', notListed: 'Δεν αναφέρεται' },
   card2: { about: 'Περιγραφή', summaryFacts: 'Σύντομη περίληψη από τα επιβεβαιωμένα στοιχεία.', summaryAi: 'Περίληψη από AI μόνο από τα επιβεβαιωμένα στοιχεία.', venue: 'Χώρος', organizer: 'Διοργανωτής', age: 'Ηλικία', ageAll: 'Για όλες τις ηλικίες', tickets: 'Εισιτήρια', unknown: 'Δεν αναφέρεται' },
+  events: { title: 'Εκδηλώσεις', list: 'Λίστα', calendar: 'Ημερολόγιο', s_all: 'Επερχόμενες', s_concerts: 'Συναυλίες', s_festivals: 'Φεστιβάλ', s_markets: 'Αγορές & εκθέσεις', s_nightlife: 'Πάρτι & νυχτερινή ζωή', s_sports: 'Αθλητικά', s_family: 'Οικογένεια & παιδιά', s_culture: 'Πολιτιστικά', within: '{{km}} χλμ', useLocation: 'Κοντά μου', changeCity: 'Αλλαγή πόλης', anyPrice: 'Οποιαδήποτε τιμή', ageFamily: 'Για όλους', nearYou: 'Σύντομα κοντά σας', onDay: 'Αυτή την ημέρα', pickDay: 'Επιλέξτε ημέρα.', empty: 'Δεν υπάρχουν εκδηλώσεις με αυτά τα φίλτρα.', prevMonth: 'Προηγούμενος μήνας', nextMonth: 'Επόμενος μήνας', countOnDay: '{{count}} εκδηλώσεις' },
   errors: {
     network: 'Δεν υπάρχει σύνδεση με το passtra.', server: 'Κάτι πήγε στραβά από την πλευρά μας.', notFound: 'Αυτό δεν είναι πλέον διαθέσιμο.',
     locationDenied: 'Η πρόσβαση στην τοποθεσία απορρίφθηκε.', locationOutside: 'Το passtra καλύπτει προς το παρόν την Κύπρο. Εμφανίζεται η Λεμεσός.',

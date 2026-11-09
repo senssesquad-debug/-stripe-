@@ -4,7 +4,7 @@ const en = {
     seeAll: 'See all', share: 'Share', km: 'km', min: 'min', loading: 'Loading…', offlineCached: 'Offline — showing data from {{time}}',
     demo: 'DEMO', free: 'Free', usuallyFree: 'Usually free', priceUnknown: 'Price not listed', close: 'Close', apply: 'Apply', clear: 'Clear',
   },
-  tabs: { today: 'Today', explore: 'Explore', map: 'Map', saved: 'Saved', profile: 'Profile' },
+  tabs: { events: 'Events', today: 'Today', explore: 'Explore', map: 'Map', saved: 'Saved', profile: 'Profile' },
   onboarding: {
     welcomeTitle: 'What’s happening around you, right now.',
     welcomeBody: 'Concerts, places, markets, beaches and everyday essentials — from verified sources, with the time they were last checked.',
@@ -163,6 +163,7 @@ const en = {
   hours: { openNow: 'Open now', closedNow: 'Closed now', closed: 'Closed', allDay: 'Open 24 hours', holiday: 'Public holiday', unknownDay: 'Not known', notListed: 'Opening hours are not listed by our sources.', cantRead: 'Listed as “{{raw}}”.', phClosed: 'Closed on public holidays.', phHours: 'Public holidays: {{rule}}', tzNote: 'Times are Cyprus time.' },
   schedule: { title: 'Date & time', date: 'Date', dates: 'Dates', days: 'Days', daysCount: '{{count}} days', doors: 'Doors open', start: 'Starts', end: 'Ends', duration: 'Length', time: 'Time', timeNotListed: 'Exact time not listed', notListed: 'Not listed' },
   card2: { about: 'About', summaryFacts: 'Short summary from the verified details above.', summaryAi: 'Summary written by AI only from the verified details above.', venue: 'Venue', organizer: 'Organiser', age: 'Age', ageAll: 'All ages', tickets: 'Tickets', unknown: 'Not listed' },
+  events: { title: 'Events', list: 'List', calendar: 'Calendar', s_all: 'Upcoming events', s_concerts: 'Concerts', s_festivals: 'Festivals', s_markets: 'Markets & fairs', s_nightlife: 'Parties & nightlife', s_sports: 'Sports', s_family: 'Family & kids', s_culture: 'Cultural events', within: '{{km}} km', useLocation: 'Near me', changeCity: 'Change city', anyPrice: 'Any price', ageFamily: 'All ages', nearYou: 'Upcoming near you', onDay: 'On this day', pickDay: 'Pick a day to see everything on it.', empty: 'No events match these filters.', prevMonth: 'Previous month', nextMonth: 'Next month', countOnDay: '{{count}} events' },
   errors: {
     network: 'Can’t reach passtra right now.', server: 'Something went wrong on our side.', notFound: 'This item is no longer available.',
     locationDenied: 'Location permission denied.', locationOutside: 'passtra currently covers Cyprus. Showing Limassol.',
